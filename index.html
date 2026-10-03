@@ -43,7 +43,9 @@ input { font-family: inherit; }
 
 #app-screen, #login-screen { max-width: 520px; margin: 0 auto; min-height: 100vh; }
 #login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-#app-screen { padding-top: 105px; } /* Offset para a barra superior */
+
+/* Offsets calibrados - 90px garante um espaçamento perfeito abaixo da topbar */
+#app-screen { padding-top: calc(90px + env(safe-area-inset-top, 0px)); } 
 
 /* Topbar fixa globalmente acima de tudo */
 .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 250; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 12px; border-bottom: 1px solid var(--border); }
@@ -118,7 +120,7 @@ input { font-family: inherit; }
 
 .hist-details { background: var(--card2); border-radius: 6px; padding: 14px; margin-top: 10px; border: 1px solid var(--border); }
 .hist-info { font-size: 13px; color: var(--muted); line-height: 1.5; }
-.hist-type { font-weight: 600; color: var(--text); display: block; margin-bottom: 2px; }
+.hist-type { font-weight: 600; color: var(--text); display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .hist-driver-row { display: block; margin-bottom: 4px; }
 .hist-actions { display: flex; gap: 8px; margin-top: 12px; }
 
@@ -153,11 +155,11 @@ input { font-family: inherit; }
 .car-header::before { content:''; display:block; width:3px; height:12px; background: var(--accent); border-radius:2px; }
 
 /* Modal */
-.modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; padding-top: 105px; } /* Offset da barra de cima */
+.modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; padding-top: calc(90px + env(safe-area-inset-top, 0px)); }
 .modal-overlay.active { display: block; }
-.modal-overlay .page { padding-bottom: 120px; } /* Espaço extra no final para não tapar botões guardar/cancelar */
+.modal-overlay .page { padding-bottom: 120px; }
 
-#custom-confirm { z-index: 300; background: rgba(1, 4, 9, 0.8); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; }
+#custom-confirm { z-index: 300; background: rgba(1, 4, 9, 0.8); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding-top: 0; }
 #custom-confirm.active { display: flex; }
 .confirm-box { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
 .confirm-box h3 { font-size: 16px; margin-bottom: 8px; }
@@ -210,7 +212,7 @@ input { font-family: inherit; }
 
     <!-- TAB 1: INÍCIO -->
     <div id="tab-home" class="page tab-content">
-      <div class="eyebrow" style="margin-top: 4px;">Balanços Atuais</div>
+      <div class="eyebrow">Balanços Atuais</div>
       <div class="card no-pad-top">
         <ul class="list" id="balance-list"></ul>
       </div>
@@ -858,10 +860,16 @@ input { font-family: inherit; }
             
           html += `<div class="hist-details" style="margin-top: ${index > 0 ? '10px' : '0'};">
              <div class="hist-info">
-               <span class="hist-type">${typeLabel}</span>
+               <span class="hist-type">
+                  ${typeLabel}
+                  ${dayTrips.length > 1 ? `<span class="tag" style="font-size:10px;">Carro ${index + 1}</span>` : ''}
+               </span>
                <span class="hist-driver-row"><strong style="color:var(--accent)">${driverLabel}:</strong> ${trip.drivers.join(" e ")}</span>
                <span><strong style="color:var(--muted)">${passLabel}:</strong> ${passAlfab || "Nenhum"}</span>
-               <div style="margin-top:6px; font-size:12px; color:var(--text)">Custo Total: ${fmt(trip.totalCost)} 🪙</div>
+               <div style="margin-top:8px; display:flex; justify-content:space-between; font-size:12px; color:var(--text)">
+                  <span>Custo Viagem: <strong>${fmt(trip.totalCost)} 🪙</strong></span>
+                  <span>Custo/Pessoa: <strong>${fmt(trip.costPerPassenger)} 🪙</strong></span>
+               </div>
              </div>
              <div class="hist-actions">
                 <button class="gh-btn outline" style="flex:1; padding: 6px;" onclick="editTrip('${trip.id}')">Editar</button>
@@ -1104,9 +1112,10 @@ input { font-family: inherit; }
                <div style="display:flex; justify-content:space-between; margin-bottom:2px;"><span>Custo por passageiro:</span> <strong style="color:var(--text)">${fmt(costPerPassenger)} 🪙</strong></div>
                <div style="display:flex; justify-content:space-between;"><span>Crédito por condutor:</span> <strong style="color:var(--text)">${fmt(creditPerDriver)} 🪙</strong></div>
             `;
+            // Alterado para isolar os passageiros de cada carro na gravação
             window.currentTripCalculations = [
-               { driver: d0, passengers: allPass, totalCost: c0Calc.totalCost, costPerPassenger, profitPerDriver: creditPerDriver, isOneWay: carsData[0].isOneWay },
-               { driver: d1, passengers: allPass, totalCost: c1Calc.totalCost, costPerPassenger, profitPerDriver: creditPerDriver, isOneWay: carsData[1].isOneWay }
+               { driver: d0, passengers: [...p0], totalCost: c0Calc.totalCost, costPerPassenger, profitPerDriver: creditPerDriver, isOneWay: carsData[0].isOneWay },
+               { driver: d1, passengers: [...p1], totalCost: c1Calc.totalCost, costPerPassenger, profitPerDriver: creditPerDriver, isOneWay: carsData[1].isOneWay }
             ];
             valid = true;
          }
@@ -1130,7 +1139,7 @@ input { font-family: inherit; }
                   <div style="display:flex; justify-content:space-between; margin-top:6px; margin-bottom:2px;"><span>Custo da viagem:</span> <strong style="color:var(--text)">${fmt(calc.totalCost)} 🪙</strong></div>
                   <div style="display:flex; justify-content:space-between;"><span>Custo por passageiro:</span> <strong style="color:var(--text)">${fmt(calc.costPerPassenger)} 🪙</strong></div>
                </div>`;
-               tripCalcs.push({ driver: car.driver, passengers: car.passengers, totalCost: calc.totalCost, costPerPassenger: calc.costPerPassenger, profitPerDriver: calc.totalCost, isOneWay: car.isOneWay });
+               tripCalcs.push({ driver: car.driver, passengers: [...car.passengers], totalCost: calc.totalCost, costPerPassenger: calc.costPerPassenger, profitPerDriver: calc.totalCost, isOneWay: car.isOneWay });
             }
          }
          window.currentTripCalculations = tripCalcs;
