@@ -35,7 +35,7 @@
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; background: var(--bg); touch-action: manipulation; }
 button, a, img { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif; color: var(--text); -webkit-tap-highlight-color: transparent; padding-bottom: calc(105px + env(safe-area-inset-bottom, 0px)); }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif; color: var(--text); -webkit-tap-highlight-color: transparent; padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
 h1, h2, h3, h4 { font-weight: 600; margin: 0; }
 p { margin: 0; line-height: 1.5; color: var(--muted); font-size: 13.5px; }
 button { font-family: inherit; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease; }
@@ -43,7 +43,7 @@ input { font-family: inherit; }
 
 #app-screen, #login-screen { max-width: 520px; margin: 0 auto; min-height: 100vh; }
 #login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-#app-screen { padding-top: 85px; }
+#app-screen { padding-top: 105px; } /* Offset para a barra superior */
 
 /* Topbar fixa globalmente acima de tudo */
 .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 250; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 12px; border-bottom: 1px solid var(--border); }
@@ -153,9 +153,9 @@ input { font-family: inherit; }
 .car-header::before { content:''; display:block; width:3px; height:12px; background: var(--accent); border-radius:2px; }
 
 /* Modal */
-.modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; padding-top: 85px; }
+.modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; padding-top: 105px; } /* Offset da barra de cima */
 .modal-overlay.active { display: block; }
-.modal-overlay .page { padding-bottom: 100px; }
+.modal-overlay .page { padding-bottom: 120px; } /* Espaço extra no final para não tapar botões guardar/cancelar */
 
 #custom-confirm { z-index: 300; background: rgba(1, 4, 9, 0.8); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; }
 #custom-confirm.active { display: flex; }
@@ -235,7 +235,7 @@ input { font-family: inherit; }
       <div class="card">
         <h3>Estatísticas Gerais</h3>
         
-        <div class="stats-section-title" style="margin-top: 4px;">RÁCIO (VEZES CONDUTOR / VIAGENS PARTICIPADAS)</div>
+        <div class="stats-section-title" style="margin-top: 4px;">RÁCIO CONDUÇÃO/VIAGENS</div>
         <div id="stats-ratio-chart" class="stats-chart"></div>
 
         <div class="stats-section-title">Métricas de Participação (Nº de Vezes)</div>
