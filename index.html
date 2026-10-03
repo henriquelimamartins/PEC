@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Gestão de Boleias PEC</title>
+
+<link rel="icon" type="image/png" href="./favicon.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Boleias PEC">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;          
+  --card: #161b22;        
+  --card2: #21262d;       
+  --border: #30363d;      
+  --accent: #d66b2b;      /* Laranja ténue, suave e menos brilhante */
+  --green: #238636;       
+  --green-hover: #2ea043;
+  --danger: #f85149;      
+  --text: #f0f6fc;        
+  --muted: #8b949e;       
+  --weekend-bg: #1a1715;  
+  --weekend-border: #2c2520;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; background: var(--bg); touch-action: manipulation; }
+button, a, img { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif; color: var(--text); -webkit-tap-highlight-color: transparent; padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px)); }
+h1, h2, h3, h4 { font-weight: 600; margin: 0; }
+p { margin: 0; line-height: 1.5; color: var(--muted); font-size: 13.5px; }
+button { font-family: inherit; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease; }
+input { font-family: inherit; }
+
+#app-screen, #login-screen { max-width: 520px; margin: 0 auto; min-height: 100vh; }
+#login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+
+/* Topbar fixa globalmente acima de tudo */
+.topbar { position: sticky; top: 0; z-index: 250; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 12px; border-bottom: 1px solid var(--border); }
+.topbar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.brand { font-size: 14px; font-weight: 600; letter-spacing: -0.2px; color: var(--text); display: flex; align-items: center; gap: 6px; }
+.brand span { color: var(--accent); font-weight: 700; }
+.header-date { font-size: 11px; color: var(--muted); font-weight: 500; }
+
+/* Barra Semanal */
+.phasebar { display: flex; gap: 4px; margin-bottom: 4px; }
+.pseg { flex: 1; height: 6px; border-radius: 3px; background: var(--card2); border: 1px solid var(--border); overflow: hidden; position: relative; }
+.pseg i { display: block; height: 100%; border-radius: 3px; }
+.pseg.past i { background: var(--muted); opacity: 0.5; }
+.pseg.today { border-color: var(--accent); }
+.pseg.today i { background: var(--accent); box-shadow: 0 0 6px rgba(214, 107, 43, 0.4); }
+.pseg.future i { display: none; }
+
+.plabels { display: flex; gap: 4px; }
+.plabels span { flex: 1; text-align: center; font-size: 9.5px; color: var(--muted); font-weight: 500; }
+.plabels span.cur { color: var(--accent); font-weight: 700; }
+
+.page { padding: 16px; }
+.eyebrow { color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+
+/* GitHub Cards */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.card.no-pad-top { padding-top: 4px; padding-bottom: 4px; }
+.card h3 { font-size: 14px; margin-bottom: 12px; color: var(--text); display: flex; justify-content: space-between; align-items: center; }
+.tag { color: var(--muted); font-size: 11px; font-weight: 500; background: var(--card2); border: 1px solid var(--border); padding: 2px 8px; border-radius: 12px; }
+
+/* Botões */
+.gh-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--card2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; width: 100%; text-align: center; color: var(--text); font-weight: 500; font-size: 14px; }
+.gh-btn:hover { background: #30363d; }
+.gh-btn.primary { background: var(--green); border-color: rgba(240,246,252,0.1); color: #fff; }
+.gh-btn.primary:hover { background: var(--green-hover); }
+.gh-btn.danger { background: #da3633; border-color: rgba(240,246,252,0.1); color: #fff; }
+.gh-btn.danger:hover { background: #b62324; }
+.gh-btn.outline { background: transparent; border: 1px solid var(--border); }
+
+.input-text { background: #010409; border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 10px 12px; font-size: 14px; width: 100%; outline: none; }
+.input-text:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(214, 107, 43, 0.25); }
+
+/* Listas Balanços */
+.list { list-style: none; padding: 0; margin: 0; }
+.list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.list-item:last-child { border-bottom: none; }
+.balance-name { font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; flex: 1; flex-wrap: wrap; }
+.balance-val { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; min-width: 60px; }
+.balance-val.positive { color: #3fb950; }
+.balance-val.negative { color: var(--danger); }
+.next-driver-tag { background: rgba(214, 107, 43, 0.15); color: var(--accent); font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; border: 1px solid rgba(214, 107, 43, 0.35); text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Calendário Grid & Fim de Semana Castanho */
+.calendar-header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.calendar-header-nav button { background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 4px 8px; border-radius: 4px; font-size: 11px; height: 26px; display: inline-flex; align-items: center; justify-content: center; }
+
+.streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 16px; }
+.s-day { background: var(--card2); border-radius: 6px; padding: 6px 2px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--border); cursor: pointer; position: relative; }
+.s-month-badge { position: absolute; top: 2px; right: 4px; font-size: 7px; font-weight: 600; color: var(--muted); opacity: 0.8; letter-spacing: -0.2px; }
+.s-day .s-date { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1; margin-top: 1px; }
+.s-day .s-wkd { font-size: 8.5px; text-transform: uppercase; color: var(--muted); margin-top: 4px; font-weight: 500; }
+.s-day.past { background: #010409; opacity: 0.6; }
+.s-day.other-month { opacity: 0.35 !important; }
+.s-day.weekend { background: var(--weekend-bg); border-color: var(--weekend-border); }
+.s-day.weekend .s-wkd { color: #80583b; }
+.s-day.has-trip { border-bottom: 3px solid var(--green); }
+.s-day.selected { border-color: var(--accent) !important; background: rgba(214, 107, 43, 0.15) !important; }
+.s-day.selected .s-date { color: var(--accent); }
+
+.hist-details { background: var(--card2); border-radius: 6px; padding: 14px; margin-top: 10px; border: 1px solid var(--border); }
+.hist-info { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.hist-type { font-weight: 600; color: var(--text); display: block; margin-bottom: 2px; }
+.hist-driver-row { display: block; margin-bottom: 4px; }
+.hist-actions { display: flex; gap: 8px; margin-top: 12px; }
+
+/* Gráficos de Estatísticas */
+.stats-section-title { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
+.stats-chart { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.chart-bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.chart-label { width: 70px; color: var(--muted); font-weight: 500; text-align: right; }
+.chart-track { flex: 1; background: var(--card2); height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+.chart-fill { height: 100%; background: var(--accent); border-radius: 4px; }
+.chart-val { width: 40px; font-weight: 600; color: var(--text); text-align: left; }
+
+/* Checkbox & Forms */
+.chk-row { display: flex; align-items: center; gap: 10px; background: var(--card2); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); margin-top: 16px; cursor: pointer; }
+.chk-box { width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border); background: #010409; display: flex; align-items: center; justify-content: center; }
+.chk-box.on { background: var(--green); border-color: var(--green); }
+.chk-box.on:after { content: '\2713'; color: #fff; font-size: 12px; font-weight: 700; }
+.chk-lbl { font-size: 13px; font-weight: 500; }
+
+.form-container { max-width: 400px; margin: 0 auto; }
+.people-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 16px; }
+.person-btn { background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 10px 4px; border-radius: 6px; font-size: 12px; font-weight: 500; text-align: center; cursor: pointer; }
+.person-btn:disabled { opacity: 0.2; pointer-events: none; }
+.person-btn.is-driver { background: #30363d; border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.person-btn.is-pass { background: #9c4b1d; border-color: #d66b2b; color: #fff; font-weight: 600; }
+
+.fg { margin-bottom: 20px; }
+.fg label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
+
+.car-config-section { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+.car-header { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.car-header::before { content:''; display:block; width:3px; height:12px; background: var(--accent); border-radius:2px; }
+
+/* Modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; padding-top: 85px; }
+.modal-overlay.active { display: block; }
+.modal-overlay .page { padding-bottom: 100px; }
+
+#custom-confirm { z-index: 300; background: rgba(1, 4, 9, 0.8); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; }
+#custom-confirm.active { display: flex; }
+.confirm-box { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+.confirm-box h3 { font-size: 16px; margin-bottom: 8px; }
+
+.cars-container { display: flex; justify-content: center; padding: 10px 0; }
+.car-visual { width: 100px; height: 160px; background: #010409; border: 1px solid var(--border); border-radius: 20px 20px 10px 10px; position: relative; padding: 18px 10px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 6px; }
+.car-visual::before { content: ''; position: absolute; top: 6px; left: 10px; right: 10px; height: 18px; background: rgba(255,255,255,0.05); border-radius: 6px 6px 2px 2px; }
+.seat { background: var(--card2); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: var(--text); margin: 0 auto; border: 1px solid var(--border); }
+.seat.empty { background: transparent; border-color: transparent; color: transparent; }
+.seat.driver-seat { background: #30363d; border-color: var(--accent); color: var(--accent); }
+.seat.pass-seat { background: #9c4b1d; border-color: #d66b2b; color: #fff; }
+
+.summary-panel { background: var(--card2); padding: 14px; border-radius: 6px; border: 1px solid var(--border); border-left: 3px solid var(--accent); font-size: 13px; color: var(--text); margin-bottom: 16px; line-height: 1.5; }
+
+/* Barra Inferior Fixa */
+.botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; }
+.botnav button { flex: 1; background: none; border: none; color: var(--muted); font-size: 10px; font-weight: 500; text-transform: uppercase; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; }
+.botnav button .ic { font-size: 18px; }
+.botnav button.active { color: var(--accent); }
+
+.toast { position: fixed; left: 50%; bottom: 80px; transform: translateX(-50%) translateY(20px); background: var(--green); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; z-index: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.4); opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; text-align: center; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+  <!-- Ecrã Login -->
+  <div id="login-screen">
+    <div style="text-align: center; margin-bottom: 24px;">
+      <h1 class="brand" style="font-size: 20px; margin-bottom: 6px; justify-content: center;">GESTÃO DE BOLEIAS <span style="color:var(--accent)">PEC</span></h1>
+      <p style="color: var(--muted); font-size: 12px;">Ponte de Lima</p>
+    </div>
+    <input type="password" id="password-input" class="input-text" placeholder="Palavra-passe" style="text-align: center; margin-bottom: 12px; max-width: 280px;">
+    <button class="gh-btn primary" onclick="checkLogin()" style="width: 100%; max-width: 280px; justify-content: center;">Entrar na App</button>
+  </div>
+
+  <!-- Topbar Fixa Global (Sempre Visível) -->
+  <div id="app-screen" style="display: none;">
+    <div class="topbar">
+      <div class="topbar-header">
+        <div class="brand">GESTÃO DE BOLEIAS <span>PEC</span></div>
+        <div class="header-date" id="header-date"></div>
+      </div>
+      <div id="week-bar">
+         <div class="phasebar" id="wb-segments"></div>
+         <div class="plabels" id="wb-labels"></div>
+      </div>
+    </div>
+
+    <!-- TAB 1: INÍCIO -->
+    <div id="tab-home" class="page tab-content">
+      <div class="eyebrow" style="margin-top: 4px;">Balanços Atuais</div>
+      <div class="card no-pad-top">
+        <ul class="list" id="balance-list"></ul>
+      </div>
+
+      <button class="gh-btn primary" onclick="openModal()" style="padding: 14px; font-size: 15px;">
+        <b>Registar Nova Viagem</b>
+      </button>
+    </div>
+
+    <!-- TAB 2: HISTÓRICO -->
+    <div id="tab-history" class="page tab-content" style="display: none;">
+      <div class="eyebrow">Registo Temporal</div>
+      <div class="card">
+        <div id="history-calendar"></div>
+        <div id="history-details-container"></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: ESTATÍSTICAS -->
+    <div id="tab-stats" class="page tab-content" style="display: none;">
+      <div class="eyebrow">Métricas & Resumo</div>
+      <div class="card">
+        <h3>Estatísticas Gerais</h3>
+        
+        <div class="stats-section-title" style="margin-top: 4px;">Rácio de Condução (Vezes Condutor / Viagens Participadas)</div>
+        <div id="stats-ratio-chart" class="stats-chart"></div>
+
+        <div class="stats-section-title">Métricas de Participação (Nº de Vezes)</div>
+        <div id="stats-bars-chart" class="stats-chart" style="border-bottom: none; margin-bottom: 0;"></div>
+      </div>
+    </div>
+
+    <!-- Barra de Navegação Inferior Fixa -->
+    <div class="botnav">
+       <button onclick="switchTab('home')" class="active" id="nav-home">
+          <span class="ic">🏠</span>Início
+       </button>
+       <button onclick="switchTab('history')" id="nav-history">
+          <span class="ic">📅</span>Histórico
+       </button>
+       <button onclick="switchTab('stats')" id="nav-stats">
+          <span class="ic">📊</span>Estatísticas
+       </button>
+    </div>
+  </div>
+
+  <!-- Modal Nova Viagem -->
+  <div id="modal-trip" class="modal-overlay">
+    <div class="page form-container" id="modal-form-content" style="position: relative;">
+      
+      <!-- Cabeçalho do Formulário -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+        <h2 style="font-size: 16px; margin: 0; color: var(--text);">Registo de Viagem</h2>
+        <button onclick="closeModal()" style="background:var(--card2); border:1px solid var(--border); color:var(--text); width:32px; height:32px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer;" title="Fechar">✕</button>
+      </div>
+
+      <div class="fg">
+        <label>Data da Viagem</label>
+        <div id="new-trip-calendar"></div>
+      </div>
+
+      <!-- Carro 1 -->
+      <div class="car-config-section">
+        <div class="car-header" id="car1-header">CARRO 1</div>
+        <div class="fg">
+          <label>Condutor</label>
+          <div class="people-grid" id="grid-c1-drivers"></div>
+        </div>
+        <div class="fg" style="margin-bottom: 0;">
+          <label>Passageiros (Máx. 4)</label>
+          <div class="people-grid" id="grid-c1-pass"></div>
+        </div>
+        <div class="cars-container" id="car1-visual"></div>
+        <div class="chk-row" onclick="toggleOneWay(0)">
+          <div class="chk-box" id="trip-oneway-box-0"></div>
+          <div class="chk-lbl">Só ida? <span style="color:var(--muted); font-weight:400; font-size:11px;">(Custo a metade)</span></div>
+        </div>
+      </div>
+
+      <!-- Carro 2 -->
+      <div class="car-config-section" id="car2-section" style="display:none;">
+        <div class="car-header">CARRO 2</div>
+        <div class="fg">
+          <label>Condutor</label>
+          <div class="people-grid" id="grid-c2-drivers"></div>
+        </div>
+        <div class="fg" style="margin-bottom: 0;">
+          <label>Passageiros (Máx. 4)</label>
+          <div class="people-grid" id="grid-c2-pass"></div>
+        </div>
+        <div class="cars-container" id="car2-visual"></div>
+        <div class="chk-row" onclick="toggleOneWay(1)">
+          <div class="chk-box" id="trip-oneway-box-1"></div>
+          <div class="chk-lbl">Só ida? <span style="color:var(--muted); font-weight:400; font-size:11px;">(Custo a metade)</span></div>
+        </div>
+      </div>
+
+      <!-- Botão de Separar Custo para 2 Carros -->
+      <div id="split-cost-container" style="margin-bottom: 12px; display: none;">
+         <div class="chk-row" onclick="toggleSplitCost()">
+           <div class="chk-box" id="split-cost-box"></div>
+           <div class="chk-lbl">Separar custo das viagens <span style="color:var(--muted); font-weight:400; font-size:11px;">(Independente por carro)</span></div>
+         </div>
+      </div>
+
+      <div id="add-car2-container" style="margin-bottom: 12px;">
+         <button class="gh-btn outline" style="border-style: dashed;" onclick="setCars(2)">+ Adicionar Carro 2</button>
+      </div>
+      <div id="remove-car2-container" style="margin-bottom: 20px; display: none;">
+         <button class="gh-btn danger" onclick="setCars(1)">- Remover Carro 2</button>
+      </div>
+
+      <div class="summary-panel" id="summary-box">
+        Selecione os condutores e passageiros para calcular custos.
+      </div>
+
+      <!-- Botões Cancelar e Guardar no fundo -->
+      <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+        <button class="gh-btn outline" style="flex:1; padding: 14px; font-size: 15px; margin: 0;" onclick="closeModal()">Cancelar</button>
+        <button class="gh-btn primary" style="flex:1; padding: 14px; font-size: 15px; margin: 0;" id="btn-save-trip" onclick="saveTrip()" disabled>Guardar</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal In-App Confirmar Apagar -->
+  <div id="custom-confirm" class="modal-overlay" style="z-index: 300;">
+     <div class="confirm-box" style="margin: 0 auto; margin-top: 20vh;">
+        <h3 id="confirm-title">Apagar Viagem?</h3>
+        <p id="confirm-msg" style="color: var(--muted); font-size: 13px; margin-bottom: 16px;">Esta ação vai recalcular todos os balanços.</p>
+        <div style="display:flex; gap:8px;">
+           <button class="gh-btn outline" style="flex:1; margin:0;" onclick="closeConfirm()">Cancelar</button>
+           <button class="gh-btn danger" style="flex:1; margin:0;" id="confirm-btn">Sim, Apagar</button>
+        </div>
+     </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- LÓGICA -->
+  <script type="module">
+    const USE_FIREBASE = false; 
+
+    const firebaseConfig = {
+      apiKey: "A_TUA_API_KEY",
+      authDomain: "O_TEU_PROJECT.firebaseapp.com",
+      projectId: "O_TEU_PROJECT",
+      storageBucket: "O_TEU_PROJECT.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
+    };
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    let db;
+    if (USE_FIREBASE) {
+      const app = initializeApp(firebaseConfig);
+      db = getFirestore(app);
+    }
+
+    const PEOPLE = ["Ana", "André", "Henrique", "Joana", "João", "Luciano", "Luís", "Mariana"];
+    const FEMALES = ["Ana", "Joana", "Mariana"];
+    const INITIALS = { "Ana": "AC", "Luciano": "LF", "Luís": "LA", "André": "AS", "Henrique": "HL", "Joana": "JF", "João": "JC", "Mariana": "MB" };
+    
+    let trips = []; 
+    let balances = {}; 
+    
+    let todayISO = new Date().toISOString().slice(0,10);
+    let historySelectedDate = todayISO;
+    
+    let formDate = todayISO;
+    let selectedCars = 1;
+    let splitCostMode = false;
+    let carsData = [
+      { driver: null, passengers: [], isOneWay: false },
+      { driver: null, passengers: [], isOneWay: false }
+    ];
+    let editingTripId = null;
+
+    window.showToast = function(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2500);
+    }
+    
+    const fmt = (num) => parseFloat(num.toFixed(2)).toString();
+
+    let confirmCallback = null;
+    window.showConfirm = function(title, msg, callback) {
+       document.getElementById("confirm-title").innerText = title;
+       document.getElementById("confirm-msg").innerText = msg;
+       confirmCallback = callback;
+       document.getElementById("custom-confirm").classList.add("active");
+    }
+    window.closeConfirm = function() {
+       document.getElementById("custom-confirm").classList.remove("active");
+       confirmCallback = null;
+    }
+    document.getElementById("confirm-btn").onclick = function() {
+       if(confirmCallback) confirmCallback();
+       closeConfirm();
+    }
+
+    window.switchTab = function(tabName) {
+       document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+       document.querySelectorAll('.botnav button').forEach(el => el.classList.remove('active'));
+       
+       document.getElementById('tab-' + tabName).style.display = 'block';
+       document.getElementById('nav-' + tabName).classList.add('active');
+       if(tabName === 'stats') renderStats();
+       window.scrollTo(0,0);
+    }
+
+    // Função de Hash SHA-256 para a password "pec2026"
+    async function hashString(string) {
+      const msgUint8 = new TextEncoder().encode(string);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    window.checkLogin = async function() {
+      const pwd = document.getElementById("password-input").value;
+      // Hash SHA-256 correspondente a "pec2026"
+      const targetHash = "2496e57975c7cb484c2049d5bf599e0339cb1d43a14434241cd64d4b1a1ea0f9"; 
+      const enteredHash = await hashString(pwd);
+
+      if (enteredHash === targetHash || pwd === "pec2026") {
+        localStorage.setItem("pec_auth", "true");
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("app-screen").style.display = "block";
+        initApp();
+      } else {
+        alert("Password incorreta.");
+      }
+    }
+
+    window.onload = function() {
+      if (localStorage.getItem("pec_auth") === "true") {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("app-screen").style.display = "block";
+        initApp();
+      }
+    }
+
+    function initApp() {
+      renderHeaderDate();
+      renderWeekBar();
+      if (USE_FIREBASE) {
+        const q = query(collection(db, "trips"), orderBy("date", "desc"));
+        onSnapshot(q, (snapshot) => {
+          trips = [];
+          snapshot.forEach((doc) => { trips.push({ id: doc.id, ...doc.data() }); });
+          recalculateAndRender();
+        });
+      } else {
+        const localTrips = localStorage.getItem("pec_trips_v19");
+        if(localTrips) trips = JSON.parse(localTrips);
+        recalculateAndRender();
+      }
+    }
+
+    function renderHeaderDate() {
+       const months = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
+       const shortDays = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
+       const now = new Date();
+       document.getElementById("header-date").innerText = `${shortDays[now.getDay()]}, ${String(now.getDate()).padStart(2, '0')} DE ${months[now.getMonth()]} ${now.getFullYear()}`;
+    }
+
+    function renderWeekBar() {
+       const today = new Date(); 
+       const shortDays = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
+       const segsContainer = document.getElementById("wb-segments");
+       const labelsContainer = document.getElementById("wb-labels");
+       
+       let segsHtml = "";
+       let labelsHtml = "";
+       
+       for(let i = -3; i <= 3; i++) {
+          const d = new Date(today);
+          d.setDate(today.getDate() + i);
+          const dayIdx = d.getDay();
+          
+          let cls = "pseg ";
+          if(i < 0) cls += "past";
+          else if(i === 0) cls += "today";
+          else cls += "future";
+          
+          segsHtml += `<div class="${cls}"><i></i></div>`;
+          labelsHtml += `<span class="${i === 0 ? 'cur' : ''}">${shortDays[dayIdx]}</span>`;
+       }
+       segsContainer.innerHTML = segsHtml;
+       labelsContainer.innerHTML = labelsHtml;
+    }
+
+    function getLastDrivenTime(personName) {
+       let latest = 0;
+       for(let t of trips) {
+          if(t.drivers && t.drivers.includes(personName)) {
+             let dTime = new Date(t.date).getTime();
+             if(dTime > latest) latest = dTime;
+          }
+       }
+       return latest;
+    }
+
+    function recalculateAndRender() {
+      PEOPLE.forEach(p => balances[p] = 0);
+      trips.forEach(trip => {
+        trip.passengers.forEach(p => balances[p] -= trip.costPerPassenger);
+        trip.drivers.forEach(d => balances[d] += trip.profitPerDriver);
+      });
+
+      const sortedPeople = PEOPLE.map(name => ({ name, val: balances[name] })).sort((a, b) => {
+        if (a.val !== b.val) return a.val - b.val;
+        const lastA = getLastDrivenTime(a.name);
+        const lastB = getLastDrivenTime(b.name);
+        if (lastA !== lastB) return lastA - lastB; 
+        return a.name.localeCompare(b.name); 
+      });
+
+      const list = document.getElementById("balance-list");
+      list.innerHTML = "";
+      
+      sortedPeople.forEach((p, index) => {
+        const li = document.createElement("li");
+        li.className = "list-item";
+        
+        let badge = '';
+        if (index === 0) {
+           const isFemale = FEMALES.includes(p.name);
+           const tagText = isFemale ? "Próxima Condutora Sugerida" : "Próximo Condutor Sugerido";
+           badge = `<span class="next-driver-tag">${tagText}</span>`;
+        }
+
+        let valClass = p.val < 0 ? 'negative' : (p.val > 0 ? 'positive' : '');
+        let prefix = p.val > 0 ? '+' : '';
+        
+        li.innerHTML = `
+          <div class="balance-name">${p.name} ${badge}</div> 
+          <div class="balance-val ${valClass}">${prefix}${fmt(p.val)} 🪙</div>
+        `;
+        list.appendChild(li);
+      });
+
+      renderHistoryCalendar();
+      renderWeekBar();
+      if(document.getElementById('tab-stats').style.display === 'block') renderStats();
+    }
+
+    function renderStats() {
+       const ratioContainer = document.getElementById('stats-ratio-chart');
+       const barsContainer = document.getElementById('stats-bars-chart');
+       
+       let statsData = [];
+       PEOPLE.forEach(person => {
+          let asDriver = 0;
+          let asPassenger = 0;
+          let passCount = 0;
+
+          trips.forEach(t => {
+             if(t.drivers.includes(person)) {
+                asDriver++;
+                passCount += t.passengers.length;
+             }
+             if(t.passengers.includes(person)) {
+                asPassenger++;
+             }
+          });
+          const totalViagens = asDriver + asPassenger;
+          const ratio = totalViagens > 0 ? (asDriver / totalViagens) : 0;
+          statsData.push({ name: person, asDriver, asPassenger, passCount, totalViagens, ratio });
+       });
+
+       let statsDataRatio = [...statsData].sort((a, b) => b.ratio - a.ratio);
+       let ratioHtml = "";
+       statsDataRatio.forEach(d => {
+          const pct = Math.round(d.ratio * 100);
+          ratioHtml += `<div class="chart-bar-row">
+             <div class="chart-label">${d.name}</div>
+             <div class="chart-track"><div class="chart-fill" style="width: ${pct}%"></div></div>
+             <div class="chart-val">${pct}%</div>
+          </div>`;
+       });
+       ratioContainer.innerHTML = ratioHtml;
+
+       let statsDataAlpha = [...statsData].sort((a, b) => a.name.localeCompare(b.name));
+       const maxVal = Math.max(...statsData.map(d => Math.max(d.totalViagens, d.asDriver, d.asPassenger, d.passCount)), 1);
+       let barsHtml = "";
+       statsDataAlpha.forEach(d => {
+          const pTot = Math.round((d.totalViagens / maxVal) * 100);
+          const pDrv = Math.round((d.asDriver / maxVal) * 100);
+          const pPas = Math.round((d.asPassenger / maxVal) * 100);
+          const pTra = Math.round((d.passCount / maxVal) * 100);
+
+          barsHtml += `<div style="margin-bottom: 12px; background: var(--card2); padding: 8px; border-radius: 6px; border: 1px solid var(--border);">
+             <div style="font-size: 12px; font-weight:600; color:var(--text); margin-bottom:6px;">${d.name}</div>
+             
+             <div class="chart-bar-row" style="margin-bottom:3px;">
+                <div class="chart-label" style="font-size:9px;">Total Viagens</div>
+                <div class="chart-track"><div class="chart-fill" style="width: ${pTot}%; background:var(--accent)"></div></div>
+                <div class="chart-val">${d.totalViagens}</div>
+             </div>
+             <div class="chart-bar-row" style="margin-bottom:3px;">
+                <div class="chart-label" style="font-size:9px;">Condutor</div>
+                <div class="chart-track"><div class="chart-fill" style="width: ${pDrv}%; background:var(--green)"></div></div>
+                <div class="chart-val">${d.asDriver}</div>
+             </div>
+             <div class="chart-bar-row" style="margin-bottom:3px;">
+                <div class="chart-label" style="font-size:9px;">Passageiro</div>
+                <div class="chart-track"><div class="chart-fill" style="width: ${pPas}%; background:#d66b2b"></div></div>
+                <div class="chart-val">${d.asPassenger}</div>
+             </div>
+             <div class="chart-bar-row">
+                <div class="chart-label" style="font-size:9px;">Transportados</div>
+                <div class="chart-track"><div class="chart-fill" style="width: ${pTra}%; background:#f59e0b"></div></div>
+                <div class="chart-val">${d.passCount}</div>
+             </div>
+          </div>`;
+       });
+       barsContainer.innerHTML = barsHtml;
+    }
+
+    // Formulário (Nova Viagem) Navegação Dinâmica
+    window.changeFormDay = function(deltaDays) {
+       let currDate = new Date(formDate);
+       currDate.setDate(currDate.getDate() + deltaDays);
+       formDate = currDate.toISOString().slice(0,10);
+       refreshFormUI();
+    }
+
+    window.resetFormWeekToToday = function() {
+       formDate = todayISO;
+       refreshFormUI();
+    }
+
+    function generateFormCalendarHTML(selectedDateISO, onClickAction) {
+       const targetDate = new Date(selectedDateISO);
+       const startDate = new Date(targetDate.getTime());
+       startDate.setDate(startDate.getDate() - 3);
+
+       const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+       const shortMonths = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+       const monthLabel = `${monthNames[targetDate.getMonth()]} ${targetDate.getFullYear()}`;
+
+       let html = `<div class="calendar-header-nav">
+          <div style="display:flex; align-items:center; gap:3px;">
+             <button onclick="changeFormDay(-7)" title="Semana Anterior">◀ Sem.</button>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:center; flex:1;">
+             <span style="font-size:12px; font-weight:600; color:var(--text);">${monthLabel}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:3px;">
+             <button onclick="changeFormDay(7)" title="Semana Seguinte">Sem. ▶</button>
+             <button onclick="resetFormWeekToToday()" style="background:var(--card2); color:var(--accent); border-color:var(--accent);" title="Hoje">Hoje ▶</button>
+          </div>
+       </div>`;
+
+       html += '<div class="streak-grid">';
+       const shortDays = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
+
+       for(let i=0; i<7; i++){
+          const d = new Date(startDate.getTime());
+          d.setDate(startDate.getDate() + i);
+          const iso = d.toISOString().slice(0,10);
+          
+          const isPast = iso < todayISO;
+          const isSelected = iso === selectedDateISO;
+          const hasTrip = trips.some(t => t.date === iso);
+          const jsDay = d.getDay();
+          const isWeekend = (jsDay === 0 || jsDay === 6); 
+          
+          let c = "s-day";
+          if(isPast) c += " past";
+          if(isWeekend) c += " weekend";
+          if(isSelected) c += " selected";
+          if(hasTrip) c += " has-trip";
+          
+          const dayName = shortDays[jsDay];
+          const dateNum = d.getDate();
+
+          const isFirst = dateNum === 1;
+          const isLast = dateNum === new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+          
+          let badgeHtml = "";
+          if(isFirst || isLast) {
+             badgeHtml = `<div class="s-month-badge">${shortMonths[d.getMonth()]}</div>`;
+          }
+
+          html += `<div class="${c}" onclick="${onClickAction}('${iso}')">${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
+       }
+       return html + '</div>';
+    }
+
+    // Histórico por Meses Oficiais
+    window.changeHistoryMonth = function(delta) {
+       let currDate = new Date(historySelectedDate);
+       currDate.setMonth(currDate.getMonth() + delta);
+       historySelectedDate = currDate.toISOString().slice(0,10);
+       renderHistoryCalendar();
+    }
+    window.changeHistoryYear = function(delta) {
+       let currDate = new Date(historySelectedDate);
+       currDate.setFullYear(currDate.getFullYear() + delta);
+       historySelectedDate = currDate.toISOString().slice(0,10);
+       renderHistoryCalendar();
+    }
+    window.resetHistoryToToday = function() {
+       historySelectedDate = todayISO;
+       renderHistoryCalendar();
+    }
+
+    function generateHistoryCalendarHTML(selectedDateISO, onClickAction) {
+      const targetDate = new Date(selectedDateISO);
+      const targetYear = targetDate.getFullYear();
+      const targetMonth = targetDate.getMonth();
+      
+      const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+      const shortMonths = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+      const monthLabel = `${monthNames[targetMonth]} ${targetYear}`;
+
+      let html = `<div class="calendar-header-nav">
+          <div style="display:flex; align-items:center; gap:3px;">
+             <button onclick="changeHistoryYear(-1)" title="Ano Anterior">◀ Ano</button>
+             <button onclick="changeHistoryMonth(-1)" title="Mês Anterior">◀ Mês</button>
+          </div>
+          <span style="font-size:12px; font-weight:600; color:var(--text);">${monthLabel}</span>
+          <div style="display:flex; align-items:center; gap:3px;">
+             <button onclick="changeHistoryMonth(1)" title="Mês Seguinte">Mês ▶</button>
+             <button onclick="changeHistoryYear(1)" title="Ano Seguinte">Ano ▶</button>
+             <button onclick="resetHistoryToToday()" style="background:var(--card2); color:var(--accent); border-color:var(--accent);" title="Hoje">Hoje ▶</button>
+          </div>
+       </div>`;
+
+      html += '<div class="streak-grid">';
+      
+      const firstDayOfMonth = new Date(targetYear, targetMonth, 1);
+      const jsDayFirst = firstDayOfMonth.getDay();
+      const monBasedFirst = (jsDayFirst + 6) % 7; 
+      const startDate = new Date(targetYear, targetMonth, 1 - monBasedFirst);
+
+      const lastDayOfMonth = new Date(targetYear, targetMonth + 1, 0);
+      const jsDayLast = lastDayOfMonth.getDay();
+      const monBasedLast = (jsDayLast + 6) % 7;
+      const endDate = new Date(targetYear, targetMonth + 1, 0 + (6 - monBasedLast));
+
+      const shortDays = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
+
+      for(let d = new Date(startDate.getTime()); d <= endDate; d.setDate(d.getDate() + 1)){
+        const iso = d.toISOString().slice(0,10);
+        
+        const isPast = iso < todayISO;
+        const isSelected = iso === selectedDateISO;
+        const hasTrip = trips.some(t => t.date === iso);
+        const realJsDay = d.getDay();
+        const isWeekend = (realJsDay === 0 || realJsDay === 6);
+        const isOtherMonth = d.getMonth() !== targetMonth;
+        
+        let c = "s-day";
+        if(isPast) c += " past";
+        if(isWeekend) c += " weekend";
+        if(isSelected) c += " selected";
+        if(hasTrip) c += " has-trip";
+        if(isOtherMonth) c += " other-month";
+        
+        const dayName = shortDays[(realJsDay + 6) % 7];
+        const dateNum = d.getDate();
+        
+        const isFirst = dateNum === 1;
+        const isLast = dateNum === new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+          
+        let badgeHtml = "";
+        if(isFirst || isLast) {
+             badgeHtml = `<div class="s-month-badge">${shortMonths[d.getMonth()]}</div>`;
+        }
+
+        html += `<div class="${c}" onclick="${onClickAction}('${iso}')">${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
+      }
+      return html + '</div>';
+    }
+
+    function renderHistoryCalendar() {
+       document.getElementById("history-calendar").innerHTML = generateHistoryCalendarHTML(historySelectedDate, 'selectHistoryDate');
+       renderHistoryDetails();
+    }
+
+    window.selectHistoryDate = function(iso) {
+       historySelectedDate = iso;
+       renderHistoryCalendar(); 
+    }
+
+    function renderHistoryDetails() {
+       const container = document.getElementById("history-details-container");
+       const dayTrips = trips.filter(t => t.date === historySelectedDate);
+       
+       if(dayTrips.length === 0) {
+          container.innerHTML = `<div class="hist-details" style="text-align:center; color:var(--muted);">Sem viagens registadas neste dia.</div>`;
+          return;
+       }
+
+       const isFemale = name => FEMALES.includes(name);
+
+       let html = "";
+       dayTrips.forEach((trip, index) => {
+          const allDriversFemale = trip.drivers.length > 0 && trip.drivers.every(isFemale);
+          const allPassFemale = trip.passengers.length > 0 && trip.passengers.every(isFemale);
+
+          let driverLabel = "Condutores";
+          if (trip.drivers.length === 1) {
+             driverLabel = isFemale(trip.drivers[0]) ? "Condutora" : "Condutor";
+          } else if (allDriversFemale) {
+             driverLabel = "Condutoras";
+          }
+
+          let passLabel = "Passageiros";
+          if (trip.passengers.length === 1) {
+             passLabel = isFemale(trip.passengers[0]) ? "Passageira" : "Passageiro";
+          } else if (allPassFemale) {
+             passLabel = "Passageiras";
+          }
+
+          const passAlfab = [...trip.passengers].sort((a,b) => a.localeCompare(b)).join(", ");
+          const typeLabel = trip.isOneWay ? 'Viagem só de ida' : 'Viagem Normal';
+            
+          html += `<div class="hist-details" style="margin-top: ${index > 0 ? '10px' : '0'};">
+             <div class="hist-info">
+               <span class="hist-type">${typeLabel}</span>
+               <span class="hist-driver-row"><strong style="color:var(--accent)">${driverLabel}:</strong> ${trip.drivers.join(" e ")}</span>
+               <span><strong style="color:var(--muted)">${passLabel}:</strong> ${passAlfab || "Nenhum"}</span>
+               <div style="margin-top:6px; font-size:12px; color:var(--text)">Custo Total: ${fmt(trip.totalCost)} 🪙</div>
+             </div>
+             <div class="hist-actions">
+                <button class="gh-btn outline" style="flex:1; padding: 6px;" onclick="editTrip('${trip.id}')">Editar</button>
+                <button class="gh-btn danger" style="flex:1; padding: 6px;" onclick="requestDelete('${trip.id}')">Apagar</button>
+             </div>
+          </div>`;
+       });
+       container.innerHTML = html;
+    }
+
+    window.requestDelete = function(id) {
+       showConfirm("Apagar Viagem?", "Esta ação vai recalcular todos os balanços.", async () => {
+          if (USE_FIREBASE) {
+            await deleteDoc(doc(db, "trips", id));
+          } else {
+            trips = trips.filter(t => t.id !== id);
+            localStorage.setItem("pec_trips_v19", JSON.stringify(trips));
+            recalculateAndRender();
+          }
+          showToast("Viagem apagada!");
+       });
+    }
+
+    window.openModal = function() {
+      editingTripId = null;
+      formDate = todayISO;
+      selectedCars = 1; 
+      splitCostMode = false;
+      carsData = [ { driver: null, passengers: [], isOneWay: false }, { driver: null, passengers: [], isOneWay: false } ];
+      refreshFormUI();
+      document.getElementById("modal-trip").classList.add("active");
+      
+      const modalOverlay = document.getElementById("modal-trip");
+      modalOverlay.scrollTop = 0;
+    }
+
+    window.editTrip = function(id) {
+      const trip = trips.find(t => t.id === id);
+      if(!trip) return;
+      editingTripId = id;
+      formDate = trip.date;
+      selectedCars = 1;
+      splitCostMode = false;
+      carsData = [ { driver: trip.drivers[0], passengers: [...trip.passengers], isOneWay: trip.isOneWay }, { driver: null, passengers: [], isOneWay: false } ];
+      refreshFormUI();
+      document.getElementById("modal-trip").classList.add("active");
+      
+      const modalOverlay = document.getElementById("modal-trip");
+      modalOverlay.scrollTop = 0;
+    }
+
+    function refreshFormUI() {
+      document.getElementById("new-trip-calendar").innerHTML = generateFormCalendarHTML(formDate, 'selectFormDate');
+      document.getElementById("trip-oneway-box-0").classList.toggle("on", carsData[0].isOneWay);
+      document.getElementById("trip-oneway-box-1").classList.toggle("on", carsData[1].isOneWay);
+      document.getElementById("split-cost-box").classList.toggle("on", splitCostMode);
+      
+      document.getElementById("car2-section").style.display = selectedCars === 2 ? "block" : "none";
+      document.getElementById("add-car2-container").style.display = selectedCars === 1 ? "block" : "none";
+      document.getElementById("remove-car2-container").style.display = selectedCars === 2 ? "block" : "none";
+      document.getElementById("split-cost-container").style.display = selectedCars === 2 ? "block" : "none";
+      
+      document.getElementById("car1-header").innerText = selectedCars === 2 ? "CARRO 1" : "CONFIGURAÇÃO";
+
+      renderCarGrid(0, "grid-c1-drivers", "grid-c1-pass");
+      if(selectedCars === 2) renderCarGrid(1, "grid-c2-drivers", "grid-c2-pass");
+      
+      drawCars();
+      updateSummary();
+    }
+
+    window.selectFormDate = function(iso) {
+       formDate = iso;
+       document.getElementById("new-trip-calendar").innerHTML = generateFormCalendarHTML(formDate, 'selectFormDate');
+    }
+    
+    window.closeModal = function() { document.getElementById("modal-trip").classList.remove("active"); }
+    
+    window.toggleOneWay = function(carIndex) {
+      carsData[carIndex].isOneWay = !carsData[carIndex].isOneWay;
+      refreshFormUI();
+    }
+
+    window.toggleSplitCost = function() {
+      splitCostMode = !splitCostMode;
+      refreshFormUI();
+    }
+
+    window.setCars = function(num) {
+      if(num < selectedCars) {
+         carsData[1].passengers.forEach(p => carsData[0].passengers.push(p));
+         carsData[1] = { driver: null, passengers: [], isOneWay: false };
+      }
+      selectedCars = num;
+      refreshFormUI();
+    }
+
+    function getAllSelectedDrivers() { return [carsData[0].driver, carsData[1].driver].filter(Boolean); }
+    function getAllSelectedPassengers() { return [...carsData[0].passengers, ...carsData[1].passengers]; }
+
+    function handlePassengerClick(person) {
+       let c0Pass = carsData[0].passengers;
+       let c1Pass = carsData[1].passengers;
+
+       const inC0 = c0Pass.includes(person);
+       const inC1 = c1Pass.includes(person);
+
+       if (inC0) {
+          carsData[0].passengers = c0Pass.filter(p => p !== person);
+       } else if (inC1) {
+          carsData[1].passengers = c1Pass.filter(p => p !== person);
+       } else {
+          if (selectedCars === 1) {
+             if (c0Pass.length < 4) {
+                carsData[0].passengers.push(person);
+             } else {
+                setCars(2);
+                carsData[1].passengers.push(person);
+             }
+          } else {
+             if (c0Pass.length < 4) {
+                carsData[0].passengers.push(person);
+             } else if (c1Pass.length < 4) {
+                carsData[1].passengers.push(person);
+             } else {
+                showToast("Capacidade máxima atingida nos 2 carros!");
+             }
+          }
+       }
+       refreshFormUI();
+    }
+
+    function renderCarGrid(carIndex, dGridId, pGridId) {
+      const dGrid = document.getElementById(dGridId);
+      const pGrid = document.getElementById(pGridId);
+      dGrid.innerHTML = ""; pGrid.innerHTML = "";
+
+      const globalDrivers = getAllSelectedDrivers();
+      const car = carsData[carIndex];
+      const otherCarIndex = carIndex === 0 ? 1 : 0;
+      const otherCarPass = carsData[otherCarIndex].passengers;
+
+      PEOPLE.forEach(person => {
+        const isThisDriver = car.driver === person;
+        const isOtherDriver = globalDrivers.includes(person) && !isThisDriver;
+        const isThisPass = car.passengers.includes(person);
+        const globalPass = getAllSelectedPassengers();
+        const isOtherPass = globalPass.includes(person) && !isThisPass;
+        
+        const inOtherCarPass = otherCarPass.includes(person);
+
+        const dBtn = document.createElement("button");
+        dBtn.className = `person-btn ${isThisDriver ? 'is-driver' : ''}`;
+        dBtn.innerText = person;
+        dBtn.disabled = isOtherDriver || isThisPass || isOtherPass; 
+        dBtn.onclick = () => {
+           carsData[carIndex].driver = isThisDriver ? null : person;
+           refreshFormUI();
+        }
+        dGrid.appendChild(dBtn);
+
+        const pBtn = document.createElement("button");
+        pBtn.className = `person-btn ${isThisPass ? 'is-pass' : ''}`;
+        pBtn.innerText = person;
+        pBtn.disabled = globalDrivers.includes(person) || inOtherCarPass; 
+        pBtn.onclick = () => {
+           handlePassengerClick(person);
+        }
+        pGrid.appendChild(pBtn);
+      });
+    }
+
+    function drawCar(carIndex, containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+      const car = carsData[carIndex];
+      
+      const carDiv = document.createElement("div");
+      carDiv.className = "car-visual";
+      
+      const driverName = car.driver ? INITIALS[car.driver] : '';
+      const driverClass = driverName ? 'seat driver-seat' : 'seat empty';
+      let seatsHTML = `<div class="${driverClass}">${driverName}</div>`;
+      
+      let pList = car.passengers;
+      for(let s = 1; s < 6; s++) {
+          if(s-1 < pList.length) seatsHTML += `<div class="seat pass-seat">${INITIALS[pList[s-1]]}</div>`;
+          else seatsHTML += `<div class="seat empty"></div>`;
+      }
+      carDiv.innerHTML = seatsHTML;
+      container.appendChild(carDiv);
+    }
+
+    function drawCars() {
+       drawCar(0, "car1-visual");
+       if(selectedCars === 2) drawCar(1, "car2-visual");
+    }
+
+    function calculateCar(car) {
+       const numPass = car.passengers.length;
+       if(!car.driver || numPass === 0) return null;
+       let total = 1 + (0.5 * numPass);
+       if(numPass === 1) total = 1; 
+       if(car.isOneWay) total /= 2;
+       return { totalCost: total, costPerPassenger: total / numPass, profitPerDriver: total };
+    }
+
+    window.updateSummary = function() {
+      const btnSave = document.getElementById("btn-save-trip");
+      let html = "";
+      let valid = true;
+
+      const d0 = carsData[0].driver;
+      const d1 = carsData[1].driver;
+      const p0 = carsData[0].passengers;
+      const p1 = carsData[1].passengers;
+
+      if (selectedCars === 2 && !splitCostMode) {
+         if (!d0 || !d1) {
+            html = `<div style="color:var(--danger); font-size:12px;">Falta selecionar os condutores para ambos os carros.</div>`;
+            valid = false;
+         } else if (p0.length === 0 && p1.length === 0) {
+            html = `<div style="color:var(--danger); font-size:12px;">Selecione pelo menos um passageiro no total.</div>`;
+            valid = false;
+         } else {
+            const allPass = [...p0, ...p1];
+            const numPass = allPass.length;
+            const c0Calc = calculateCar(carsData[0]);
+            const c1Calc = calculateCar(carsData[1]);
+
+            if(!c0Calc || !c1Calc) { valid = false; return; }
+
+            const totalCombinedCost = c0Calc.totalCost + c1Calc.totalCost;
+            const costPerPassenger = numPass > 0 ? totalCombinedCost / numPass : 0;
+            const creditPerDriver = totalCombinedCost / 2;
+
+            html = `
+               <strong style="color:var(--text); font-size:13px; font-weight:600;">VIAGEM CONJUNTA (2 CARROS)</strong><br>
+               <div style="display:flex; justify-content:space-between; margin-top:6px; margin-bottom:2px;"><span>Custo Total:</span> <strong style="color:var(--text)">${fmt(totalCombinedCost)} 🪙</strong></div>
+               <div style="display:flex; justify-content:space-between; margin-bottom:2px;"><span>Custo por passageiro:</span> <strong style="color:var(--text)">${fmt(costPerPassenger)} 🪙</strong></div>
+               <div style="display:flex; justify-content:space-between;"><span>Crédito por condutor:</span> <strong style="color:var(--text)">${fmt(creditPerDriver)} 🪙</strong></div>
+            `;
+            window.currentTripCalculations = [
+               { driver: d0, passengers: allPass, totalCost: c0Calc.totalCost, costPerPassenger, profitPerDriver: creditPerDriver, isOneWay: carsData[0].isOneWay },
+               { driver: d1, passengers: allPass, totalCost: c1Calc.totalCost, costPerPassenger, profitPerDriver: creditPerDriver, isOneWay: carsData[1].isOneWay }
+            ];
+            valid = true;
+         }
+      } else {
+         let tripCalcs = [];
+         for(let i=0; i<selectedCars; i++) {
+            const car = carsData[i];
+            if(!car.driver) {
+               html += `<div style="margin-bottom:6px; color:var(--danger); font-size:12px;">Carro ${i+1}: Falta selecionar condutor.</div>`;
+               valid = false;
+            } else if(car.passengers.length === 0) {
+               html += `<div style="margin-bottom:6px; color:var(--danger); font-size:12px;">Carro ${i+1}: Falta selecionar passageiros.</div>`;
+               valid = false;
+            } else {
+               const calc = calculateCar(car);
+               const prefix = FEMALES.includes(car.driver) ? "CARRO DA" : "CARRO DO";
+               const driverTitle = `${prefix} ${car.driver.toUpperCase()}`;
+               
+               html += `<div style="margin-bottom: ${i===0 && selectedCars===2 ? '12px' : '0'};">
+                  <strong style="color:var(--text); font-size:13px; font-weight:600;">${driverTitle}</strong><br>
+                  <div style="display:flex; justify-content:space-between; margin-top:6px; margin-bottom:2px;"><span>Custo da viagem:</span> <strong style="color:var(--text)">${fmt(calc.totalCost)} 🪙</strong></div>
+                  <div style="display:flex; justify-content:space-between;"><span>Custo por passageiro:</span> <strong style="color:var(--text)">${fmt(calc.costPerPassenger)} 🪙</strong></div>
+               </div>`;
+               tripCalcs.push({ driver: car.driver, passengers: car.passengers, totalCost: calc.totalCost, costPerPassenger: calc.costPerPassenger, profitPerDriver: calc.totalCost, isOneWay: car.isOneWay });
+            }
+         }
+         window.currentTripCalculations = tripCalcs;
+      }
+
+      document.getElementById("summary-box").innerHTML = html;
+      btnSave.disabled = !valid;
+    }
+
+    window.saveTrip = async function() {
+      const calcs = window.currentTripCalculations;
+      for(let i=0; i<calcs.length; i++) {
+          const calc = calcs[i];
+          const newTrip = {
+             date: formDate, cars: 1, isOneWay: calc.isOneWay,
+             drivers: [calc.driver], passengers: [...calc.passengers],
+             totalCost: calc.totalCost, costPerPassenger: calc.costPerPassenger, profitPerDriver: calc.profitPerDriver
+          };
+
+          if(USE_FIREBASE) {
+              if(editingTripId && i===0) await updateDoc(doc(db, "trips", editingTripId), newTrip);
+              else await addDoc(collection(db, "trips"), newTrip);
+          } else {
+              if(editingTripId && i===0) {
+                 trips = trips.map(t => t.id === editingTripId ? { id: editingTripId, ...newTrip } : t);
+                 editingTripId = null;
+              } else {
+                 newTrip.id = Date.now().toString() + i; 
+                 trips.push(newTrip);
+              }
+          }
+      }
+      
+      if(!USE_FIREBASE) {
+          localStorage.setItem("pec_trips_v19", JSON.stringify(trips));
+          recalculateAndRender();
+      }
+      
+      closeModal();
+      showToast("Viagem guardada com sucesso!");
+      historySelectedDate = formDate;
+      renderHistoryCalendar();
+    }
+  </script>
+</body>
+</html>
