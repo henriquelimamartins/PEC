@@ -345,6 +345,15 @@ input { font-family: inherit; }
 
   <div id="toast" class="toast"></div>
 
+  <!-- Registo do Service Worker para PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log("Service Worker registado com sucesso!"))
+        .catch((err) => console.log("Erro ao registar Service Worker:", err));
+    }
+  </script>
+
   <!-- LÓGICA -->
   <script type="module">
     const USE_FIREBASE = false; 
@@ -464,7 +473,7 @@ input { font-family: inherit; }
           recalculateAndRender();
         });
       } else {
-        const localTrips = localStorage.getItem("pec_trips_v19");
+        const localTrips = localStorage.getItem("pec_trips_v20");
         if(localTrips) trips = JSON.parse(localTrips);
         recalculateAndRender();
       }
@@ -854,7 +863,7 @@ input { font-family: inherit; }
             await deleteDoc(doc(db, "trips", id));
           } else {
             trips = trips.filter(t => t.id !== id);
-            localStorage.setItem("pec_trips_v19", JSON.stringify(trips));
+            localStorage.setItem("pec_trips_v20", JSON.stringify(trips));
             recalculateAndRender();
           }
           showToast("Viagem apagada!");
@@ -1141,7 +1150,7 @@ input { font-family: inherit; }
       }
       
       if(!USE_FIREBASE) {
-          localStorage.setItem("pec_trips_v19", JSON.stringify(trips));
+          localStorage.setItem("pec_trips_v20", JSON.stringify(trips));
           recalculateAndRender();
       }
       
