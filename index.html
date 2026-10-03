@@ -22,7 +22,7 @@
   --card: #161b22;        
   --card2: #21262d;       
   --border: #30363d;      
-  --accent: #d66b2b;      /* Laranja ténue, suave e menos brilhante */
+  --accent: #d66b2b;      
   --green: #238636;       
   --green-hover: #2ea043;
   --danger: #f85149;      
@@ -35,7 +35,7 @@
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; background: var(--bg); touch-action: manipulation; }
 button, a, img { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif; color: var(--text); -webkit-tap-highlight-color: transparent; padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px)); }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif; color: var(--text); -webkit-tap-highlight-color: transparent; padding-bottom: calc(105px + env(safe-area-inset-bottom, 0px)); }
 h1, h2, h3, h4 { font-weight: 600; margin: 0; }
 p { margin: 0; line-height: 1.5; color: var(--muted); font-size: 13.5px; }
 button { font-family: inherit; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease; }
@@ -43,15 +43,17 @@ input { font-family: inherit; }
 
 #app-screen, #login-screen { max-width: 520px; margin: 0 auto; min-height: 100vh; }
 #login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+#app-screen { padding-top: 85px; }
 
 /* Topbar fixa globalmente acima de tudo */
-.topbar { position: sticky; top: 0; z-index: 250; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 12px; border-bottom: 1px solid var(--border); }
-.topbar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 250; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 12px; border-bottom: 1px solid var(--border); }
+.topbar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; max-width: 520px; margin-left: auto; margin-right: auto; }
 .brand { font-size: 14px; font-weight: 600; letter-spacing: -0.2px; color: var(--text); display: flex; align-items: center; gap: 6px; }
 .brand span { color: var(--accent); font-weight: 700; }
-.header-date { font-size: 11px; color: var(--muted); font-weight: 500; }
+.header-date { font-size: 11px; color: var(--muted); font-weight: 500; text-transform: uppercase; }
 
 /* Barra Semanal */
+#week-bar { max-width: 520px; margin: 0 auto; }
 .phasebar { display: flex; gap: 4px; margin-bottom: 4px; }
 .pseg { flex: 1; height: 6px; border-radius: 3px; background: var(--card2); border: 1px solid var(--border); overflow: hidden; position: relative; }
 .pseg i { display: block; height: 100%; border-radius: 3px; }
@@ -96,12 +98,14 @@ input { font-family: inherit; }
 .next-driver-tag { background: rgba(214, 107, 43, 0.15); color: var(--accent); font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; border: 1px solid rgba(214, 107, 43, 0.35); text-transform: uppercase; letter-spacing: 0.5px; }
 
 /* Calendário Grid & Fim de Semana Castanho */
-.calendar-header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: var(--muted); }
-.calendar-header-nav button { background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 4px 8px; border-radius: 4px; font-size: 11px; height: 26px; display: inline-flex; align-items: center; justify-content: center; }
+.calendar-header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.calendar-header-nav button { flex-direction: column; background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 4px; border-radius: 4px; font-size: 8px; height: auto; gap: 2px; min-width: 32px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; text-transform: uppercase; }
+.center-date { text-align: center; line-height: 1.2; font-size: 11px; }
+.center-date span { display: block; }
 
 .streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 16px; }
-.s-day { background: var(--card2); border-radius: 6px; padding: 6px 2px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--border); cursor: pointer; position: relative; }
-.s-month-badge { position: absolute; top: 2px; right: 4px; font-size: 7px; font-weight: 600; color: var(--muted); opacity: 0.8; letter-spacing: -0.2px; }
+.s-day { background: var(--card2); border-radius: 6px; padding: 12px 2px 4px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--border); cursor: pointer; position: relative; }
+.s-month-badge { position: absolute; top: 2px; left: 0; right: 0; text-align: center; font-size: 7px; font-weight: 600; color: var(--muted); opacity: 0.8; }
 .s-day .s-date { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1; margin-top: 1px; }
 .s-day .s-wkd { font-size: 8.5px; text-transform: uppercase; color: var(--muted); margin-top: 4px; font-weight: 500; }
 .s-day.past { background: #010409; opacity: 0.6; }
@@ -190,8 +194,9 @@ input { font-family: inherit; }
     <button class="gh-btn primary" onclick="checkLogin()" style="width: 100%; max-width: 280px; justify-content: center;">Entrar na App</button>
   </div>
 
-  <!-- Topbar Fixa Global (Sempre Visível) -->
+  <!-- App Principal -->
   <div id="app-screen" style="display: none;">
+    <!-- Topbar Fixa Global -->
     <div class="topbar">
       <div class="topbar-header">
         <div class="brand">GESTÃO DE BOLEIAS <span>PEC</span></div>
@@ -226,11 +231,11 @@ input { font-family: inherit; }
 
     <!-- TAB 3: ESTATÍSTICAS -->
     <div id="tab-stats" class="page tab-content" style="display: none;">
-      <div class="eyebrow">Métricas & Resumo</div>
+      <div class="eyebrow">MÉTRICAS E RESUMO</div>
       <div class="card">
         <h3>Estatísticas Gerais</h3>
         
-        <div class="stats-section-title" style="margin-top: 4px;">Rácio de Condução (Vezes Condutor / Viagens Participadas)</div>
+        <div class="stats-section-title" style="margin-top: 4px;">RÁCIO (VEZES CONDUTOR / VIAGENS PARTICIPADAS)</div>
         <div id="stats-ratio-chart" class="stats-chart"></div>
 
         <div class="stats-section-title">Métricas de Participação (Nº de Vezes)</div>
@@ -380,10 +385,15 @@ input { font-family: inherit; }
     const FEMALES = ["Ana", "Joana", "Mariana"];
     const INITIALS = { "Ana": "AC", "Luciano": "LF", "Luís": "LA", "André": "AS", "Henrique": "HL", "Joana": "JF", "João": "JC", "Mariana": "MB" };
     
+    // Função segura para ir buscar a data ISO sem sofrer compensações de TimeZone (UTC vs Local)
+    function getLocalDateISO(d = new Date()) {
+       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
     let trips = []; 
     let balances = {}; 
     
-    let todayISO = new Date().toISOString().slice(0,10);
+    let todayISO = getLocalDateISO();
     let historySelectedDate = todayISO;
     
     let formDate = todayISO;
@@ -440,7 +450,6 @@ input { font-family: inherit; }
 
     window.checkLogin = async function() {
       const pwd = document.getElementById("password-input").value;
-      // Hash SHA-256 correspondente a "pec2026"
       const targetHash = "2496e57975c7cb484c2049d5bf599e0339cb1d43a14434241cd64d4b1a1ea0f9"; 
       const enteredHash = await hashString(pwd);
 
@@ -481,9 +490,8 @@ input { font-family: inherit; }
 
     function renderHeaderDate() {
        const months = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
-       const shortDays = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
        const now = new Date();
-       document.getElementById("header-date").innerText = `${shortDays[now.getDay()]}, ${String(now.getDate()).padStart(2, '0')} DE ${months[now.getMonth()]} ${now.getFullYear()}`;
+       document.getElementById("header-date").innerText = `${String(now.getDate()).padStart(2, '0')} ${months[now.getMonth()]} ${now.getFullYear()}`;
     }
 
     function renderWeekBar() {
@@ -496,8 +504,8 @@ input { font-family: inherit; }
        let labelsHtml = "";
        
        for(let i = -3; i <= 3; i++) {
-          const d = new Date(today);
-          d.setDate(today.getDate() + i);
+          const d = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+          d.setDate(d.getDate() + i);
           const dayIdx = d.getDay();
           
           let cls = "pseg ";
@@ -516,7 +524,8 @@ input { font-family: inherit; }
        let latest = 0;
        for(let t of trips) {
           if(t.drivers && t.drivers.includes(personName)) {
-             let dTime = new Date(t.date).getTime();
+             let parts = t.date.split('-');
+             let dTime = new Date(parts[0], parts[1]-1, parts[2]).getTime();
              if(dTime > latest) latest = dTime;
           }
        }
@@ -547,9 +556,7 @@ input { font-family: inherit; }
         
         let badge = '';
         if (index === 0) {
-           const isFemale = FEMALES.includes(p.name);
-           const tagText = isFemale ? "Próxima Condutora Sugerida" : "Próximo Condutor Sugerido";
-           badge = `<span class="next-driver-tag">${tagText}</span>`;
+           badge = `<span class="next-driver-tag">CONDUTOR SUGERIDO</span>`;
         }
 
         let valClass = p.val < 0 ? 'negative' : (p.val > 0 ? 'positive' : '');
@@ -627,7 +634,7 @@ input { font-family: inherit; }
              </div>
              <div class="chart-bar-row" style="margin-bottom:3px;">
                 <div class="chart-label" style="font-size:9px;">Passageiro</div>
-                <div class="chart-track"><div class="chart-fill" style="width: ${pPas}%; background:#d66b2b"></div></div>
+                <div class="chart-track"><div class="chart-fill" style="width: ${pPas}%; background:var(--muted)"></div></div>
                 <div class="chart-val">${d.asPassenger}</div>
              </div>
              <div class="chart-bar-row">
@@ -642,9 +649,10 @@ input { font-family: inherit; }
 
     // Formulário (Nova Viagem) Navegação Dinâmica
     window.changeFormDay = function(deltaDays) {
-       let currDate = new Date(formDate);
+       let parts = formDate.split('-');
+       let currDate = new Date(parts[0], parts[1]-1, parts[2]);
        currDate.setDate(currDate.getDate() + deltaDays);
-       formDate = currDate.toISOString().slice(0,10);
+       formDate = getLocalDateISO(currDate);
        refreshFormUI();
     }
 
@@ -654,24 +662,26 @@ input { font-family: inherit; }
     }
 
     function generateFormCalendarHTML(selectedDateISO, onClickAction) {
-       const targetDate = new Date(selectedDateISO);
-       const startDate = new Date(targetDate.getTime());
+       const parts = selectedDateISO.split('-');
+       const targetDate = new Date(parts[0], parts[1]-1, parts[2]);
+       
+       const startDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
        startDate.setDate(startDate.getDate() - 3);
 
        const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
        const shortMonths = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
-       const monthLabel = `${monthNames[targetDate.getMonth()]} ${targetDate.getFullYear()}`;
 
        let html = `<div class="calendar-header-nav">
-          <div style="display:flex; align-items:center; gap:3px;">
-             <button onclick="changeFormDay(-7)" title="Semana Anterior">◀ Sem.</button>
+          <div style="display:flex; gap:4px;">
+             <button onclick="changeFormDay(-7)" title="Semana Anterior"><span>◀</span><span>Sem</span></button>
           </div>
-          <div style="display:flex; align-items:center; justify-content:center; flex:1;">
-             <span style="font-size:12px; font-weight:600; color:var(--text);">${monthLabel}</span>
+          <div class="center-date">
+             <span style="font-weight:700; color:var(--text); text-transform:uppercase; font-size:12px;">${monthNames[targetDate.getMonth()]}</span>
+             <span>${targetDate.getFullYear()}</span>
           </div>
-          <div style="display:flex; align-items:center; gap:3px;">
-             <button onclick="changeFormDay(7)" title="Semana Seguinte">Sem. ▶</button>
-             <button onclick="resetFormWeekToToday()" style="background:var(--card2); color:var(--accent); border-color:var(--accent);" title="Hoje">Hoje ▶</button>
+          <div style="display:flex; gap:4px;">
+             <button onclick="changeFormDay(7)" title="Semana Seguinte"><span>▶</span><span>Sem</span></button>
+             <button onclick="resetFormWeekToToday()" style="background:#30363d; color:#ffffff; border-color:#8b949e;" title="Hoje"><span>▼</span><span>Hoje</span></button>
           </div>
        </div>`;
 
@@ -679,9 +689,9 @@ input { font-family: inherit; }
        const shortDays = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
 
        for(let i=0; i<7; i++){
-          const d = new Date(startDate.getTime());
+          const d = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
           d.setDate(startDate.getDate() + i);
-          const iso = d.toISOString().slice(0,10);
+          const iso = getLocalDateISO(d);
           
           const isPast = iso < todayISO;
           const isSelected = iso === selectedDateISO;
@@ -713,15 +723,17 @@ input { font-family: inherit; }
 
     // Histórico por Meses Oficiais
     window.changeHistoryMonth = function(delta) {
-       let currDate = new Date(historySelectedDate);
+       let parts = historySelectedDate.split('-');
+       let currDate = new Date(parts[0], parts[1]-1, parts[2]);
        currDate.setMonth(currDate.getMonth() + delta);
-       historySelectedDate = currDate.toISOString().slice(0,10);
+       historySelectedDate = getLocalDateISO(currDate);
        renderHistoryCalendar();
     }
     window.changeHistoryYear = function(delta) {
-       let currDate = new Date(historySelectedDate);
+       let parts = historySelectedDate.split('-');
+       let currDate = new Date(parts[0], parts[1]-1, parts[2]);
        currDate.setFullYear(currDate.getFullYear() + delta);
-       historySelectedDate = currDate.toISOString().slice(0,10);
+       historySelectedDate = getLocalDateISO(currDate);
        renderHistoryCalendar();
     }
     window.resetHistoryToToday = function() {
@@ -730,24 +742,27 @@ input { font-family: inherit; }
     }
 
     function generateHistoryCalendarHTML(selectedDateISO, onClickAction) {
-      const targetDate = new Date(selectedDateISO);
+      const parts = selectedDateISO.split('-');
+      const targetDate = new Date(parts[0], parts[1]-1, parts[2]);
       const targetYear = targetDate.getFullYear();
       const targetMonth = targetDate.getMonth();
       
       const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
       const shortMonths = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
-      const monthLabel = `${monthNames[targetMonth]} ${targetYear}`;
 
       let html = `<div class="calendar-header-nav">
-          <div style="display:flex; align-items:center; gap:3px;">
-             <button onclick="changeHistoryYear(-1)" title="Ano Anterior">◀ Ano</button>
-             <button onclick="changeHistoryMonth(-1)" title="Mês Anterior">◀ Mês</button>
+          <div style="display:flex; gap:4px;">
+             <button onclick="changeHistoryYear(-1)" title="Ano Anterior"><span>◀</span><span>Ano</span></button>
+             <button onclick="changeHistoryMonth(-1)" title="Mês Anterior"><span>◀</span><span>Mês</span></button>
           </div>
-          <span style="font-size:12px; font-weight:600; color:var(--text);">${monthLabel}</span>
-          <div style="display:flex; align-items:center; gap:3px;">
-             <button onclick="changeHistoryMonth(1)" title="Mês Seguinte">Mês ▶</button>
-             <button onclick="changeHistoryYear(1)" title="Ano Seguinte">Ano ▶</button>
-             <button onclick="resetHistoryToToday()" style="background:var(--card2); color:var(--accent); border-color:var(--accent);" title="Hoje">Hoje ▶</button>
+          <div class="center-date">
+             <span style="font-weight:700; color:var(--text); text-transform:uppercase; font-size:12px;">${monthNames[targetMonth]}</span>
+             <span>${targetYear}</span>
+          </div>
+          <div style="display:flex; gap:4px;">
+             <button onclick="changeHistoryMonth(1)" title="Mês Seguinte"><span>▶</span><span>Mês</span></button>
+             <button onclick="changeHistoryYear(1)" title="Ano Seguinte"><span>▶</span><span>Ano</span></button>
+             <button onclick="resetHistoryToToday()" style="background:#30363d; color:#ffffff; border-color:#8b949e;" title="Hoje"><span>▼</span><span>Hoje</span></button>
           </div>
        </div>`;
 
@@ -766,7 +781,7 @@ input { font-family: inherit; }
       const shortDays = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
 
       for(let d = new Date(startDate.getTime()); d <= endDate; d.setDate(d.getDate() + 1)){
-        const iso = d.toISOString().slice(0,10);
+        const iso = getLocalDateISO(d);
         
         const isPast = iso < todayISO;
         const isSelected = iso === selectedDateISO;
@@ -947,32 +962,33 @@ input { font-family: inherit; }
     function getAllSelectedDrivers() { return [carsData[0].driver, carsData[1].driver].filter(Boolean); }
     function getAllSelectedPassengers() { return [...carsData[0].passengers, ...carsData[1].passengers]; }
 
-    function handlePassengerClick(person) {
-       let c0Pass = carsData[0].passengers;
-       let c1Pass = carsData[1].passengers;
+    function handlePassengerClick(person, clickedCarIndex) {
+       const car = carsData[clickedCarIndex];
+       const otherCarIndex = clickedCarIndex === 0 ? 1 : 0;
+       const otherCar = carsData[otherCarIndex];
 
-       const inC0 = c0Pass.includes(person);
-       const inC1 = c1Pass.includes(person);
-
-       if (inC0) {
-          carsData[0].passengers = c0Pass.filter(p => p !== person);
-       } else if (inC1) {
-          carsData[1].passengers = c1Pass.filter(p => p !== person);
+       if (car.passengers.includes(person)) {
+          // Remover do carro em que clicámos
+          car.passengers = car.passengers.filter(p => p !== person);
        } else {
-          if (selectedCars === 1) {
-             if (c0Pass.length < 4) {
-                carsData[0].passengers.push(person);
+          if (otherCar.passengers.includes(person)) {
+             // Mover o passageiro do outro carro para este
+             if (car.passengers.length < 4) {
+                 otherCar.passengers = otherCar.passengers.filter(p => p !== person);
+                 car.passengers.push(person);
              } else {
-                setCars(2);
-                carsData[1].passengers.push(person);
+                 showToast("Capacidade máxima atingida neste carro!");
              }
           } else {
-             if (c0Pass.length < 4) {
-                carsData[0].passengers.push(person);
-             } else if (c1Pass.length < 4) {
+             // Adicionar novo passageiro ao carro que foi clicado
+             if (car.passengers.length < 4) {
+                car.passengers.push(person);
+             } else if (selectedCars === 1 && clickedCarIndex === 0) {
+                // Abre o 2º carro automaticamente e mete-o lá
+                setCars(2);
                 carsData[1].passengers.push(person);
              } else {
-                showToast("Capacidade máxima atingida nos 2 carros!");
+                showToast("Capacidade máxima atingida neste carro!");
              }
           }
        }
@@ -996,8 +1012,6 @@ input { font-family: inherit; }
         const globalPass = getAllSelectedPassengers();
         const isOtherPass = globalPass.includes(person) && !isThisPass;
         
-        const inOtherCarPass = otherCarPass.includes(person);
-
         const dBtn = document.createElement("button");
         dBtn.className = `person-btn ${isThisDriver ? 'is-driver' : ''}`;
         dBtn.innerText = person;
@@ -1011,9 +1025,10 @@ input { font-family: inherit; }
         const pBtn = document.createElement("button");
         pBtn.className = `person-btn ${isThisPass ? 'is-pass' : ''}`;
         pBtn.innerText = person;
-        pBtn.disabled = globalDrivers.includes(person) || inOtherCarPass; 
+        // Só desabilita o botão se a pessoa for condutora. (Passageiro noutro carro não bloqueia, ele move-se!)
+        pBtn.disabled = globalDrivers.includes(person); 
         pBtn.onclick = () => {
-           handlePassengerClick(person);
+           handlePassengerClick(person, carIndex);
         }
         pGrid.appendChild(pBtn);
       });
