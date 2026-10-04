@@ -25,6 +25,7 @@
   --accent: #d66b2b;      
   --green: #238636;       
   --green-hover: #2ea043;
+  --yellow: #d29922;      /* Nova cor para passageiros */
   --danger: #f85149;      
   --text: #f0f6fc;        
   --muted: #8b949e;       
@@ -111,9 +112,13 @@ input, select { font-family: inherit; }
 .s-day.future-day { opacity: 0.25 !important; cursor: not-allowed; }
 .s-day.weekend { background: var(--weekend-bg); border-color: var(--weekend-border); }
 .s-day.weekend .s-wkd { color: #80583b; }
-.s-day.has-trip { border-bottom: 3px solid var(--green); }
 .s-day.selected { border-color: var(--accent) !important; background: rgba(214, 107, 43, 0.15) !important; }
 .s-day.selected .s-date { color: var(--accent); }
+
+/* Variações de marcadores no calendário */
+.s-day.has-trip { border-bottom: 3px solid var(--green); }
+.s-day.has-trip-driver { border-bottom: 3px solid var(--accent); }
+.s-day.has-trip-passenger { border-bottom: 3px solid var(--yellow); }
 
 .hist-details { background: var(--card2); border-radius: 6px; padding: 14px; margin-top: 10px; border: 1px solid var(--border); }
 .hist-info { font-size: 13px; color: var(--muted); line-height: 1.5; }
@@ -228,10 +233,6 @@ input, select { font-family: inherit; }
       <button class="gh-btn primary" onclick="openModal()" style="padding: 14px; font-size: 15px;">
         <b>Registar Nova Viagem</b>
       </button>
-      
-      <button class="gh-btn outline" onclick="exportToWhatsApp()" style="font-size: 13px; color: var(--muted);">
-        <span class="ic">📤</span> Copiar Resumo para WhatsApp
-      </button>
     </div>
 
     <!-- TAB 2: HISTÓRICO -->
@@ -240,7 +241,7 @@ input, select { font-family: inherit; }
       
       <div style="margin-bottom: 16px;">
          <select id="history-filter" class="input-text" onchange="applyHistoryFilter()">
-            <option value="ALL">Visualização por Calendário</option>
+            <option value="ALL">Visualização Global por Calendário</option>
          </select>
       </div>
 
@@ -382,7 +383,6 @@ input, select { font-family: inherit; }
   </script>
 
   <script type="module">
-    // Altera para true e preenche as tuas chaves para ativar a cloud com suporte offline
     const USE_FIREBASE = false; 
 
     const firebaseConfig = {
@@ -394,14 +394,12 @@ input, select { font-family: inherit; }
       appId: "APP_ID"
     };
 
-    // Novas importações atualizadas com suporte offline (Persistent Cache)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     let db;
     if (USE_FIREBASE) {
       const app = initializeApp(firebaseConfig);
-      // Inicialização do Firestore com suporte Offline
       db = initializeFirestore(app, {
         localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
       });
@@ -417,10 +415,10 @@ input, select { font-family: inherit; }
 
     let trips = []; 
     let balances = {}; 
-    let sortedPeopleGlobally = []; // Variável global para ser usada na exportação WhatsApp
     
     let todayISO = getLocalDateISO();
     let historySelectedDate = todayISO;
+    let currentHistoryFilter = "ALL"; // Guarda o estado atual do filtro do histórico
     
     let formDate = todayISO;
     let selectedCars = 1;
@@ -431,13 +429,12 @@ input, select { font-family: inherit; }
     ];
     let editingTripId = null;
 
-    // Preenche a dropdown do Histórico com os nomes
     function initHistoryFilterDropdown() {
        const select = document.getElementById("history-filter");
        PEOPLE.forEach(person => {
           let opt = document.createElement('option');
           opt.value = person;
-          opt.innerHTML = `Visualizar apenas ${person}`;
+          opt.innerHTML = `Visualizar calendário de ${person}`;
           select.appendChild(opt);
        });
     }
@@ -476,8 +473,9 @@ input, select { font-family: inherit; }
        
        if(tabName === 'history') {
           historySelectedDate = getLocalDateISO();
-          document.getElementById('history-filter').value = "ALL"; // Reset ao abrir
-          applyHistoryFilter();
+          document.getElementById('history-filter').value = "ALL"; 
+          currentHistoryFilter = "ALL";
+          renderHistoryCalendar();
        }
        if(tabName === 'stats') renderStats();
        window.scrollTo(0,0);
@@ -590,8 +588,6 @@ input, select { font-family: inherit; }
         return a.name.localeCompare(b.name); 
       });
       
-      sortedPeopleGlobally = sortedPeople; // Guardar para usar na exportação
-
       const list = document.getElementById("balance-list");
       list.innerHTML = "";
       
@@ -621,30 +617,9 @@ input, select { font-family: inherit; }
         list.appendChild(li);
       });
 
-      applyHistoryFilter(); // Reflete no ecrã de histórico de imediato dependendo do dropdown
+      renderHistoryCalendar();
       renderWeekBar();
       if(document.getElementById('tab-stats').style.display === 'block') renderStats();
-    }
-
-    window.exportToWhatsApp = function() {
-      let text = "🚗 *Ponto de Situação - Boleias PEC*\n\n";
-      
-      text += "📊 *Balanços Atuais:*\n";
-      sortedPeopleGlobally.forEach(p => {
-         let prefix = p.val > 0 ? '+' : '';
-         let sign = p.val < 0 ? '-' : prefix;
-         text += `${p.name}: ${sign}${Math.abs(p.val).toFixed(2)} 🪙\n`;
-      });
-
-      text += `\n🚦 *Próximo a conduzir:* ${sortedPeopleGlobally[0].name}\n`;
-      text += `📈 *Total de viagens:* ${trips.length}\n`;
-
-      navigator.clipboard.writeText(text).then(() => {
-         showToast("Resumo copiado! Pronto a colar no WhatsApp.");
-      }).catch(err => {
-         console.error("Erro ao copiar", err);
-         showToast("Não foi possível copiar automaticamente.");
-      });
     }
 
     function renderStats() {
@@ -722,87 +697,12 @@ input, select { font-family: inherit; }
        barsContainer.innerHTML = barsHtml;
     }
 
-    // --- NOVA LOGICA DE FILTRO DE HISTÓRICO ---
+    // --- LOGICA DE FILTRO DO HISTÓRICO ---
     window.applyHistoryFilter = function() {
-       const val = document.getElementById("history-filter").value;
-       const cal = document.getElementById("history-calendar");
-       
-       if (val === "ALL") {
-          cal.style.display = "block";
-          renderHistoryCalendar();
-       } else {
-          cal.style.display = "none";
-          renderPersonHistory(val);
-       }
+       currentHistoryFilter = document.getElementById("history-filter").value;
+       renderHistoryCalendar();
     }
-
-    function renderPersonHistory(personName) {
-       const container = document.getElementById("history-details-container");
-       
-       // Filtra e ordena as viagens da pessoa (da mais recente para a mais antiga)
-       const personTrips = trips.filter(t => t.drivers.includes(personName) || t.passengers.includes(personName));
-       personTrips.sort((a, b) => b.date.localeCompare(a.date));
-
-       if(personTrips.length === 0) {
-          container.innerHTML = `
-            <div class="hist-details" style="text-align:center; padding: 24px 14px;">
-              <div style="color:var(--muted); font-size:13px;">Sem viagens registadas de momento para ${personName}.</div>
-            </div>
-          `;
-          return;
-       }
-
-       const isFemale = name => FEMALES.includes(name);
-
-       let html = `<div style="font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:10px; margin-top:8px;">Registo Global - ${personName}</div>`;
-       
-       personTrips.forEach((trip, index) => {
-          const allDriversFemale = trip.drivers.length > 0 && trip.drivers.every(isFemale);
-          const allPassFemale = trip.passengers.length > 0 && trip.passengers.every(isFemale);
-
-          let driverLabel = "Condutores";
-          if (trip.drivers.length === 1) {
-             driverLabel = isFemale(trip.drivers[0]) ? "Condutora" : "Condutor";
-          } else if (allDriversFemale) {
-             driverLabel = "Condutoras";
-          }
-
-          let passLabel = "Passageiros";
-          if (trip.passengers.length === 1) {
-             passLabel = isFemale(trip.passengers[0]) ? "Passageira" : "Passageiro";
-          } else if (allPassFemale) {
-             passLabel = "Passageiras";
-          }
-
-          const passAlfab = [...trip.passengers].sort((a,b) => a.localeCompare(b)).join(", ");
-          const typeLabel = trip.isOneWay ? 'Viagem só de ida' : 'Viagem Normal';
-          
-          // Tratamento simplificado de Data
-          const parts = trip.date.split('-');
-          const readableDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
-            
-          html += `<div class="hist-details" style="margin-top: ${index > 0 ? '10px' : '0'};">
-             <div class="hist-info">
-               <span class="hist-type">
-                  <span>${typeLabel}</span>
-                  <span class="hist-type-date">${readableDate}</span>
-               </span>
-               <span class="hist-driver-row"><strong style="color:var(--accent)">${driverLabel}:</strong> ${trip.drivers.join(" e ")}</span>
-               <span><strong style="color:var(--muted)">${passLabel}:</strong> ${passAlfab || "Nenhum"}</span>
-               <div style="margin-top:8px; display:flex; justify-content:space-between; font-size:12px; color:var(--text)">
-                  <span>Custo Viagem: <strong>${fmt(trip.totalCost)} 🪙</strong></span>
-                  <span>Custo/Pessoa: <strong>${fmt(trip.costPerPassenger)} 🪙</strong></span>
-               </div>
-             </div>
-             <div class="hist-actions">
-                <button class="gh-btn outline" style="flex:1; padding: 6px;" onclick="editTrip('${trip.id}')">Editar</button>
-                <button class="gh-btn danger" style="flex:1; padding: 6px;" onclick="requestDelete('${trip.id}')">Apagar</button>
-             </div>
-          </div>`;
-       });
-       container.innerHTML = html;
-    }
-    // --- FIM DA NOVA LÓGICA ---
+    // --- FIM DA LÓGICA DE FILTRO ---
 
     window.changeFormDay = function(deltaDays) {
        let parts = formDate.split('-');
@@ -954,17 +854,28 @@ input, select { font-family: inherit; }
         const isPast = iso < todayISO;
         const isFuture = iso > todayISO;
         const isSelected = iso === selectedDateISO;
-        const hasTrip = trips.some(t => t.date === iso);
         const realJsDay = d.getDay();
         const isWeekend = (realJsDay === 0 || realJsDay === 6);
         const isOtherMonth = d.getMonth() !== targetMonth;
+        
+        let tripClass = "";
+        if (currentHistoryFilter === "ALL") {
+           const hasTrip = trips.some(t => t.date === iso);
+           if (hasTrip) tripClass = "has-trip";
+        } else {
+           const personTrips = trips.filter(t => t.date === iso && (t.drivers.includes(currentHistoryFilter) || t.passengers.includes(currentHistoryFilter)));
+           if (personTrips.length > 0) {
+              const isDriver = personTrips.some(t => t.drivers.includes(currentHistoryFilter));
+              tripClass = isDriver ? "has-trip-driver" : "has-trip-passenger";
+           }
+        }
         
         let c = "s-day";
         if(isPast) c += " past";
         if(isFuture) c += " future-day";
         if(isWeekend) c += " weekend";
         if(isSelected) c += " selected";
-        if(hasTrip) c += " has-trip";
+        if(tripClass) c += " " + tripClass;
         if(isOtherMonth) c += " other-month";
         
         const dayName = shortDays[(realJsDay + 6) % 7];
@@ -997,16 +908,24 @@ input, select { font-family: inherit; }
 
     function renderHistoryDetails() {
        const container = document.getElementById("history-details-container");
-       const dayTrips = trips.filter(t => t.date === historySelectedDate);
+       let dayTrips = trips.filter(t => t.date === historySelectedDate);
+       
+       // Se o filtro estiver ativo, mostramos apenas as viagens em que a pessoa participou naquele dia
+       if (currentHistoryFilter !== "ALL") {
+          dayTrips = dayTrips.filter(t => t.drivers.includes(currentHistoryFilter) || t.passengers.includes(currentHistoryFilter));
+       }
        
        if(dayTrips.length === 0) {
           const isFuture = historySelectedDate > todayISO;
           let btnHtml = isFuture ? '' : `<button class="gh-btn primary" style="margin:0 auto; padding:10px 16px; width:auto; font-size:13px;" onclick="openModalWithDate('${historySelectedDate}')">Registar Viagem</button>`;
+          let msgText = currentHistoryFilter !== "ALL" 
+             ? `Nenhum registo para ${currentHistoryFilter} neste dia.` 
+             : `Sem viagens registadas neste dia.`;
           
           container.innerHTML = `
             <div class="hist-details" style="text-align:center; padding: 24px 14px;">
-              <div style="color:var(--muted); font-size:13px; margin-bottom:16px;">Sem viagens registadas neste dia.</div>
-              ${btnHtml}
+              <div style="color:var(--muted); font-size:13px; margin-bottom:16px;">${msgText}</div>
+              ${currentHistoryFilter === "ALL" ? btnHtml : ''}
             </div>
           `;
           return;
@@ -1181,12 +1100,12 @@ input, select { font-family: inherit; }
              }
           } else {
              if (car.passengers.length < 4) {
-                car.passengers.push(person);
+                 car.passengers.push(person);
              } else if (selectedCars === 1 && clickedCarIndex === 0) {
-                setCars(2);
-                carsData[1].passengers.push(person);
+                 setCars(2);
+                 carsData[1].passengers.push(person);
              } else {
-                showToast("Capacidade máxima atingida neste carro!");
+                 showToast("Capacidade máxima atingida neste carro!");
              }
           }
        }
@@ -1411,8 +1330,8 @@ input, select { font-family: inherit; }
       closeModal();
       showToast("Viagem guardada com sucesso!");
       historySelectedDate = formDate;
-      // Garante que se o utilizador acabou de guardar e vai ao histórico, a view reseta para o calendário
       document.getElementById('history-filter').value = "ALL";
+      currentHistoryFilter = "ALL";
       applyHistoryFilter();
     }
   </script>
