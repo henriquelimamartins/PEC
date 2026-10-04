@@ -33,6 +33,10 @@
   --weekend-border: #2c2520;
 }
 
+/* Ocultar a barra de scroll globalmente para parecer uma app nativa */
+::-webkit-scrollbar { display: none; }
+html, body { -ms-overflow-style: none; scrollbar-width: none; }
+
 * { box-sizing: border-box; }
 html, body { min-height: 100vh; margin: 0; background: var(--bg); touch-action: manipulation; }
 button, a, img, select { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
@@ -131,9 +135,10 @@ input, select { font-family: inherit; }
 .stats-chart { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
 .chart-bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
 .chart-label { width: 70px; color: var(--muted); font-weight: 500; text-align: right; }
-.chart-track { flex: 1; background: var(--card2); height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+.chart-track { flex: 1; background: var(--card2); height: 10px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); position: relative; }
 .chart-fill { height: 100%; background: var(--accent); border-radius: 4px; }
 .chart-val { width: 40px; font-weight: 600; color: var(--text); text-align: left; }
+.ref-line { position: absolute; left: 33%; top: 0; bottom: 0; width: 1px; border-left: 1px dashed rgba(255,255,255,0.4); z-index: 2; pointer-events: none; }
 
 .chk-row { display: flex; align-items: center; gap: 10px; background: var(--card2); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); margin-top: 16px; cursor: pointer; }
 .chk-box { width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border); background: #010409; display: flex; align-items: center; justify-content: center; }
@@ -155,8 +160,9 @@ input, select { font-family: inherit; }
 .car-header { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
 .car-header::before { content:''; display:block; width:3px; height:12px; background: var(--accent); border-radius:2px; }
 
-.modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; padding-top: calc(90px + env(safe-area-inset-top, 0px)); }
+.modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; padding-top: calc(90px + env(safe-area-inset-top, 0px)); -ms-overflow-style: none; scrollbar-width: none; }
 .modal-overlay.active { display: block; }
+.modal-overlay::-webkit-scrollbar { display: none; }
 .modal-overlay .page { padding-bottom: 160px; } 
 
 #custom-confirm { z-index: 300; background: rgba(1, 4, 9, 0.8); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding-top: 0; }
@@ -202,7 +208,7 @@ input, select { font-family: inherit; }
   <!-- Ecrã Login -->
   <div id="login-screen">
     <div style="text-align: center; margin-bottom: 24px;">
-      <h1 class="brand" style="font-size: 20px; margin-bottom: 6px; justify-content: center;">GESTÃO DE BOLEIAS <span style="color:var(--accent)">PEC</span></h1>
+      <h1 class="brand" style="font-size: 20px; margin-bottom: 6px; justify-content: center;">GESTÃO DE <span>BOLEIAS</span> PEC</h1>
       <p style="color: var(--muted); font-size: 12px;">Ponte de Lima</p>
     </div>
     <input type="password" id="password-input" class="input-text" placeholder="Palavra-passe" style="text-align: center; margin-bottom: 12px; max-width: 280px;">
@@ -214,7 +220,7 @@ input, select { font-family: inherit; }
     <!-- Topbar Fixa Global -->
     <div class="topbar">
       <div class="topbar-header">
-        <div class="brand">GESTÃO DE BOLEIAS <span>PEC</span></div>
+        <div class="brand">GESTÃO DE <span>BOLEIAS</span> PEC</div>
         <div class="header-date" id="header-date"></div>
       </div>
       <div id="week-bar">
@@ -234,9 +240,9 @@ input, select { font-family: inherit; }
         <b>Registar Nova Viagem</b>
       </button>
 
-      <!-- Botão para migração dos dados locais para o Firebase -->
-      <button class="gh-btn outline" onclick="migrarParaFirebase()" style="border-style: dashed; color: var(--accent); margin-top: 10px; font-size: 13px;">
-        ☁️ Sincronizar Dados Locais para o Firebase
+      <!-- Botão para forçar recarregamento manual dos dados (sem apagar nada) -->
+      <button id="btn-refresh" class="gh-btn outline" onclick="forceRefresh()" style="border-style: dashed; color: var(--accent); margin-top: 10px; font-size: 13px;">
+        🔄 Atualizar Dados da Nuvem
       </button>
     </div>
 
@@ -390,7 +396,7 @@ input, select { font-family: inherit; }
   </script>
 
   <script type="module">
-    const USE_FIREBASE = true; // Ativado para usar o Firebase
+    const USE_FIREBASE = true; // Firebase Ativado
 
     const firebaseConfig = {
       apiKey: "AIzaSyCEhvEeluGLKUi3YE28j8hFZIvSWXRfS68",
@@ -402,7 +408,7 @@ input, select { font-family: inherit; }
     };
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, getDocs } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
     let db;
     if (USE_FIREBASE) {
@@ -448,26 +454,46 @@ input, select { font-family: inherit; }
        });
     }
 
-    // Função para migrar dados locais para o Firebase
+    // Função manual para garantir refresh real da base de dados Firebase
+    window.forceRefresh = async function() {
+       if(!USE_FIREBASE) return;
+       const btn = document.getElementById("btn-refresh");
+       btn.innerText = "A atualizar...";
+       btn.disabled = true;
+       try {
+          const q = query(collection(db, "trips"), orderBy("date", "desc"));
+          const snapshot = await getDocs(q);
+          trips = [];
+          snapshot.forEach((doc) => { trips.push({ id: doc.id, ...doc.data() }); });
+          recalculateAndRender();
+          showToast("Dados atualizados da nuvem!");
+       } catch (err) {
+          showToast("Erro ao sincronizar dados!");
+       } finally {
+          btn.innerHTML = "🔄 Atualizar Dados da Nuvem";
+          btn.disabled = false;
+       }
+    }
+
+    // Função de migração segura de segurança mantida internamente
     window.migrarParaFirebase = async function() {
-      if (!USE_FIREBASE) {
-         alert("O Firebase está desativado.");
-         return;
-      }
+      if (!USE_FIREBASE) return alert("O Firebase está desativado.");
       const localTrips = JSON.parse(localStorage.getItem("pec_trips_v20") || "[]");
-      if (localTrips.length === 0) {
-         alert("Não tens dados locais guardados para migrar neste telemóvel.");
-         return;
-      }
+      if (localTrips.length === 0) return alert("Não tens dados locais guardados para migrar neste telemóvel.");
+      
       const confirmar = confirm(`Foram encontradas ${localTrips.length} viagens na cache local. Queres enviá-las para o Firebase?`);
       if (confirmar) {
-         for (let trip of localTrips) {
-            const { id, ...tripData } = trip;
-            await addDoc(collection(db, "trips"), tripData);
+         try {
+            for (let trip of localTrips) {
+               const { id, ...tripData } = trip;
+               await addDoc(collection(db, "trips"), tripData);
+            }
+            alert("Sucesso! Os dados foram guardados na nuvem e a cache será limpa.");
+            localStorage.removeItem("pec_trips_v20"); // SÓ APAGA DEPOIS DE SUCESSO CONFIRMADO
+            window.location.reload();
+         } catch(e) {
+            alert("Erro de comunicação com o Firebase. Os teus dados LOCAIS NÃO FORAM apagados. Tenta novamente.");
          }
-         alert("Migração concluída com sucesso! Os teus dados já estão na nuvem.");
-         localStorage.removeItem("pec_trips_v20");
-         window.location.reload();
       }
     }
 
@@ -540,33 +566,8 @@ input, select { font-family: inherit; }
         document.getElementById("login-screen").style.display = "none";
         document.getElementById("app-screen").style.display = "block";
         initApp();
-        initHistorySwipeListeners();
         initFormSwipeListeners();
       }
-    }
-
-    // --- SWIPE DO HISTÓRICO (Muda de Mês) ---
-    function initHistorySwipeListeners() {
-       const histCal = document.getElementById('history-card-container');
-       if(!histCal) return;
-       let touchStartX = 0, touchStartY = 0;
-       
-       histCal.addEventListener('touchstart', e => {
-          touchStartX = e.changedTouches[0].screenX;
-          touchStartY = e.changedTouches[0].screenY;
-       }, {passive: true});
-       
-       histCal.addEventListener('touchend', e => {
-          let touchEndX = e.changedTouches[0].screenX;
-          let touchEndY = e.changedTouches[0].screenY;
-          const diffX = Math.abs(touchEndX - touchStartX);
-          const diffY = Math.abs(touchEndY - touchStartY);
-          
-          if (diffX > 40 && diffX > diffY) {
-             if (touchEndX < touchStartX) changeHistoryMonth(1);
-             else changeHistoryMonth(-1);
-          }
-       }, {passive: true});
     }
 
     // --- SWIPE DO FORMULÁRIO DE REGISTO (Muda de Semana) ---
@@ -658,6 +659,16 @@ input, select { font-family: inherit; }
        return latest;
     }
 
+    function getPersonRatio(personName) {
+       let drv = 0, pas = 0;
+       trips.forEach(t => {
+          if(t.drivers.includes(personName)) drv++;
+          if(t.passengers.includes(personName)) pas++;
+       });
+       let total = drv + pas;
+       return total === 0 ? 0 : (drv / total);
+    }
+
     function recalculateAndRender() {
       PEOPLE.forEach(p => balances[p] = 0);
       trips.forEach(trip => {
@@ -665,11 +676,19 @@ input, select { font-family: inherit; }
         trip.drivers.forEach(d => balances[d] += trip.profitPerDriver);
       });
 
-      const sortedPeople = PEOPLE.map(name => ({ name, val: balances[name] })).sort((a, b) => {
+      const sortedPeople = PEOPLE.map(name => ({
+        name, 
+        val: balances[name],
+        ratio: getPersonRatio(name),
+        lastTime: getLastDrivenTime(name)
+      })).sort((a, b) => {
+        // 1º - Menor Saldo primeiro (o mais negativo precisa mais de conduzir)
         if (a.val !== b.val) return a.val - b.val;
-        const lastA = getLastDrivenTime(a.name);
-        const lastB = getLastDrivenTime(b.name);
-        if (lastA !== lastB) return lastA - lastB; 
+        // 2º - Menor Rácio primeiro (quem conduz percentualmente menos vezes)
+        if (a.ratio !== b.ratio) return a.ratio - b.ratio;
+        // 3º - Conduziu há mais tempo primeiro (datas antigas = números menores)
+        if (a.lastTime !== b.lastTime) return a.lastTime - b.lastTime;
+        // 4º - Ordem Alfabética
         return a.name.localeCompare(b.name); 
       });
       
@@ -733,13 +752,17 @@ input, select { font-family: inherit; }
           statsData.push({ name: person, asDriver, asPassenger, passCount, totalViagens, ratio });
        });
 
-       let statsDataRatio = [...statsData].sort((a, b) => a.name.localeCompare(b.name));
+       // Ordenação do Rácio: Ascendente (menor para maior)
+       let statsDataRatio = [...statsData].sort((a, b) => a.ratio - b.ratio);
        let ratioHtml = "";
        statsDataRatio.forEach(d => {
           const pct = Math.round(d.ratio * 100);
           ratioHtml += `<div class="chart-bar-row">
              <div class="chart-label">${d.name}</div>
-             <div class="chart-track"><div class="chart-fill" style="width: ${pct}%"></div></div>
+             <div class="chart-track">
+                <div class="ref-line"></div>
+                <div class="chart-fill" style="width: ${pct}%"></div>
+             </div>
              <div class="chart-val">${pct}%</div>
           </div>`;
        });
