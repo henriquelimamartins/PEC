@@ -25,7 +25,7 @@
   --accent: #d66b2b;      
   --green: #238636;       
   --green-hover: #2ea043;
-  --yellow: #d29922;      /* Nova cor para passageiros */
+  --yellow: #fbbf24;      /* Amarelo mais brilhante para contraste visual */
   --danger: #f85149;      
   --text: #f0f6fc;        
   --muted: #8b949e;       
@@ -107,7 +107,7 @@ input, select { font-family: inherit; }
 .s-month-badge { position: absolute; top: 2px; left: 0; right: 0; text-align: center; font-size: 7px; font-weight: 600; color: var(--muted); opacity: 0.8; }
 .s-day .s-date { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1; margin-top: 1px; }
 .s-day .s-wkd { font-size: 8.5px; text-transform: uppercase; color: var(--muted); margin-top: 4px; font-weight: 500; }
-.s-day.past { background: #010409; opacity: 0.6; }
+.s-day.past { background: #010409; opacity: 0.85; } /* Fade reduzido para não ficar muito escuro */
 .s-day.other-month { opacity: 0.35 !important; }
 .s-day.future-day { opacity: 0.25 !important; cursor: not-allowed; }
 .s-day.weekend { background: var(--weekend-bg); border-color: var(--weekend-border); }
@@ -241,7 +241,7 @@ input, select { font-family: inherit; }
       
       <div style="margin-bottom: 16px;">
          <select id="history-filter" class="input-text" onchange="applyHistoryFilter()">
-            <option value="ALL">Visualização Global por Calendário</option>
+            <option value="ALL">Visualização Global</option>
          </select>
       </div>
 
@@ -418,7 +418,7 @@ input, select { font-family: inherit; }
     
     let todayISO = getLocalDateISO();
     let historySelectedDate = todayISO;
-    let currentHistoryFilter = "ALL"; // Guarda o estado atual do filtro do histórico
+    let currentHistoryFilter = "ALL"; 
     
     let formDate = todayISO;
     let selectedCars = 1;
@@ -431,10 +431,12 @@ input, select { font-family: inherit; }
 
     function initHistoryFilterDropdown() {
        const select = document.getElementById("history-filter");
+       select.innerHTML = '<option value="ALL">Visualização Global</option>';
        PEOPLE.forEach(person => {
           let opt = document.createElement('option');
           opt.value = person;
-          opt.innerHTML = `Visualizar calendário de ${person}`;
+          const isFemale = FEMALES.includes(person);
+          opt.innerHTML = isFemale ? `Viagens da ${person}` : `Viagens do ${person}`;
           select.appendChild(opt);
        });
     }
@@ -508,7 +510,39 @@ input, select { font-family: inherit; }
         document.getElementById("login-screen").style.display = "none";
         document.getElementById("app-screen").style.display = "block";
         initApp();
+        initSwipeListeners();
       }
+    }
+
+    // --- LÓGICA DE SWIPE DO CALENDÁRIO ---
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    function initSwipeListeners() {
+       const histCal = document.getElementById('history-card-container');
+       histCal.addEventListener('touchstart', e => {
+          touchStartX = e.changedTouches[0].screenX;
+          touchStartY = e.changedTouches[0].screenY;
+       }, {passive: true});
+       
+       histCal.addEventListener('touchend', e => {
+          touchEndX = e.changedTouches[0].screenX;
+          touchEndY = e.changedTouches[0].screenY;
+          
+          const diffX = Math.abs(touchEndX - touchStartX);
+          const diffY = Math.abs(touchEndY - touchStartY);
+          
+          // Se o movimento horizontal for maior que o vertical e houver distância suficiente
+          if (diffX > 40 && diffX > diffY) {
+             if (touchEndX < touchStartX) {
+                changeHistoryMonth(1); // Swipe esquerda (próximo)
+             } else {
+                changeHistoryMonth(-1); // Swipe direita (anterior)
+             }
+          }
+       }, {passive: true});
     }
 
     function initApp() {
@@ -697,12 +731,10 @@ input, select { font-family: inherit; }
        barsContainer.innerHTML = barsHtml;
     }
 
-    // --- LOGICA DE FILTRO DO HISTÓRICO ---
     window.applyHistoryFilter = function() {
        currentHistoryFilter = document.getElementById("history-filter").value;
        renderHistoryCalendar();
     }
-    // --- FIM DA LÓGICA DE FILTRO ---
 
     window.changeFormDay = function(deltaDays) {
        let parts = formDate.split('-');
@@ -910,7 +942,6 @@ input, select { font-family: inherit; }
        const container = document.getElementById("history-details-container");
        let dayTrips = trips.filter(t => t.date === historySelectedDate);
        
-       // Se o filtro estiver ativo, mostramos apenas as viagens em que a pessoa participou naquele dia
        if (currentHistoryFilter !== "ALL") {
           dayTrips = dayTrips.filter(t => t.drivers.includes(currentHistoryFilter) || t.passengers.includes(currentHistoryFilter));
        }
@@ -953,7 +984,7 @@ input, select { font-family: inherit; }
           }
 
           const passAlfab = [...trip.passengers].sort((a,b) => a.localeCompare(b)).join(", ");
-          const typeLabel = trip.isOneWay ? 'Viagem só de ida' : 'Viagem Normal';
+          const typeLabel = trip.isOneWay ? 'Viagem Só de Ida' : 'Viagem Normal';
             
           html += `<div class="hist-details" style="margin-top: ${index > 0 ? '10px' : '0'};">
              <div class="hist-info">
