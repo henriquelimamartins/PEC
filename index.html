@@ -138,7 +138,6 @@ input, select { font-family: inherit; }
 .chart-track { flex: 1; background: var(--card2); height: 10px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); position: relative; }
 .chart-fill { height: 100%; background: var(--accent); border-radius: 4px; }
 .chart-val { width: 40px; font-weight: 600; color: var(--text); text-align: left; }
-.ref-line { position: absolute; left: 33%; top: 0; bottom: 0; width: 1px; border-left: 1px dashed rgba(255,255,255,0.4); z-index: 2; pointer-events: none; }
 
 .chk-row { display: flex; align-items: center; gap: 10px; background: var(--card2); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); margin-top: 16px; cursor: pointer; }
 .chk-box { width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border); background: #010409; display: flex; align-items: center; justify-content: center; }
@@ -280,6 +279,33 @@ input, select { font-family: inherit; }
         <div id="stats-bars-chart" class="stats-chart" style="border-bottom: none; margin-bottom: 0;"></div>
       </div>
     </div>
+    
+    <!-- TAB 4: INFO -->
+    <div id="tab-info" class="page tab-content" style="display: none;">
+      <div class="eyebrow">Sobre o Sistema</div>
+      <div class="card">
+        <h3 style="margin-bottom: 12px; color: var(--text);">Como funciona a aplicação?</h3>
+        <p style="margin-bottom: 16px; color: var(--muted); line-height: 1.6;">
+          Esta aplicação foi criada para gerir de forma justa e totalmente automática quem deve ser o próximo condutor nas boleias de grupo.
+        </p>
+        
+        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">1. O Balanço (🪙)</h4>
+        <p style="margin-bottom: 16px; line-height: 1.6; color: var(--text);">
+          Funciona como uma economia virtual. Sempre que conduzes, <strong>ganhas</strong> créditos por cada passageiro que transportas. Quando vais à boleia no carro de alguém, <strong>gastas</strong> créditos para pagar a tua viagem.<br><br>
+          <em>A pessoa com o balanço mais negativo é sempre a sugerida para pegar no carro a seguir!</em>
+        </p>
+
+        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">2. Desempates e Rácio</h4>
+        <p style="margin-bottom: 16px; line-height: 1.6; color: var(--text);">
+          Se existirem duas ou mais pessoas com o mesmo valor de balanço, a app escolhe de forma inteligente a que tem o <strong>menor Rácio</strong> (ou seja, quem conduziu percentualmente menos vezes em relação às vezes que foi à boleia). Se ainda assim houver empate, é chamado quem não conduz há mais tempo.
+        </p>
+        
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center;">
+          <p style="font-size: 12px; margin-bottom: 10px; color: var(--muted);">Quer saber ainda mais sobre os algoritmos complexos por trás da nossa plataforma?</p>
+          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 13px;">Para mais informações, clica aqui</a>
+        </div>
+      </div>
+    </div>
 
     <!-- Barra de Navegação Inferior Fixa -->
     <div class="botnav">
@@ -291,6 +317,9 @@ input, select { font-family: inherit; }
        </button>
        <button onclick="switchTab('stats')" id="nav-stats">
           <span class="ic">📊</span>Estatísticas
+       </button>
+       <button onclick="switchTab('info')" id="nav-info">
+          <span class="ic">ℹ️</span>Info
        </button>
     </div>
   </div>
@@ -682,13 +711,9 @@ input, select { font-family: inherit; }
         ratio: getPersonRatio(name),
         lastTime: getLastDrivenTime(name)
       })).sort((a, b) => {
-        // 1º - Menor Saldo primeiro (o mais negativo precisa mais de conduzir)
         if (a.val !== b.val) return a.val - b.val;
-        // 2º - Menor Rácio primeiro (quem conduz percentualmente menos vezes)
         if (a.ratio !== b.ratio) return a.ratio - b.ratio;
-        // 3º - Conduziu há mais tempo primeiro (datas antigas = números menores)
         if (a.lastTime !== b.lastTime) return a.lastTime - b.lastTime;
-        // 4º - Ordem Alfabética
         return a.name.localeCompare(b.name); 
       });
       
@@ -760,7 +785,6 @@ input, select { font-family: inherit; }
           ratioHtml += `<div class="chart-bar-row">
              <div class="chart-label">${d.name}</div>
              <div class="chart-track">
-                <div class="ref-line"></div>
                 <div class="chart-fill" style="width: ${pct}%"></div>
              </div>
              <div class="chart-val">${pct}%</div>
