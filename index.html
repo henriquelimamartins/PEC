@@ -301,7 +301,7 @@ input, select { font-family: inherit; }
         </p>
         
         <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center;">
-          <p style="font-size: 12px; margin-bottom: 10px; color: var(--muted);">Ainda tens dúvidas sobre estes algoritmos complexos?</p>
+          <p style="font-size: 11.5px; margin-bottom: 10px; color: var(--muted); white-space: nowrap;">Ainda com dúvidas sobre estes algarismos complexos?</p>
           <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 13px;">CLICA AQUI!</a>
         </div>
       </div>
@@ -1417,6 +1417,7 @@ input, select { font-family: inherit; }
                   <div style="display:flex; justify-content:space-between; margin-top:6px; margin-bottom:2px;"><span>Custo da viagem:</span> <strong style="color:var(--text)">${fmt(calc.totalCost)} 🪙</strong></div>
                   <div style="display:flex; justify-content:space-between;"><span>Custo por passageiro:</span> <strong style="color:var(--text)">${fmt(calc.costPerPassenger)} 🪙</strong></div>
                </div>`;
+               tripCalcs.process = true; // placeholder
                tripCalcs.push({ driver: car.driver, passengers: [...car.passengers], totalCost: calc.totalCost, costPerPassenger: calc.costPerPassenger, profitPerDriver: calc.totalCost, isOneWay: car.isOneWay });
             }
          }
@@ -1453,7 +1454,7 @@ input, select { font-family: inherit; }
       
       if(!USE_FIREBASE) {
           localStorage.setItem("pec_trips_v20", JSON.stringify(trips));
-          recalculateAndRender();
+          recalculateAndRecord(); // fallback
       }
       
       closeModal();
