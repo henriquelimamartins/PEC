@@ -33,7 +33,6 @@
 }
 
 * { box-sizing: border-box; }
-/* Correção do height: 100% para min-height: 100vh para os offsets inferiores funcionarem */
 html, body { min-height: 100vh; margin: 0; background: var(--bg); touch-action: manipulation; }
 button, a, img { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif; color: var(--text); -webkit-tap-highlight-color: transparent; padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px)); }
@@ -45,17 +44,14 @@ input { font-family: inherit; }
 #app-screen, #login-screen { max-width: 520px; margin: 0 auto; min-height: 100vh; }
 #login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
 
-/* Offsets calibrados - 90px garante um espaçamento perfeito abaixo da topbar */
 #app-screen { padding-top: calc(90px + env(safe-area-inset-top, 0px)); } 
 
-/* Topbar fixa globalmente acima de tudo */
 .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 250; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 12px; border-bottom: 1px solid var(--border); }
 .topbar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; max-width: 520px; margin-left: auto; margin-right: auto; }
 .brand { font-size: 14px; font-weight: 600; letter-spacing: -0.2px; color: var(--text); display: flex; align-items: center; gap: 6px; }
 .brand span { color: var(--accent); font-weight: 700; }
 .header-date { font-size: 11px; color: var(--muted); font-weight: 500; text-transform: uppercase; }
 
-/* Barra Semanal */
 #week-bar { max-width: 520px; margin: 0 auto; }
 .phasebar { display: flex; gap: 4px; margin-bottom: 4px; }
 .pseg { flex: 1; height: 6px; border-radius: 3px; background: var(--card2); border: 1px solid var(--border); overflow: hidden; position: relative; }
@@ -72,13 +68,11 @@ input { font-family: inherit; }
 .page { padding: 16px; }
 .eyebrow { color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
 
-/* GitHub Cards */
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
 .card.no-pad-top { padding-top: 4px; padding-bottom: 4px; }
 .card h3 { font-size: 14px; margin-bottom: 12px; color: var(--text); display: flex; justify-content: space-between; align-items: center; }
 .tag { color: var(--muted); font-size: 11px; font-weight: 500; background: var(--card2); border: 1px solid var(--border); padding: 2px 8px; border-radius: 12px; }
 
-/* Botões */
 .gh-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--card2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; width: 100%; text-align: center; color: var(--text); font-weight: 500; font-size: 14px; }
 .gh-btn:hover { background: #30363d; }
 .gh-btn.primary { background: var(--green); border-color: rgba(240,246,252,0.1); color: #fff; }
@@ -86,11 +80,11 @@ input { font-family: inherit; }
 .gh-btn.danger { background: #da3633; border-color: rgba(240,246,252,0.1); color: #fff; }
 .gh-btn.danger:hover { background: #b62324; }
 .gh-btn.outline { background: transparent; border: 1px solid var(--border); }
+.gh-btn:disabled { opacity: 0.4; pointer-events: none; }
 
 .input-text { background: #010409; border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 10px 12px; font-size: 14px; width: 100%; outline: none; }
 .input-text:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(214, 107, 43, 0.25); }
 
-/* Listas Balanços */
 .list { list-style: none; padding: 0; margin: 0; }
 .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 10px; }
 .list-item:last-child { border-bottom: none; }
@@ -101,9 +95,9 @@ input { font-family: inherit; }
 .balance-val.negative { color: var(--danger); }
 .next-driver-tag { background: rgba(214, 107, 43, 0.15); color: var(--accent); font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; border: 1px solid rgba(214, 107, 43, 0.35); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
 
-/* Calendário Grid & Fim de Semana Castanho */
 .calendar-header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 12px; font-weight: 600; color: var(--muted); }
 .calendar-header-nav button { flex-direction: column; background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 4px; border-radius: 4px; font-size: 8px; height: auto; gap: 2px; min-width: 32px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; text-transform: uppercase; }
+.calendar-header-nav button:disabled { opacity: 0.2; pointer-events: none; }
 .center-date { text-align: center; line-height: 1.2; font-size: 11px; }
 .center-date span { display: block; }
 
@@ -114,6 +108,7 @@ input { font-family: inherit; }
 .s-day .s-wkd { font-size: 8.5px; text-transform: uppercase; color: var(--muted); margin-top: 4px; font-weight: 500; }
 .s-day.past { background: #010409; opacity: 0.6; }
 .s-day.other-month { opacity: 0.35 !important; }
+.s-day.future-day { opacity: 0.25 !important; cursor: not-allowed; }
 .s-day.weekend { background: var(--weekend-bg); border-color: var(--weekend-border); }
 .s-day.weekend .s-wkd { color: #80583b; }
 .s-day.has-trip { border-bottom: 3px solid var(--green); }
@@ -126,7 +121,6 @@ input { font-family: inherit; }
 .hist-driver-row { display: block; margin-bottom: 4px; }
 .hist-actions { display: flex; gap: 8px; margin-top: 12px; }
 
-/* Gráficos de Estatísticas */
 .stats-section-title { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
 .stats-chart { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
 .chart-bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
@@ -135,7 +129,6 @@ input { font-family: inherit; }
 .chart-fill { height: 100%; background: var(--accent); border-radius: 4px; }
 .chart-val { width: 40px; font-weight: 600; color: var(--text); text-align: left; }
 
-/* Checkbox & Forms */
 .chk-row { display: flex; align-items: center; gap: 10px; background: var(--card2); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); margin-top: 16px; cursor: pointer; }
 .chk-box { width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border); background: #010409; display: flex; align-items: center; justify-content: center; }
 .chk-box.on { background: var(--green); border-color: var(--green); }
@@ -156,7 +149,6 @@ input { font-family: inherit; }
 .car-header { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
 .car-header::before { content:''; display:block; width:3px; height:12px; background: var(--accent); border-radius:2px; }
 
-/* Modal */
 .modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; padding-top: calc(90px + env(safe-area-inset-top, 0px)); }
 .modal-overlay.active { display: block; }
 .modal-overlay .page { padding-bottom: 160px; } 
@@ -166,7 +158,6 @@ input { font-family: inherit; }
 .confirm-box { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
 .confirm-box h3 { font-size: 16px; margin-bottom: 8px; }
 
-/* Novo Design do Carro (Dinâmico: 2 atrás se <= 4 pessoas; 3 atrás se = 5 pessoas) */
 .cars-container { display: flex; justify-content: center; gap: 16px; padding: 10px 0; }
 .car-visual { 
   width: 112px; background: #010409; border: 1px solid var(--border); 
@@ -178,7 +169,6 @@ input { font-family: inherit; }
   background: rgba(255,255,255,0.06); border-radius: 4px 4px 2px 2px; 
 }
 .car-row { display: flex; width: 100%; justify-content: center; }
-/* O gap frontal e o gap para 2 lugares atrás são idênticos para alinhar perfeitamente */
 .front-row, .back-row-2 { gap: 14px; }
 .back-row-3 { gap: 6px; }
 .seat { 
@@ -192,7 +182,6 @@ input { font-family: inherit; }
 
 .summary-panel { background: var(--card2); padding: 14px; border-radius: 6px; border: 1px solid var(--border); border-left: 3px solid var(--accent); font-size: 13px; color: var(--text); margin-bottom: 16px; line-height: 1.5; }
 
-/* Barra Inferior Fixa */
 .botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; }
 .botnav button { flex: 1; background: none; border: none; color: var(--muted); font-size: 10px; font-weight: 500; text-transform: uppercase; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; }
 .botnav button .ic { font-size: 18px; }
@@ -255,7 +244,6 @@ input { font-family: inherit; }
       <div class="card">
         <h3 style="margin-bottom: 8px;">Estatísticas Gerais</h3>
         
-        <!-- Bloco de Viagens Totais -->
         <div style="font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 20px; display: flex; align-items: baseline; gap: 8px;">
           <span id="stats-total-trips">0</span>
           <span style="font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase;">Viagens Registadas</span>
@@ -287,7 +275,6 @@ input { font-family: inherit; }
   <div id="modal-trip" class="modal-overlay">
     <div class="page form-container" id="modal-form-content" style="position: relative;">
       
-      <!-- Cabeçalho do Formulário -->
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
         <h2 style="font-size: 16px; margin: 0; color: var(--text);">Registo de Viagem</h2>
         <button onclick="closeModal()" style="background:var(--card2); border:1px solid var(--border); color:var(--text); width:32px; height:32px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer;" title="Fechar">✕</button>
@@ -334,7 +321,6 @@ input { font-family: inherit; }
         </div>
       </div>
 
-      <!-- Botão de Separar Custo para 2 Carros -->
       <div id="split-cost-container" style="margin-bottom: 12px; display: none;">
          <div class="chk-row" onclick="toggleSplitCost()">
            <div class="chk-box" id="split-cost-box"></div>
@@ -353,7 +339,6 @@ input { font-family: inherit; }
         Selecione os condutores e passageiros para calcular custos.
       </div>
 
-      <!-- Botões Cancelar e Guardar no fundo -->
       <div style="display: flex; gap: 8px; margin-bottom: 20px;">
         <button class="gh-btn outline" style="flex:1; padding: 14px; font-size: 15px; margin: 0;" onclick="closeModal()">Cancelar</button>
         <button class="gh-btn primary" style="flex:1; padding: 14px; font-size: 15px; margin: 0;" id="btn-save-trip" onclick="saveTrip()" disabled>Guardar</button>
@@ -376,7 +361,6 @@ input { font-family: inherit; }
 
   <div id="toast" class="toast"></div>
 
-  <!-- Registo do Service Worker para PWA -->
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js')
@@ -385,7 +369,6 @@ input { font-family: inherit; }
     }
   </script>
 
-  <!-- LÓGICA -->
   <script type="module">
     const USE_FIREBASE = false; 
 
@@ -411,7 +394,6 @@ input { font-family: inherit; }
     const FEMALES = ["Ana", "Joana", "Mariana"];
     const INITIALS = { "Ana": "AC", "Luciano": "LF", "Luís": "LA", "André": "AS", "Henrique": "HL", "Joana": "JF", "João": "JC", "Mariana": "MB" };
     
-    // Função segura para ir buscar a data ISO sem sofrer compensações de TimeZone (UTC vs Local)
     function getLocalDateISO(d = new Date()) {
        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
@@ -471,7 +453,6 @@ input { font-family: inherit; }
        window.scrollTo(0,0);
     }
 
-    // Função de Hash SHA-256 para a password "pec2026"
     async function hashString(string) {
       const msgUint8 = new TextEncoder().encode(string);
       const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
@@ -594,11 +575,9 @@ input { font-family: inherit; }
 
         let valClass = p.val < 0 ? 'negative' : (p.val > 0 ? 'positive' : '');
         let prefix = p.val > 0 ? '+' : '';
-        // Mostra sempre duas casas decimais no balanço
         let valStr = Math.abs(p.val).toFixed(2);
         let sign = p.val < 0 ? '-' : prefix;
         
-        // Estrutura alterada para manter a tag à direita
         li.innerHTML = `
           <div class="balance-name">${p.name}</div>
           <div class="balance-right">
@@ -609,7 +588,6 @@ input { font-family: inherit; }
         list.appendChild(li);
       });
 
-      // Evita re-renderizar o histórico sempre, a não ser que estejamos nessa aba, mas mantemos os dados limpos
       renderHistoryCalendar();
       renderWeekBar();
       if(document.getElementById('tab-stats').style.display === 'block') renderStats();
@@ -619,7 +597,6 @@ input { font-family: inherit; }
        const ratioContainer = document.getElementById('stats-ratio-chart');
        const barsContainer = document.getElementById('stats-bars-chart');
        
-       // Atualiza o total de viagens registadas
        document.getElementById('stats-total-trips').innerText = trips.length;
        
        let statsData = [];
@@ -642,7 +619,6 @@ input { font-family: inherit; }
           statsData.push({ name: person, asDriver, asPassenger, passCount, totalViagens, ratio });
        });
 
-       // Ordenar agora alfabeticamente
        let statsDataRatio = [...statsData].sort((a, b) => a.name.localeCompare(b.name));
        let ratioHtml = "";
        statsDataRatio.forEach(d => {
@@ -692,12 +668,14 @@ input { font-family: inherit; }
        barsContainer.innerHTML = barsHtml;
     }
 
-    // Formulário (Nova Viagem) Navegação Dinâmica
     window.changeFormDay = function(deltaDays) {
        let parts = formDate.split('-');
        let currDate = new Date(parts[0], parts[1]-1, parts[2]);
        currDate.setDate(currDate.getDate() + deltaDays);
-       formDate = getLocalDateISO(currDate);
+       let newIso = getLocalDateISO(currDate);
+       // Não permite avançar para além de hoje no formulário
+       if(newIso > todayISO) return;
+       formDate = newIso;
        refreshFormUI();
     }
 
@@ -739,6 +717,7 @@ input { font-family: inherit; }
           const iso = getLocalDateISO(d);
           
           const isPast = iso < todayISO;
+          const isFuture = iso > todayISO;
           const isSelected = iso === selectedDateISO;
           const hasTrip = trips.some(t => t.date === iso);
           const jsDay = d.getDay();
@@ -746,6 +725,7 @@ input { font-family: inherit; }
           
           let c = "s-day";
           if(isPast) c += " past";
+          if(isFuture) c += " future-day";
           if(isWeekend) c += " weekend";
           if(isSelected) c += " selected";
           if(hasTrip) c += " has-trip";
@@ -761,24 +741,31 @@ input { font-family: inherit; }
              badgeHtml = `<div class="s-month-badge">${shortMonths[d.getMonth()]}</div>`;
           }
 
-          html += `<div class="${c}" onclick="${onClickAction}('${iso}')">${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
+          let clickAttr = isFuture ? '' : `onclick="${onClickAction}('${iso}')"`;
+          html += `<div class="${c}" ${clickAttr}>${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
        }
        return html + '</div>';
     }
 
-    // Histórico por Meses Oficiais
     window.changeHistoryMonth = function(delta) {
        let parts = historySelectedDate.split('-');
        let currDate = new Date(parts[0], parts[1]-1, parts[2]);
        currDate.setMonth(currDate.getMonth() + delta);
-       historySelectedDate = getLocalDateISO(currDate);
+       let newIso = getLocalDateISO(currDate);
+       
+       // Limite mínimo: Novembro 2025 (2025-11-01)
+       if(newIso < "2025-11-01") return;
+       historySelectedDate = newIso;
        renderHistoryCalendar();
     }
     window.changeHistoryYear = function(delta) {
        let parts = historySelectedDate.split('-');
        let currDate = new Date(parts[0], parts[1]-1, parts[2]);
        currDate.setFullYear(currDate.getFullYear() + delta);
-       historySelectedDate = getLocalDateISO(currDate);
+       let newIso = getLocalDateISO(currDate);
+       
+       if(newIso < "2025-11-01") return;
+       historySelectedDate = newIso;
        renderHistoryCalendar();
     }
     window.resetHistoryToToday = function() {
@@ -795,10 +782,13 @@ input { font-family: inherit; }
       const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
       const shortMonths = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
 
+      // Desativa botão de mês anterior se estivermos em Novembro de 2025
+      const canGoPrev = !(targetYear === 2025 && targetMonth === 10);
+
       let html = `<div class="calendar-header-nav">
           <div style="display:flex; gap:4px;">
-             <button onclick="changeHistoryYear(-1)" title="Ano Anterior"><span>◀</span><span>Ano</span></button>
-             <button onclick="changeHistoryMonth(-1)" title="Mês Anterior"><span>◀</span><span>Mês</span></button>
+             <button onclick="changeHistoryYear(-1)" ${!canGoPrev ? 'disabled' : ''} title="Ano Anterior"><span>◀</span><span>Ano</span></button>
+             <button onclick="changeHistoryMonth(-1)" ${!canGoPrev ? 'disabled' : ''} title="Mês Anterior"><span>◀</span><span>Mês</span></button>
           </div>
           <div class="center-date">
              <span style="font-weight:700; color:var(--text); text-transform:uppercase; font-size:12px;">${monthNames[targetMonth]}</span>
@@ -829,6 +819,7 @@ input { font-family: inherit; }
         const iso = getLocalDateISO(d);
         
         const isPast = iso < todayISO;
+        const isFuture = iso > todayISO;
         const isSelected = iso === selectedDateISO;
         const hasTrip = trips.some(t => t.date === iso);
         const realJsDay = d.getDay();
@@ -837,6 +828,7 @@ input { font-family: inherit; }
         
         let c = "s-day";
         if(isPast) c += " past";
+        if(isFuture) c += " future-day";
         if(isWeekend) c += " weekend";
         if(isSelected) c += " selected";
         if(hasTrip) c += " has-trip";
@@ -853,17 +845,23 @@ input { font-family: inherit; }
              badgeHtml = `<div class="s-month-badge">${shortMonths[d.getMonth()]}</div>`;
         }
 
-        html += `<div class="${c}" onclick="${onClickAction}('${iso}')">${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
+        let clickAttr = isFuture ? '' : `onclick="${onClickAction}('${iso}')"`;
+        html += `<div class="${c}" ${clickAttr}>${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
       }
       return html + '</div>';
     }
 
     function renderHistoryCalendar() {
-       document.getElementById("history-calendar").innerHTML = generateHistoryCalendarHTML(historySelectedDate, 'selectHistoryDate');
+       document.getElementById("history-calendar").innerHTML = generateHistoryHistoryCalendarHTML_safe();
        renderHistoryDetails();
     }
 
+    function generateHistoryHistoryCalendarHTML_safe() {
+       return generateHistoryCalendarHTML(historySelectedDate, 'selectHistoryDate');
+    }
+
     window.selectHistoryDate = function(iso) {
+       if(iso > todayISO) return;
        historySelectedDate = iso;
        renderHistoryCalendar(); 
     }
@@ -873,12 +871,13 @@ input { font-family: inherit; }
        const dayTrips = trips.filter(t => t.date === historySelectedDate);
        
        if(dayTrips.length === 0) {
+          const isFuture = historySelectedDate > todayISO;
+          let btnHtml = isFuture ? '' : `<button class="gh-btn primary" style="margin:0 auto; padding:10px 16px; width:auto; font-size:13px;" onclick="openModalWithDate('${historySelectedDate}')">Registar Viagem</button>`;
+          
           container.innerHTML = `
             <div class="hist-details" style="text-align:center; padding: 24px 14px;">
               <div style="color:var(--muted); font-size:13px; margin-bottom:16px;">Sem viagens registadas neste dia.</div>
-              <button class="gh-btn primary" style="margin:0 auto; padding:10px 16px; width:auto; font-size:13px;" onclick="openModalWithDate('${historySelectedDate}')">
-                 Registar Viagem
-              </button>
+              ${btnHtml}
             </div>
           `;
           return;
@@ -957,6 +956,7 @@ input { font-family: inherit; }
     }
 
     window.openModalWithDate = function(dateIso) {
+      if(dateIso > todayISO) return;
       openModal();
       formDate = dateIso;
       refreshFormUI();
@@ -998,6 +998,7 @@ input { font-family: inherit; }
     }
 
     window.selectFormDate = function(iso) {
+       if(iso > todayISO) return;
        formDate = iso;
        document.getElementById("new-trip-calendar").innerHTML = generateFormCalendarHTML(formDate, 'selectFormDate');
     }
@@ -1024,19 +1025,25 @@ input { font-family: inherit; }
     }
 
     function getAllSelectedDrivers() { return [carsData[0].driver, carsData[1].driver].filter(Boolean); }
-    function getAllSelectedPassengers() { return [...carsData[0].passengers, ...carsData[1].passengers]; }
+    function getAllSelectedPassengers(carIndexToIgnore = -1) {
+       let list = [];
+       for(let i=0; i<selectedCars; i++) {
+          if(i === carIndexToIgnore) continue;
+          list.push(...carsData[i].passengers);
+       }
+       return list;
+    }
 
     function handlePassengerClick(person, clickedCarIndex) {
        const car = carsData[clickedCarIndex];
        const otherCarIndex = clickedCarIndex === 0 ? 1 : 0;
        const otherCar = carsData[otherCarIndex];
+       const allowCross = carsData[0].isOneWay || carsData[1].isOneWay;
 
        if (car.passengers.includes(person)) {
-          // Remover do carro em que clicámos
           car.passengers = car.passengers.filter(p => p !== person);
        } else {
-          if (otherCar.passengers.includes(person)) {
-             // Mover o passageiro do outro carro para este
+          if (!allowCross && otherCar.passengers.includes(person)) {
              if (car.passengers.length < 4) {
                  otherCar.passengers = otherCar.passengers.filter(p => p !== person);
                  car.passengers.push(person);
@@ -1044,11 +1051,9 @@ input { font-family: inherit; }
                  showToast("Capacidade máxima atingida neste carro!");
              }
           } else {
-             // Adicionar novo passageiro ao carro que foi clicado
              if (car.passengers.length < 4) {
                 car.passengers.push(person);
              } else if (selectedCars === 1 && clickedCarIndex === 0) {
-                // Abre o 2º carro automaticamente e mete-o lá
                 setCars(2);
                 carsData[1].passengers.push(person);
              } else {
@@ -1066,6 +1071,7 @@ input { font-family: inherit; }
 
       const globalDrivers = getAllSelectedDrivers();
       const car = carsData[carIndex];
+      const allowCross = carsData[0].isOneWay || carsData[1].isOneWay;
       const otherCarIndex = carIndex === 0 ? 1 : 0;
       const otherCarPass = carsData[otherCarIndex].passengers;
 
@@ -1073,8 +1079,9 @@ input { font-family: inherit; }
         const isThisDriver = car.driver === person;
         const isOtherDriver = globalDrivers.includes(person) && !isThisDriver;
         const isThisPass = car.passengers.includes(person);
-        const globalPass = getAllSelectedPassengers();
-        const isOtherPass = globalPass.includes(person) && !isThisPass;
+        
+        // Se a opção "Só ida?" estiver ativa, permite repetir passageiros no outro carro. Caso contrário, bloqueia.
+        const isOtherPass = !allowCross && getAllSelectedPassengers(carIndex).includes(person) && !isThisPass;
         
         const dBtn = document.createElement("button");
         dBtn.className = `person-btn ${isThisDriver ? 'is-driver' : ''}`;
@@ -1089,7 +1096,6 @@ input { font-family: inherit; }
         const pBtn = document.createElement("button");
         pBtn.className = `person-btn ${isThisPass ? 'is-pass' : ''}`;
         pBtn.innerText = person;
-        // Só desabilita o botão se a pessoa for condutora. (Passageiro noutro carro não bloqueia, ele move-se!)
         pBtn.disabled = globalDrivers.includes(person); 
         pBtn.onclick = () => {
            handlePassengerClick(person, carIndex);
@@ -1098,7 +1104,6 @@ input { font-family: inherit; }
       });
     }
 
-    // Função renovada para desenhar o carro simulando lugares reais e dinâmicos
     function drawCar(carIndex, containerId) {
       const container = document.getElementById(containerId);
       container.innerHTML = "";
@@ -1112,7 +1117,6 @@ input { font-family: inherit; }
       
       let pList = car.passengers;
       
-      // Função auxiliar para ir buscar os passageiros na ordem ou criar lugar vazio
       const getPSeat = (index) => {
          return index < pList.length 
             ? `<div class="seat pass-seat">${INITIALS[pList[index]]}</div>` 
@@ -1121,7 +1125,6 @@ input { font-family: inherit; }
       
       let backRowHTML = "";
       if (pList.length === 4) {
-         // Carro cheio (5 pessoas total = 4 passageiros): 3 lugares atrás
          backRowHTML = `
            <div class="car-row back-row-3">
               ${getPSeat(1)}
@@ -1130,7 +1133,6 @@ input { font-family: inherit; }
            </div>
          `;
       } else {
-         // Até 4 pessoas total (até 3 passageiros): 2 lugares atrás alinhados com a frente
          backRowHTML = `
            <div class="car-row back-row-2">
               ${getPSeat(1)}
@@ -1181,27 +1183,47 @@ input { font-family: inherit; }
             html = `<div style="color:var(--danger); font-size:12px;">Selecione pelo menos um passageiro no total.</div>`;
             valid = false;
          } else {
-            const allPass = [...p0, ...p1];
-            const numPass = allPass.length;
+            const allPass = [...new Set([...p0, [...p1]])]; // Passagens únicas para calcular o custo geral por cabeça
+            // Contagem total de passageiros considerando repetições se aplicável
+            const totalPassCount = p0.length + p1.length;
+            
             const c0Calc = calculateCar(carsData[0]);
             const c1Calc = calculateCar(carsData[1]);
 
             if(!c0Calc || !c1Calc) { valid = false; return; }
 
-            const totalCombinedCost = c0Calc.totalCost + c1Calc.totalCost;
-            const costPerPassenger = numPass > 0 ? totalCombinedCost / numPass : 0;
-            const creditPerDriver = totalCombinedCost / 2;
+            let cost0 = c0Calc.totalCost;
+            let cost1 = c1Calc.totalCost;
+            let credit0 = cost0;
+            let credit1 = cost1;
+
+            // Regra dos 1.5 créditos se um carro tem 2 pessoas e o outro tem 3 ou mais
+            const c0Size = 1 + p0.length; // condutor + passageiros
+            const c1Size = 1 + p1.length;
+
+            if ((c0Size === 2 && c1Size >= 3) || (c1Size === 2 && c0Size >= 3)) {
+               if (c0Size === 2) {
+                  cost0 = carsData[0].isOneWay ? 0.75 : 1.5;
+                  credit0 = cost0;
+               } else {
+                  cost1 = carsData[1].isOneWay ? 0.75 : 1.5;
+                  credit1 = cost1;
+               }
+            }
+
+            const totalCombinedCost = cost0 + cost1;
+            const uniquePassList = [...new Set([...p0, ...p1])];
+            const costPerPassenger = uniquePassList.length > 0 ? totalCombinedCost / uniquePassList.length : 0;
 
             html = `
                <strong style="color:var(--text); font-size:13px; font-weight:600;">VIAGEM CONJUNTA (2 CARROS)</strong><br>
                <div style="display:flex; justify-content:space-between; margin-top:6px; margin-bottom:2px;"><span>Custo Total:</span> <strong style="color:var(--text)">${fmt(totalCombinedCost)} 🪙</strong></div>
                <div style="display:flex; justify-content:space-between; margin-bottom:2px;"><span>Custo por passageiro:</span> <strong style="color:var(--text)">${fmt(costPerPassenger)} 🪙</strong></div>
-               <div style="display:flex; justify-content:space-between;"><span>Crédito por condutor:</span> <strong style="color:var(--text)">${fmt(creditPerDriver)} 🪙</strong></div>
             `;
-            // Alterado para isolar os passageiros de cada carro na gravação
+            
             window.currentTripCalculations = [
-               { driver: d0, passengers: [...p0], totalCost: c0Calc.totalCost, costPerPassenger, profitPerDriver: creditPerDriver, isOneWay: carsData[0].isOneWay },
-               { driver: d1, passengers: [...p1], totalCost: c1Calc.totalCost, costPerPassenger, profitPerDriver: creditPerDriver, isOneWay: carsData[1].isOneWay }
+               { driver: d0, passengers: [...p0], totalCost: cost0, costPerPassenger, profitPerDriver: credit0, isOneWay: carsData[0].isOneWay },
+               { driver: d1, passengers: [...p1], totalCost: cost1, costPerPassenger, profitPerDriver: credit1, isOneWay: carsData[1].isOneWay }
             ];
             valid = true;
          }
