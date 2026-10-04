@@ -234,7 +234,7 @@ input, select { font-family: inherit; }
         <b>Registar Nova Viagem</b>
       </button>
 
-      <!-- Botão temporário opcional para migração via telemóvel para o Firebase -->
+      <!-- Botão para migração dos dados locais para o Firebase -->
       <button class="gh-btn outline" onclick="migrarParaFirebase()" style="border-style: dashed; color: var(--accent); margin-top: 10px; font-size: 13px;">
         ☁️ Sincronizar Dados Locais para o Firebase
       </button>
@@ -390,19 +390,19 @@ input, select { font-family: inherit; }
   </script>
 
   <script type="module">
-    const USE_FIREBASE = false; 
+    const USE_FIREBASE = true; // Ativado para usar o Firebase
 
     const firebaseConfig = {
-      apiKey: "A_TUA_API_KEY",
-      authDomain: "O_TEU_PROJECT.firebaseapp.com",
-      projectId: "O_TEU_PROJECT",
-      storageBucket: "O_TEU_PROJECT.appspot.com",
-      messagingSenderId: "SENDER_ID",
-      appId: "APP_ID"
+      apiKey: "AIzaSyCEhvEeluGLKUi3YE28j8hFZIvSWXRfS68",
+      authDomain: "boleias-pec.firebaseapp.com",
+      projectId: "boleias-pec",
+      storageBucket: "boleias-pec.firebasestorage.app",
+      messagingSenderId: "920930610974",
+      appId: "1:920930610974:web:600d31aeaaebc9aef0230f"
     };
 
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
     let db;
     if (USE_FIREBASE) {
@@ -448,15 +448,15 @@ input, select { font-family: inherit; }
        });
     }
 
-    // Função para migrar os dados do LocalStorage para o Firebase caso decidas ativar
+    // Função para migrar dados locais para o Firebase
     window.migrarParaFirebase = async function() {
       if (!USE_FIREBASE) {
-         alert("Primeiro tens de colocar USE_FIREBASE = true e preencher as credenciais no código.");
+         alert("O Firebase está desativado.");
          return;
       }
       const localTrips = JSON.parse(localStorage.getItem("pec_trips_v20") || "[]");
       if (localTrips.length === 0) {
-         alert("Não tens dados locais guardados para migrar.");
+         alert("Não tens dados locais guardados para migrar neste telemóvel.");
          return;
       }
       const confirmar = confirm(`Foram encontradas ${localTrips.length} viagens na cache local. Queres enviá-las para o Firebase?`);
@@ -465,8 +465,9 @@ input, select { font-family: inherit; }
             const { id, ...tripData } = trip;
             await addDoc(collection(db, "trips"), tripData);
          }
-         alert("Migração concluída com sucesso!");
+         alert("Migração concluída com sucesso! Os teus dados já estão na nuvem.");
          localStorage.removeItem("pec_trips_v20");
+         window.location.reload();
       }
     }
 
@@ -1053,7 +1054,7 @@ input, select { font-family: inherit; }
                 <button class="gh-btn outline" style="flex:1; padding: 6px;" onclick="editTrip('${trip.id}')">Editar</button>
                 <button class="gh-btn danger" style="flex:1; padding: 6px;" onclick="requestDelete('${trip.id}')">Apagar</button>
              </div>
-          `;
+          </div>`;
        });
        container.innerHTML = html;
     }
