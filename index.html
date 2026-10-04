@@ -25,7 +25,7 @@
   --accent: #d66b2b;      
   --green: #238636;       
   --green-hover: #2ea043;
-  --yellow: #fbbf24;      /* Amarelo mais brilhante para contraste visual */
+  --yellow: #fbbf24;      
   --danger: #f85149;      
   --text: #f0f6fc;        
   --muted: #8b949e;       
@@ -107,7 +107,7 @@ input, select { font-family: inherit; }
 .s-month-badge { position: absolute; top: 2px; left: 0; right: 0; text-align: center; font-size: 7px; font-weight: 600; color: var(--muted); opacity: 0.8; }
 .s-day .s-date { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1; margin-top: 1px; }
 .s-day .s-wkd { font-size: 8.5px; text-transform: uppercase; color: var(--muted); margin-top: 4px; font-weight: 500; }
-.s-day.past { background: #010409; opacity: 0.85; } /* Fade reduzido para não ficar muito escuro */
+.s-day.past { background: #010409; opacity: 0.85; } 
 .s-day.other-month { opacity: 0.35 !important; }
 .s-day.future-day { opacity: 0.25 !important; cursor: not-allowed; }
 .s-day.weekend { background: var(--weekend-bg); border-color: var(--weekend-border); }
@@ -233,6 +233,11 @@ input, select { font-family: inherit; }
       <button class="gh-btn primary" onclick="openModal()" style="padding: 14px; font-size: 15px;">
         <b>Registar Nova Viagem</b>
       </button>
+
+      <!-- Botão temporário opcional para migração via telemóvel para o Firebase -->
+      <button class="gh-btn outline" onclick="migrarParaFirebase()" style="border-style: dashed; color: var(--accent); margin-top: 10px; font-size: 13px;">
+        ☁️ Sincronizar Dados Locais para o Firebase
+      </button>
     </div>
 
     <!-- TAB 2: HISTÓRICO -->
@@ -295,7 +300,9 @@ input, select { font-family: inherit; }
 
       <div class="fg">
         <label>Data da Viagem</label>
-        <div id="new-trip-calendar"></div>
+        <div id="form-calendar-wrapper">
+          <div id="new-trip-calendar"></div>
+        </div>
       </div>
 
       <!-- Carro 1 -->
@@ -441,6 +448,28 @@ input, select { font-family: inherit; }
        });
     }
 
+    // Função para migrar os dados do LocalStorage para o Firebase caso decidas ativar
+    window.migrarParaFirebase = async function() {
+      if (!USE_FIREBASE) {
+         alert("Primeiro tens de colocar USE_FIREBASE = true e preencher as credenciais no código.");
+         return;
+      }
+      const localTrips = JSON.parse(localStorage.getItem("pec_trips_v20") || "[]");
+      if (localTrips.length === 0) {
+         alert("Não tens dados locais guardados para migrar.");
+         return;
+      }
+      const confirmar = confirm(`Foram encontradas ${localTrips.length} viagens na cache local. Queres enviá-las para o Firebase?`);
+      if (confirmar) {
+         for (let trip of localTrips) {
+            const { id, ...tripData } = trip;
+            await addDoc(collection(db, "trips"), tripData);
+         }
+         alert("Migração concluída com sucesso!");
+         localStorage.removeItem("pec_trips_v20");
+      }
+    }
+
     window.showToast = function(msg) {
       const t = document.getElementById("toast");
       t.textContent = msg;
@@ -510,36 +539,57 @@ input, select { font-family: inherit; }
         document.getElementById("login-screen").style.display = "none";
         document.getElementById("app-screen").style.display = "block";
         initApp();
-        initSwipeListeners();
+        initHistorySwipeListeners();
+        initFormSwipeListeners();
       }
     }
 
-    // --- LÓGICA DE SWIPE DO CALENDÁRIO ---
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchEndX = 0;
-    let touchEndY = 0;
-
-    function initSwipeListeners() {
+    // --- SWIPE DO HISTÓRICO (Muda de Mês) ---
+    function initHistorySwipeListeners() {
        const histCal = document.getElementById('history-card-container');
+       if(!histCal) return;
+       let touchStartX = 0, touchStartY = 0;
+       
        histCal.addEventListener('touchstart', e => {
           touchStartX = e.changedTouches[0].screenX;
           touchStartY = e.changedTouches[0].screenY;
        }, {passive: true});
        
        histCal.addEventListener('touchend', e => {
-          touchEndX = e.changedTouches[0].screenX;
-          touchEndY = e.changedTouches[0].screenY;
-          
+          let touchEndX = e.changedTouches[0].screenX;
+          let touchEndY = e.changedTouches[0].screenY;
           const diffX = Math.abs(touchEndX - touchStartX);
           const diffY = Math.abs(touchEndY - touchStartY);
           
-          // Se o movimento horizontal for maior que o vertical e houver distância suficiente
           if (diffX > 40 && diffX > diffY) {
-             if (touchEndX < touchStartX) {
-                changeHistoryMonth(1); // Swipe esquerda (próximo)
+             if (touchEndX < touchStartX) changeHistoryMonth(1);
+             else changeHistoryMonth(-1);
+          }
+       }, {passive: true});
+    }
+
+    // --- SWIPE DO FORMULÁRIO DE REGISTO (Muda de Semana) ---
+    function initFormSwipeListeners() {
+       const formCal = document.getElementById('form-calendar-wrapper');
+       if(!formCal) return;
+       let formStartX = 0, formStartY = 0;
+       
+       formCal.addEventListener('touchstart', e => {
+          formStartX = e.changedTouches[0].screenX;
+          formStartY = e.changedTouches[0].screenY;
+       }, {passive: true});
+       
+       formCal.addEventListener('touchend', e => {
+          let formEndX = e.changedTouches[0].screenX;
+          let formEndY = e.changedTouches[0].screenY;
+          const diffX = Math.abs(formEndX - formStartX);
+          const diffY = Math.abs(formEndY - formStartY);
+          
+          if (diffX > 40 && diffX > diffY) {
+             if (formEndX < formStartX) {
+                changeFormDay(7); // Avança uma semana
              } else {
-                changeHistoryMonth(-1); // Swipe direita (anterior)
+                changeFormDay(-7); // Recua uma semana
              }
           }
        }, {passive: true});
@@ -1003,7 +1053,7 @@ input, select { font-family: inherit; }
                 <button class="gh-btn outline" style="flex:1; padding: 6px;" onclick="editTrip('${trip.id}')">Editar</button>
                 <button class="gh-btn danger" style="flex:1; padding: 6px;" onclick="requestDelete('${trip.id}')">Apagar</button>
              </div>
-          </div>`;
+          `;
        });
        container.innerHTML = html;
     }
