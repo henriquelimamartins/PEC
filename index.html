@@ -285,24 +285,24 @@ input, select { font-family: inherit; }
       <div class="eyebrow">Sobre o Sistema</div>
       <div class="card">
         <h3 style="margin-bottom: 12px; color: var(--text);">Como funciona a aplicação?</h3>
-        <p style="margin-bottom: 16px; color: var(--muted); line-height: 1.6;">
+        <p style="margin-bottom: 16px; color: var(--muted); line-height: 1.6; text-align: justify;">
           Esta aplicação foi criada para gerir de forma justa e totalmente automática quem deve ser o próximo condutor nas boleias de grupo.
         </p>
         
         <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">1. O Balanço (🪙)</h4>
-        <p style="margin-bottom: 16px; line-height: 1.6; color: var(--text);">
+        <p style="margin-bottom: 16px; line-height: 1.6; color: var(--text); text-align: justify;">
           Funciona como uma economia virtual. Sempre que conduzes, <strong>ganhas</strong> créditos por cada passageiro que transportas. Quando vais à boleia no carro de alguém, <strong>gastas</strong> créditos para pagar a tua viagem.<br><br>
           <em>A pessoa com o balanço mais negativo é sempre a sugerida para pegar no carro a seguir!</em>
         </p>
 
         <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">2. Desempates e Rácio</h4>
-        <p style="margin-bottom: 16px; line-height: 1.6; color: var(--text);">
+        <p style="margin-bottom: 16px; line-height: 1.6; color: var(--text); text-align: justify;">
           Se existirem duas ou mais pessoas com o mesmo valor de balanço, a app escolhe de forma inteligente a que tem o <strong>menor Rácio</strong> (ou seja, quem conduziu percentualmente menos vezes em relação às vezes que foi à boleia). Se ainda assim houver empate, é chamado quem não conduz há mais tempo.
         </p>
         
         <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center;">
           <p style="font-size: 11.5px; margin-bottom: 10px; color: var(--muted); white-space: nowrap;">Ainda com dúvidas sobre estes algoritmos complexos?</p>
-          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 13px;"> > CLICA AQUI! < </a>
+          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 13px;">> CLICA AQUI <</a>
         </div>
       </div>
     </div>
@@ -483,7 +483,6 @@ input, select { font-family: inherit; }
        });
     }
 
-    // Função manual para garantir refresh real da base de dados Firebase
     window.forceRefresh = async function() {
        if(!USE_FIREBASE) return;
        const btn = document.getElementById("btn-refresh");
@@ -504,7 +503,6 @@ input, select { font-family: inherit; }
        }
     }
 
-    // Função de migração segura de segurança mantida internamente
     window.migrarParaFirebase = async function() {
       if (!USE_FIREBASE) return alert("O Firebase está desativado.");
       const localTrips = JSON.parse(localStorage.getItem("pec_trips_v20") || "[]");
@@ -518,7 +516,7 @@ input, select { font-family: inherit; }
                await addDoc(collection(db, "trips"), tripData);
             }
             alert("Sucesso! Os dados foram guardados na nuvem e a cache será limpa.");
-            localStorage.removeItem("pec_trips_v20"); // SÓ APAGA DEPOIS DE SUCESSO CONFIRMADO
+            localStorage.removeItem("pec_trips_v20");
             window.location.reload();
          } catch(e) {
             alert("Erro de comunicação com o Firebase. Os teus dados LOCAIS NÃO FORAM apagados. Tenta novamente.");
@@ -599,7 +597,6 @@ input, select { font-family: inherit; }
       }
     }
 
-    // --- SWIPE DO FORMULÁRIO DE REGISTO (Muda de Semana) ---
     function initFormSwipeListeners() {
        const formCal = document.getElementById('form-calendar-wrapper');
        if(!formCal) return;
@@ -618,9 +615,9 @@ input, select { font-family: inherit; }
           
           if (diffX > 40 && diffX > diffY) {
              if (formEndX < formStartX) {
-                changeFormDay(7); // Avança uma semana
+                changeFormDay(7);
              } else {
-                changeFormDay(-7); // Recua uma semana
+                changeFormDay(-7);
              }
           }
        }, {passive: true});
@@ -777,7 +774,6 @@ input, select { font-family: inherit; }
           statsData.push({ name: person, asDriver, asPassenger, passCount, totalViagens, ratio });
        });
 
-       // Ordenação do Rácio: Ascendente (menor para maior)
        let statsDataRatio = [...statsData].sort((a, b) => a.ratio - b.ratio);
        let ratioHtml = "";
        statsDataRatio.forEach(d => {
@@ -1417,7 +1413,6 @@ input, select { font-family: inherit; }
                   <div style="display:flex; justify-content:space-between; margin-top:6px; margin-bottom:2px;"><span>Custo da viagem:</span> <strong style="color:var(--text)">${fmt(calc.totalCost)} 🪙</strong></div>
                   <div style="display:flex; justify-content:space-between;"><span>Custo por passageiro:</span> <strong style="color:var(--text)">${fmt(calc.costPerPassenger)} 🪙</strong></div>
                </div>`;
-               tripCalcs.process = true; // placeholder
                tripCalcs.push({ driver: car.driver, passengers: [...car.passengers], totalCost: calc.totalCost, costPerPassenger: calc.costPerPassenger, profitPerDriver: calc.totalCost, isOneWay: car.isOneWay });
             }
          }
@@ -1454,7 +1449,7 @@ input, select { font-family: inherit; }
       
       if(!USE_FIREBASE) {
           localStorage.setItem("pec_trips_v20", JSON.stringify(trips));
-          recalculateAndRecord(); // fallback
+          recalculateAndRender();
       }
       
       closeModal();
