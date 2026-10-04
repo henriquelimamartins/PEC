@@ -92,13 +92,14 @@ input { font-family: inherit; }
 
 /* Listas Balanços */
 .list { list-style: none; padding: 0; margin: 0; }
-.list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 10px; }
 .list-item:last-child { border-bottom: none; }
-.balance-name { font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; flex: 1; flex-wrap: wrap; }
-.balance-val { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; min-width: 70px; }
+.balance-name { font-size: 14px; font-weight: 500; flex: 1; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+.balance-right { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.balance-val { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; min-width: 65px; }
 .balance-val.positive { color: #3fb950; }
 .balance-val.negative { color: var(--danger); }
-.next-driver-tag { background: rgba(214, 107, 43, 0.15); color: var(--accent); font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; border: 1px solid rgba(214, 107, 43, 0.35); text-transform: uppercase; letter-spacing: 0.5px; }
+.next-driver-tag { background: rgba(214, 107, 43, 0.15); color: var(--accent); font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; border: 1px solid rgba(214, 107, 43, 0.35); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
 
 /* Calendário Grid & Fim de Semana Castanho */
 .calendar-header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 12px; font-weight: 600; color: var(--muted); }
@@ -158,14 +159,14 @@ input { font-family: inherit; }
 /* Modal */
 .modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; padding-top: calc(90px + env(safe-area-inset-top, 0px)); }
 .modal-overlay.active { display: block; }
-.modal-overlay .page { padding-bottom: 160px; } /* Espaço extra aumentado para nunca bater no fundo */
+.modal-overlay .page { padding-bottom: 160px; } 
 
 #custom-confirm { z-index: 300; background: rgba(1, 4, 9, 0.8); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding-top: 0; }
 #custom-confirm.active { display: flex; }
 .confirm-box { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
 .confirm-box h3 { font-size: 16px; margin-bottom: 8px; }
 
-/* Novo Design do Carro (2 à frente, 3 atrás) */
+/* Novo Design do Carro (Dinâmico: 2 atrás se <= 4 pessoas; 3 atrás se = 5 pessoas) */
 .cars-container { display: flex; justify-content: center; gap: 16px; padding: 10px 0; }
 .car-visual { 
   width: 112px; background: #010409; border: 1px solid var(--border); 
@@ -177,8 +178,9 @@ input { font-family: inherit; }
   background: rgba(255,255,255,0.06); border-radius: 4px 4px 2px 2px; 
 }
 .car-row { display: flex; width: 100%; justify-content: center; }
-.front-row { gap: 14px; }
-.back-row { gap: 6px; }
+/* O gap frontal e o gap para 2 lugares atrás são idênticos para alinhar perfeitamente */
+.front-row, .back-row-2 { gap: 14px; }
+.back-row-3 { gap: 6px; }
 .seat { 
   background: var(--card2); border-radius: 50%; width: 26px; height: 26px; 
   display: flex; align-items: center; justify-content: center; 
@@ -251,9 +253,15 @@ input { font-family: inherit; }
     <div id="tab-stats" class="page tab-content" style="display: none;">
       <div class="eyebrow">MÉTRICAS E RESUMO</div>
       <div class="card">
-        <h3>Estatísticas Gerais</h3>
+        <h3 style="margin-bottom: 8px;">Estatísticas Gerais</h3>
         
-        <div class="stats-section-title" style="margin-top: 4px;">RÁCIO (CONDUÇÃO/VIAGENS)</div>
+        <!-- Bloco de Viagens Totais -->
+        <div style="font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 20px; display: flex; align-items: baseline; gap: 8px;">
+          <span id="stats-total-trips">0</span>
+          <span style="font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase;">Viagens Registadas</span>
+        </div>
+        
+        <div class="stats-section-title">RÁCIO (CONDUÇÃO/VIAGENS)</div>
         <div id="stats-ratio-chart" class="stats-chart"></div>
 
         <div class="stats-section-title">Métricas de Participação (Nº de Vezes)</div>
@@ -590,9 +598,13 @@ input { font-family: inherit; }
         let valStr = Math.abs(p.val).toFixed(2);
         let sign = p.val < 0 ? '-' : prefix;
         
+        // Estrutura alterada para manter a tag à direita
         li.innerHTML = `
-          <div class="balance-name">${p.name} ${badge}</div> 
-          <div class="balance-val ${valClass}">${sign}${valStr} 🪙</div>
+          <div class="balance-name">${p.name}</div>
+          <div class="balance-right">
+             ${badge}
+             <div class="balance-val ${valClass}">${sign}${valStr} 🪙</div>
+          </div>
         `;
         list.appendChild(li);
       });
@@ -606,6 +618,9 @@ input { font-family: inherit; }
     function renderStats() {
        const ratioContainer = document.getElementById('stats-ratio-chart');
        const barsContainer = document.getElementById('stats-bars-chart');
+       
+       // Atualiza o total de viagens registadas
+       document.getElementById('stats-total-trips').innerText = trips.length;
        
        let statsData = [];
        PEOPLE.forEach(person => {
@@ -1083,7 +1098,7 @@ input { font-family: inherit; }
       });
     }
 
-    // Função renovada para desenhar o carro simulando lugares reais
+    // Função renovada para desenhar o carro simulando lugares reais e dinâmicos
     function drawCar(carIndex, containerId) {
       const container = document.getElementById(containerId);
       container.innerHTML = "";
@@ -1104,18 +1119,32 @@ input { font-family: inherit; }
             : `<div class="seat empty"></div>`;
       };
       
-      // Fila da Frente: 2 bancos (Condutor + 1 Passageiro)
-      // Fila de Trás: 3 bancos (Passageiro 2, 3 e 4)
+      let backRowHTML = "";
+      if (pList.length === 4) {
+         // Carro cheio (5 pessoas total = 4 passageiros): 3 lugares atrás
+         backRowHTML = `
+           <div class="car-row back-row-3">
+              ${getPSeat(1)}
+              ${getPSeat(2)}
+              ${getPSeat(3)}
+           </div>
+         `;
+      } else {
+         // Até 4 pessoas total (até 3 passageiros): 2 lugares atrás alinhados com a frente
+         backRowHTML = `
+           <div class="car-row back-row-2">
+              ${getPSeat(1)}
+              ${getPSeat(2)}
+           </div>
+         `;
+      }
+
       carDiv.innerHTML = `
          <div class="car-row front-row">
             <div class="${driverClass}">${driverName}</div>
             ${getPSeat(0)}
          </div>
-         <div class="car-row back-row">
-            ${getPSeat(1)}
-            ${getPSeat(2)}
-            ${getPSeat(3)}
-         </div>
+         ${backRowHTML}
       `;
       container.appendChild(carDiv);
     }
