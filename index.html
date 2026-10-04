@@ -34,12 +34,12 @@
 
 * { box-sizing: border-box; }
 html, body { min-height: 100vh; margin: 0; background: var(--bg); touch-action: manipulation; }
-button, a, img { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+button, a, img, select { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif; color: var(--text); -webkit-tap-highlight-color: transparent; padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px)); }
 h1, h2, h3, h4 { font-weight: 600; margin: 0; }
 p { margin: 0; line-height: 1.5; color: var(--muted); font-size: 13.5px; }
 button { font-family: inherit; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease; }
-input { font-family: inherit; }
+input, select { font-family: inherit; }
 
 #app-screen, #login-screen { max-width: 520px; margin: 0 auto; min-height: 100vh; }
 #login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
@@ -118,6 +118,7 @@ input { font-family: inherit; }
 .hist-details { background: var(--card2); border-radius: 6px; padding: 14px; margin-top: 10px; border: 1px solid var(--border); }
 .hist-info { font-size: 13px; color: var(--muted); line-height: 1.5; }
 .hist-type { font-weight: 600; color: var(--text); display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.hist-type-date { font-size: 11px; color: var(--accent); background: rgba(214, 107, 43, 0.15); padding: 2px 6px; border-radius: 4px; }
 .hist-driver-row { display: block; margin-bottom: 4px; }
 .hist-actions { display: flex; gap: 8px; margin-top: 12px; }
 
@@ -227,12 +228,23 @@ input { font-family: inherit; }
       <button class="gh-btn primary" onclick="openModal()" style="padding: 14px; font-size: 15px;">
         <b>Registar Nova Viagem</b>
       </button>
+      
+      <button class="gh-btn outline" onclick="exportToWhatsApp()" style="font-size: 13px; color: var(--muted);">
+        <span class="ic">📤</span> Copiar Resumo para WhatsApp
+      </button>
     </div>
 
     <!-- TAB 2: HISTÓRICO -->
     <div id="tab-history" class="page tab-content" style="display: none;">
       <div class="eyebrow">Registo Temporal</div>
-      <div class="card">
+      
+      <div style="margin-bottom: 16px;">
+         <select id="history-filter" class="input-text" onchange="applyHistoryFilter()">
+            <option value="ALL">Visualização por Calendário</option>
+         </select>
+      </div>
+
+      <div class="card" id="history-card-container">
         <div id="history-calendar"></div>
         <div id="history-details-container"></div>
       </div>
@@ -370,6 +382,7 @@ input { font-family: inherit; }
   </script>
 
   <script type="module">
+    // Altera para true e preenche as tuas chaves para ativar a cloud com suporte offline
     const USE_FIREBASE = false; 
 
     const firebaseConfig = {
@@ -381,13 +394,17 @@ input { font-family: inherit; }
       appId: "APP_ID"
     };
 
+    // Novas importações atualizadas com suporte offline (Persistent Cache)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     let db;
     if (USE_FIREBASE) {
       const app = initializeApp(firebaseConfig);
-      db = getFirestore(app);
+      // Inicialização do Firestore com suporte Offline
+      db = initializeFirestore(app, {
+        localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
+      });
     }
 
     const PEOPLE = ["Ana", "André", "Henrique", "Joana", "João", "Luciano", "Luís", "Mariana"];
@@ -400,6 +417,7 @@ input { font-family: inherit; }
 
     let trips = []; 
     let balances = {}; 
+    let sortedPeopleGlobally = []; // Variável global para ser usada na exportação WhatsApp
     
     let todayISO = getLocalDateISO();
     let historySelectedDate = todayISO;
@@ -412,6 +430,17 @@ input { font-family: inherit; }
       { driver: null, passengers: [], isOneWay: false }
     ];
     let editingTripId = null;
+
+    // Preenche a dropdown do Histórico com os nomes
+    function initHistoryFilterDropdown() {
+       const select = document.getElementById("history-filter");
+       PEOPLE.forEach(person => {
+          let opt = document.createElement('option');
+          opt.value = person;
+          opt.innerHTML = `Visualizar apenas ${person}`;
+          select.appendChild(opt);
+       });
+    }
 
     window.showToast = function(msg) {
       const t = document.getElementById("toast");
@@ -447,7 +476,8 @@ input { font-family: inherit; }
        
        if(tabName === 'history') {
           historySelectedDate = getLocalDateISO();
-          renderHistoryCalendar();
+          document.getElementById('history-filter').value = "ALL"; // Reset ao abrir
+          applyHistoryFilter();
        }
        if(tabName === 'stats') renderStats();
        window.scrollTo(0,0);
@@ -486,6 +516,7 @@ input { font-family: inherit; }
     function initApp() {
       renderHeaderDate();
       renderWeekBar();
+      initHistoryFilterDropdown();
       if (USE_FIREBASE) {
         const q = query(collection(db, "trips"), orderBy("date", "desc"));
         onSnapshot(q, (snapshot) => {
@@ -558,6 +589,8 @@ input { font-family: inherit; }
         if (lastA !== lastB) return lastA - lastB; 
         return a.name.localeCompare(b.name); 
       });
+      
+      sortedPeopleGlobally = sortedPeople; // Guardar para usar na exportação
 
       const list = document.getElementById("balance-list");
       list.innerHTML = "";
@@ -588,9 +621,30 @@ input { font-family: inherit; }
         list.appendChild(li);
       });
 
-      renderHistoryCalendar();
+      applyHistoryFilter(); // Reflete no ecrã de histórico de imediato dependendo do dropdown
       renderWeekBar();
       if(document.getElementById('tab-stats').style.display === 'block') renderStats();
+    }
+
+    window.exportToWhatsApp = function() {
+      let text = "🚗 *Ponto de Situação - Boleias PEC*\n\n";
+      
+      text += "📊 *Balanços Atuais:*\n";
+      sortedPeopleGlobally.forEach(p => {
+         let prefix = p.val > 0 ? '+' : '';
+         let sign = p.val < 0 ? '-' : prefix;
+         text += `${p.name}: ${sign}${Math.abs(p.val).toFixed(2)} 🪙\n`;
+      });
+
+      text += `\n🚦 *Próximo a conduzir:* ${sortedPeopleGlobally[0].name}\n`;
+      text += `📈 *Total de viagens:* ${trips.length}\n`;
+
+      navigator.clipboard.writeText(text).then(() => {
+         showToast("Resumo copiado! Pronto a colar no WhatsApp.");
+      }).catch(err => {
+         console.error("Erro ao copiar", err);
+         showToast("Não foi possível copiar automaticamente.");
+      });
     }
 
     function renderStats() {
@@ -668,12 +722,93 @@ input { font-family: inherit; }
        barsContainer.innerHTML = barsHtml;
     }
 
+    // --- NOVA LOGICA DE FILTRO DE HISTÓRICO ---
+    window.applyHistoryFilter = function() {
+       const val = document.getElementById("history-filter").value;
+       const cal = document.getElementById("history-calendar");
+       
+       if (val === "ALL") {
+          cal.style.display = "block";
+          renderHistoryCalendar();
+       } else {
+          cal.style.display = "none";
+          renderPersonHistory(val);
+       }
+    }
+
+    function renderPersonHistory(personName) {
+       const container = document.getElementById("history-details-container");
+       
+       // Filtra e ordena as viagens da pessoa (da mais recente para a mais antiga)
+       const personTrips = trips.filter(t => t.drivers.includes(personName) || t.passengers.includes(personName));
+       personTrips.sort((a, b) => b.date.localeCompare(a.date));
+
+       if(personTrips.length === 0) {
+          container.innerHTML = `
+            <div class="hist-details" style="text-align:center; padding: 24px 14px;">
+              <div style="color:var(--muted); font-size:13px;">Sem viagens registadas de momento para ${personName}.</div>
+            </div>
+          `;
+          return;
+       }
+
+       const isFemale = name => FEMALES.includes(name);
+
+       let html = `<div style="font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; margin-bottom:10px; margin-top:8px;">Registo Global - ${personName}</div>`;
+       
+       personTrips.forEach((trip, index) => {
+          const allDriversFemale = trip.drivers.length > 0 && trip.drivers.every(isFemale);
+          const allPassFemale = trip.passengers.length > 0 && trip.passengers.every(isFemale);
+
+          let driverLabel = "Condutores";
+          if (trip.drivers.length === 1) {
+             driverLabel = isFemale(trip.drivers[0]) ? "Condutora" : "Condutor";
+          } else if (allDriversFemale) {
+             driverLabel = "Condutoras";
+          }
+
+          let passLabel = "Passageiros";
+          if (trip.passengers.length === 1) {
+             passLabel = isFemale(trip.passengers[0]) ? "Passageira" : "Passageiro";
+          } else if (allPassFemale) {
+             passLabel = "Passageiras";
+          }
+
+          const passAlfab = [...trip.passengers].sort((a,b) => a.localeCompare(b)).join(", ");
+          const typeLabel = trip.isOneWay ? 'Viagem só de ida' : 'Viagem Normal';
+          
+          // Tratamento simplificado de Data
+          const parts = trip.date.split('-');
+          const readableDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+            
+          html += `<div class="hist-details" style="margin-top: ${index > 0 ? '10px' : '0'};">
+             <div class="hist-info">
+               <span class="hist-type">
+                  <span>${typeLabel}</span>
+                  <span class="hist-type-date">${readableDate}</span>
+               </span>
+               <span class="hist-driver-row"><strong style="color:var(--accent)">${driverLabel}:</strong> ${trip.drivers.join(" e ")}</span>
+               <span><strong style="color:var(--muted)">${passLabel}:</strong> ${passAlfab || "Nenhum"}</span>
+               <div style="margin-top:8px; display:flex; justify-content:space-between; font-size:12px; color:var(--text)">
+                  <span>Custo Viagem: <strong>${fmt(trip.totalCost)} 🪙</strong></span>
+                  <span>Custo/Pessoa: <strong>${fmt(trip.costPerPassenger)} 🪙</strong></span>
+               </div>
+             </div>
+             <div class="hist-actions">
+                <button class="gh-btn outline" style="flex:1; padding: 6px;" onclick="editTrip('${trip.id}')">Editar</button>
+                <button class="gh-btn danger" style="flex:1; padding: 6px;" onclick="requestDelete('${trip.id}')">Apagar</button>
+             </div>
+          </div>`;
+       });
+       container.innerHTML = html;
+    }
+    // --- FIM DA NOVA LÓGICA ---
+
     window.changeFormDay = function(deltaDays) {
        let parts = formDate.split('-');
        let currDate = new Date(parts[0], parts[1]-1, parts[2]);
        currDate.setDate(currDate.getDate() + deltaDays);
        let newIso = getLocalDateISO(currDate);
-       // Não permite avançar para além de hoje no formulário
        if(newIso > todayISO) return;
        formDate = newIso;
        refreshFormUI();
@@ -753,7 +888,6 @@ input { font-family: inherit; }
        currDate.setMonth(currDate.getMonth() + delta);
        let newIso = getLocalDateISO(currDate);
        
-       // Limite mínimo: Novembro 2025 (2025-11-01)
        if(newIso < "2025-11-01") return;
        historySelectedDate = newIso;
        renderHistoryCalendar();
@@ -782,7 +916,6 @@ input { font-family: inherit; }
       const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
       const shortMonths = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
 
-      // Desativa botão de mês anterior se estivermos em Novembro de 2025
       const canGoPrev = !(targetYear === 2025 && targetMonth === 10);
 
       let html = `<div class="calendar-header-nav">
@@ -852,12 +985,8 @@ input { font-family: inherit; }
     }
 
     function renderHistoryCalendar() {
-       document.getElementById("history-calendar").innerHTML = generateHistoryHistoryCalendarHTML_safe();
+       document.getElementById("history-calendar").innerHTML = generateHistoryCalendarHTML(historySelectedDate, 'selectHistoryDate');
        renderHistoryDetails();
-    }
-
-    function generateHistoryHistoryCalendarHTML_safe() {
-       return generateHistoryCalendarHTML(historySelectedDate, 'selectHistoryDate');
     }
 
     window.selectHistoryDate = function(iso) {
@@ -1072,15 +1201,12 @@ input { font-family: inherit; }
       const globalDrivers = getAllSelectedDrivers();
       const car = carsData[carIndex];
       const allowCross = carsData[0].isOneWay || carsData[1].isOneWay;
-      const otherCarIndex = carIndex === 0 ? 1 : 0;
-      const otherCarPass = carsData[otherCarIndex].passengers;
 
       PEOPLE.forEach(person => {
         const isThisDriver = car.driver === person;
         const isOtherDriver = globalDrivers.includes(person) && !isThisDriver;
         const isThisPass = car.passengers.includes(person);
         
-        // Se a opção "Só ida?" estiver ativa, permite repetir passageiros no outro carro. Caso contrário, bloqueia.
         const isOtherPass = !allowCross && getAllSelectedPassengers(carIndex).includes(person) && !isThisPass;
         
         const dBtn = document.createElement("button");
@@ -1183,10 +1309,7 @@ input { font-family: inherit; }
             html = `<div style="color:var(--danger); font-size:12px;">Selecione pelo menos um passageiro no total.</div>`;
             valid = false;
          } else {
-            const allPass = [...new Set([...p0, [...p1]])]; // Passagens únicas para calcular o custo geral por cabeça
-            // Contagem total de passageiros considerando repetições se aplicável
-            const totalPassCount = p0.length + p1.length;
-            
+            const allPass = [...new Set([...p0, ...p1])]; 
             const c0Calc = calculateCar(carsData[0]);
             const c1Calc = calculateCar(carsData[1]);
 
@@ -1197,8 +1320,7 @@ input { font-family: inherit; }
             let credit0 = cost0;
             let credit1 = cost1;
 
-            // Regra dos 1.5 créditos se um carro tem 2 pessoas e o outro tem 3 ou mais
-            const c0Size = 1 + p0.length; // condutor + passageiros
+            const c0Size = 1 + p0.length; 
             const c1Size = 1 + p1.length;
 
             if ((c0Size === 2 && c1Size >= 3) || (c1Size === 2 && c0Size >= 3)) {
@@ -1289,7 +1411,9 @@ input { font-family: inherit; }
       closeModal();
       showToast("Viagem guardada com sucesso!");
       historySelectedDate = formDate;
-      renderHistoryCalendar();
+      // Garante que se o utilizador acabou de guardar e vai ao histórico, a view reseta para o calendário
+      document.getElementById('history-filter').value = "ALL";
+      applyHistoryFilter();
     }
   </script>
 </body>
