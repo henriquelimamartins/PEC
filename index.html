@@ -165,10 +165,25 @@ input { font-family: inherit; }
 .confirm-box { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
 .confirm-box h3 { font-size: 16px; margin-bottom: 8px; }
 
-.cars-container { display: flex; justify-content: center; padding: 10px 0; }
-.car-visual { width: 100px; height: 160px; background: #010409; border: 1px solid var(--border); border-radius: 20px 20px 10px 10px; position: relative; padding: 18px 10px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 6px; }
-.car-visual::before { content: ''; position: absolute; top: 6px; left: 10px; right: 10px; height: 18px; background: rgba(255,255,255,0.05); border-radius: 6px 6px 2px 2px; }
-.seat { background: var(--card2); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: var(--text); margin: 0 auto; border: 1px solid var(--border); }
+/* Novo Design do Carro (2 à frente, 3 atrás) */
+.cars-container { display: flex; justify-content: center; gap: 16px; padding: 10px 0; }
+.car-visual { 
+  width: 112px; background: #010409; border: 1px solid var(--border); 
+  border-radius: 20px 20px 10px 10px; position: relative; padding: 28px 8px 16px; 
+  display: flex; flex-direction: column; gap: 20px;
+}
+.car-visual::before { 
+  content: ''; position: absolute; top: 8px; left: 16px; right: 16px; height: 12px; 
+  background: rgba(255,255,255,0.06); border-radius: 4px 4px 2px 2px; 
+}
+.car-row { display: flex; width: 100%; justify-content: center; }
+.front-row { gap: 14px; }
+.back-row { gap: 6px; }
+.seat { 
+  background: var(--card2); border-radius: 50%; width: 26px; height: 26px; 
+  display: flex; align-items: center; justify-content: center; 
+  font-size: 9px; font-weight: 600; color: var(--text); border: 1px solid var(--border); 
+}
 .seat.empty { background: transparent; border-color: transparent; color: transparent; }
 .seat.driver-seat { background: #30363d; border-color: var(--accent); color: var(--accent); }
 .seat.pass-seat { background: #9c4b1d; border-color: #d66b2b; color: #fff; }
@@ -847,7 +862,7 @@ input { font-family: inherit; }
             <div class="hist-details" style="text-align:center; padding: 24px 14px;">
               <div style="color:var(--muted); font-size:13px; margin-bottom:16px;">Sem viagens registadas neste dia.</div>
               <button class="gh-btn primary" style="margin:0 auto; padding:10px 16px; width:auto; font-size:13px;" onclick="openModalWithDate('${historySelectedDate}')">
-                 Registar Viagem para este dia
+                 Registar Viagem
               </button>
             </div>
           `;
@@ -1068,6 +1083,7 @@ input { font-family: inherit; }
       });
     }
 
+    // Função renovada para desenhar o carro simulando lugares reais
     function drawCar(carIndex, containerId) {
       const container = document.getElementById(containerId);
       container.innerHTML = "";
@@ -1078,14 +1094,29 @@ input { font-family: inherit; }
       
       const driverName = car.driver ? INITIALS[car.driver] : '';
       const driverClass = driverName ? 'seat driver-seat' : 'seat empty';
-      let seatsHTML = `<div class="${driverClass}">${driverName}</div>`;
       
       let pList = car.passengers;
-      for(let s = 1; s < 6; s++) {
-          if(s-1 < pList.length) seatsHTML += `<div class="seat pass-seat">${INITIALS[pList[s-1]]}</div>`;
-          else seatsHTML += `<div class="seat empty"></div>`;
-      }
-      carDiv.innerHTML = seatsHTML;
+      
+      // Função auxiliar para ir buscar os passageiros na ordem ou criar lugar vazio
+      const getPSeat = (index) => {
+         return index < pList.length 
+            ? `<div class="seat pass-seat">${INITIALS[pList[index]]}</div>` 
+            : `<div class="seat empty"></div>`;
+      };
+      
+      // Fila da Frente: 2 bancos (Condutor + 1 Passageiro)
+      // Fila de Trás: 3 bancos (Passageiro 2, 3 e 4)
+      carDiv.innerHTML = `
+         <div class="car-row front-row">
+            <div class="${driverClass}">${driverName}</div>
+            ${getPSeat(0)}
+         </div>
+         <div class="car-row back-row">
+            ${getPSeat(1)}
+            ${getPSeat(2)}
+            ${getPSeat(3)}
+         </div>
+      `;
       container.appendChild(carDiv);
     }
 
