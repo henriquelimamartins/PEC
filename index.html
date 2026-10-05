@@ -33,9 +33,9 @@
   --weekend-border: #2c2520;
 }
 
-/* Ocultar scroll. O overscroll nativo regressou para efeito elástico suave */
+/* Ocultar scroll e aplicar overscroll-behavior mais suave */
 ::-webkit-scrollbar { display: none; }
-html, body { -ms-overflow-style: none; scrollbar-width: none; overflow-x: hidden; }
+html, body { -ms-overflow-style: none; scrollbar-width: none; overflow-x: hidden; overscroll-behavior-y: contain; }
 
 * { box-sizing: border-box; }
 html, body { min-height: 100vh; margin: 0; background: var(--bg); touch-action: manipulation; }
@@ -110,7 +110,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
 /* Swipe Suave com Pré-visualização Lado a Lado */
 .swipe-container { overflow: hidden; width: 100%; position: relative; }
-.swipe-track { display: flex; width: 300%; will-change: transform; transition: transform 0.2s ease; }
+.swipe-track { display: flex; width: 300%; will-change: transform; transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
 .streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 16px; width: 33.3333%; flex-shrink: 0; }
 
 .s-day { background: var(--card2); border-radius: 6px; padding: 12px 2px 4px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--border); cursor: pointer; position: relative; }
@@ -137,15 +137,16 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .hist-actions { display: flex; gap: 8px; margin-top: 12px; }
 
 .stats-section-title { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
-.stats-chart { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); position: relative; }
+.stats-chart { display: flex; flex-direction: column; gap: 8px; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid var(--border); position: relative; overflow: visible; }
 .chart-bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; position: relative; z-index: 2; }
 .chart-label { width: 70px; color: var(--muted); font-weight: 500; text-align: right; flex-shrink: 0; }
 .chart-track { flex: 1; background: var(--card2); height: 10px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); position: relative; }
 .chart-fill { height: 100%; background: var(--accent); border-radius: 4px; }
 .chart-val { width: 40px; font-weight: 600; color: var(--text); text-align: left; flex-shrink: 0; }
 
-.avg-line { position: absolute; top: 0; bottom: 20px; border-left: 1px dashed rgba(255,255,255,0.25); z-index: 1; pointer-events: none; }
-.avg-label { position: absolute; bottom: 0; font-size: 9px; color: var(--muted); white-space: nowrap; font-weight: 500; transform: none; padding-left: 5px; pointer-events: none; }
+/* Linha da Média e Rótulo perfeitamente alinhados e sem overshoot */
+.avg-line { position: absolute; top: 4px; bottom: 22px; border-left: 1px dashed rgba(255,255,255,0.35); z-index: 1; pointer-events: none; }
+.avg-label { position: absolute; bottom: 0; font-size: 9px; color: var(--muted); white-space: nowrap; font-weight: 500; transform: translateX(-50%); pointer-events: none; z-index: 3; }
 
 .chk-row { display: flex; align-items: center; gap: 10px; background: var(--card2); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); margin-top: 16px; cursor: pointer; }
 .chk-box { width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border); background: #010409; display: flex; align-items: center; justify-content: center; }
@@ -550,7 +551,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        const origText = btn.innerText;
        btn.innerText = "A Sincronizar...";
        try {
-          // Desativa e reativa a rede para forçar flush da cache offline do Firebase
           await disableNetwork(db);
           await enableNetwork(db);
           showToast("Backup forçado!");
@@ -635,7 +635,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       }
     }
 
-    // --- NOVA LÓGICA DE SWIPE (PANORÂMICA E SUAVE) ---
+    // --- MOTOR DE SWIPE (PANORÂMICA E SUAVE) ---
     function setupSwipeListener(containerId, trackId, onSwipeLeft, onSwipeRight) {
        const container = document.getElementById(containerId);
        if(!container) return;
@@ -659,7 +659,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
              currentX = deltaX;
              const track = document.getElementById(trackId);
-             // -33.3333% é a posição central exata onde fica o mês atual visível
              if(track) track.style.transform = `translateX(calc(-33.3333% + ${deltaX}px))`;
              if(e.cancelable) e.preventDefault();
           }
@@ -674,13 +673,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           track.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
           
           if (currentX < -60) {
-             track.style.transform = `translateX(-66.6666%)`; // Anima até mostrar o Próximo Mês
+             track.style.transform = `translateX(-66.6666%)`; 
              setTimeout(() => { onSwipeLeft(); }, 250);
           } else if (currentX > 60) {
-             track.style.transform = `translateX(0%)`; // Anima até mostrar o Mês Anterior
+             track.style.transform = `translateX(0%)`; 
              setTimeout(() => { onSwipeRight(); }, 250);
           } else {
-             track.style.transform = `translateX(-33.3333%)`; // Cancela e volta ao Mês Atual
+             track.style.transform = `translateX(-33.3333%)`; 
           }
           currentX = 0;
        }, {passive: true});
@@ -860,12 +859,12 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        let statsDataAlpha = [...statsData].sort((a, b) => a.name.localeCompare(b.name));
        let ratioHtml = "";
        
-       // Linha de Média exata (80px + (100% - 130px) * %)
+       // Linha de Média perfeitamente alinhada e sem overshoot
        if(sumTotal > 0) {
            const linePos = `calc(80px + (100% - 130px) * ${globalRatioPct / 100})`;
            ratioHtml += `
              <div class="avg-line" style="left: ${linePos};"></div>
-             <div class="avg-label" style="left: ${linePos};">${globalRatioPct}% de conduções em média</div>
+             <div class="avg-label" style="left: ${linePos};">média de ${globalRatioPct}%</div>
            `;
        }
 
