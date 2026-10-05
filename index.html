@@ -33,7 +33,6 @@
   --weekend-border: #2c2520;
 }
 
-/* Ocultar scroll e restringir excesso de overscroll */
 ::-webkit-scrollbar { display: none; }
 html, body { -ms-overflow-style: none; scrollbar-width: none; overflow-x: hidden; overscroll-behavior: none; }
 
@@ -93,14 +92,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .input-text:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(214, 107, 43, 0.25); }
 
 .list { list-style: none; padding: 0; margin: 0; }
-.list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 10px; }
+.list-item { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); gap: 10px; }
 .list-item:last-child { border-bottom: none; }
-.balance-name { font-size: 14px; font-weight: 500; flex: 1; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+.balance-name { font-size: 13.5px; font-weight: 500; flex: 1; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
 .balance-right { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
-.balance-val { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; min-width: 65px; }
+.balance-val { font-size: 13.5px; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; min-width: 60px; }
 .balance-val.positive { color: #3fb950; }
 .balance-val.negative { color: var(--danger); }
-.next-driver-tag { background: rgba(214, 107, 43, 0.15); color: var(--accent); font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; border: 1px solid rgba(214, 107, 43, 0.35); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+.next-driver-tag { background: rgba(214, 107, 43, 0.15); color: var(--accent); font-size: 9.5px; padding: 2px 5px; border-radius: 4px; font-weight: 600; border: 1px solid rgba(214, 107, 43, 0.35); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
 
 .calendar-header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 12px; font-weight: 600; color: var(--muted); }
 .calendar-header-nav button { flex-direction: column; background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 4px; border-radius: 4px; font-size: 8px; height: auto; gap: 2px; min-width: 32px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; text-transform: uppercase; }
@@ -108,7 +107,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .center-date { text-align: center; line-height: 1.2; font-size: 11px; }
 .center-date span { display: block; }
 
-/* Swipe Suave com Pré-visualização Lado a Lado */
 .swipe-container { overflow: hidden; width: 100%; position: relative; }
 .swipe-track { display: flex; width: 300%; will-change: transform; transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
 .streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); auto-rows: minmax(36px, 1fr); gap: 6px; margin-bottom: 16px; width: 33.3333%; flex-shrink: 0; }
@@ -132,7 +130,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .hist-details { background: var(--card2); border-radius: 6px; padding: 14px; margin-top: 10px; border: 1px solid var(--border); }
 .hist-info { font-size: 13px; color: var(--muted); line-height: 1.5; }
 .hist-type { font-weight: 600; color: var(--text); display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.hist-type-date { font-size: 11px; color: var(--accent); background: rgba(214, 107, 43, 0.15); padding: 2px 6px; border-radius: 4px; }
 .hist-driver-row { display: block; margin-bottom: 4px; }
 .hist-actions { display: flex; gap: 8px; margin-top: 12px; }
 
@@ -144,8 +141,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .chart-fill { height: 100%; background: var(--accent); border-radius: 4px; }
 .chart-val { width: 40px; font-weight: 600; color: var(--text); text-align: left; flex-shrink: 0; }
 
-/* Linha contínua da média perfeitamente alinhada e sem overshoot abaixo da última barra */
-.avg-line { position: absolute; top: 4px; bottom: 0; border-left: 1px solid rgba(255,255,255,0.4); z-index: 1; pointer-events: none; }
+/* Linha da média estritamente entre as barras e texto logo abaixo */
+.avg-line { position: absolute; top: 4px; bottom: 8px; border-left: 1px solid rgba(255,255,255,0.4); z-index: 1; pointer-events: none; }
 .avg-label { position: absolute; bottom: -14px; font-size: 8.5px; color: var(--muted); white-space: nowrap; font-weight: 500; transform: translateX(-50%); pointer-events: none; z-index: 3; }
 
 .chk-row { display: flex; align-items: center; gap: 10px; background: var(--card2); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); margin-top: 16px; cursor: pointer; }
@@ -237,20 +234,24 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       </div>
     </div>
 
-    <!-- TAB 1: INÍCIO -->
-    <div id="tab-home" class="page tab-content">
-      <div class="eyebrow">Balanços Atuais</div>
-      <div class="card no-pad-top">
-        <ul class="list" id="balance-list"></ul>
+    <!-- TAB 1: INÍCIO (Com scroll bloqueado e ajuste perfeito ao ecrã) -->
+    <div id="tab-home" class="page tab-content" style="height: calc(100vh - 90px); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <div class="eyebrow" style="margin-bottom: 6px;">Balanços Atuais</div>
+        <div class="card no-pad-top" style="margin-bottom: 10px;">
+          <ul class="list" id="balance-list"></ul>
+        </div>
       </div>
 
-      <button class="gh-btn primary" onclick="openModal()" style="padding: 14px; font-size: 15px;">
-        <b>Registar Nova Viagem</b>
-      </button>
+      <div style="padding-bottom: 10px;">
+        <button class="gh-btn primary" onclick="openModal()" style="padding: 12px; font-size: 14px; margin-bottom: 8px;">
+          <b>Registar Nova Viagem</b>
+        </button>
 
-      <button id="btn-refresh" class="gh-btn outline" onclick="forceRefresh()" style="border-style: dashed; color: #fff; margin-top: 10px; font-size: 13px;">
-        Atualizar Dados ☁️
-      </button>
+        <button id="btn-refresh" class="gh-btn outline" onclick="forceRefresh()" style="border-style: dashed; color: #fff; margin-bottom: 0; font-size: 12.5px; padding: 10px;">
+          Atualizar Dados ☁️
+        </button>
+      </div>
     </div>
 
     <!-- TAB 2: HISTÓRICO -->
@@ -276,6 +277,10 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       <div style="margin-bottom: 16px;">
          <select id="stats-month-filter" class="input-text" onchange="renderStats()">
             <option value="ALL">Todo o tempo</option>
+            <option value="30">Últimos 30 dias</option>
+            <option value="90">Últimos 90 dias</option>
+            <option value="180">Últimos 180 dias</option>
+            <option value="365">Últimos 365 dias</option>
          </select>
       </div>
 
@@ -504,27 +509,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        });
     }
 
-    function initStatsMonthDropdown() {
-       const select = document.getElementById("stats-month-filter");
-       const currentVal = select.value;
-       select.innerHTML = '<option value="ALL">Todo o tempo</option>';
-       
-       let monthsSet = new Set();
-       trips.forEach(t => {
-          const parts = t.date.split('-');
-          monthsSet.add(`${parts[0]}-${parts[1]}`); // YYYY-MM
-       });
-       
-       Array.from(monthsSet).sort().reverse().forEach(ym => {
-          const [y, m] = ym.split('-');
-          let opt = document.createElement('option');
-          opt.value = ym;
-          opt.innerHTML = `${monthNames[parseInt(m)-1]} ${y}`;
-          select.appendChild(opt);
-       });
-       if(Array.from(monthsSet).includes(currentVal)) select.value = currentVal;
-    }
-
     window.forceRefresh = async function() {
        if(!USE_FIREBASE) return;
        const btn = document.getElementById("btn-refresh");
@@ -589,7 +573,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
        document.querySelectorAll('.botnav button').forEach(el => el.classList.remove('active'));
        
-       document.getElementById('tab-' + tabName).style.display = 'block';
+       document.getElementById('tab-' + tabName).style.display = tabName === 'home' ? 'flex' : 'block';
        document.getElementById('nav-' + tabName).classList.add('active');
        
        if(tabName === 'history') {
@@ -599,7 +583,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           renderHistoryCalendar();
        }
        if(tabName === 'stats') {
-          initStatsMonthDropdown();
           renderStats();
        }
        window.scrollTo(0,0);
@@ -635,7 +618,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       }
     }
 
-    // --- MOTOR DE SWIPE (PANORÂMICA E SUAVE) COM OVERSCROLL LIMITADO ---
     function setupSwipeListener(containerId, trackId, onSwipeLeft, onSwipeRight) {
        const container = document.getElementById(containerId);
        if(!container) return;
@@ -657,7 +639,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           const deltaY = y - startY;
 
           if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
-             // Limita a resistência e o arrasto para além do limite (overscroll contido)
              currentX = Math.max(-120, Math.min(120, deltaX));
              const track = document.getElementById(trackId);
              if(track) track.style.transform = `translateX(calc(-33.3333% + ${currentX}px))`;
@@ -814,7 +795,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       renderHistoryCalendar();
       renderWeekBar();
       if(document.getElementById('tab-stats').style.display === 'block') {
-         initStatsMonthDropdown();
          renderStats();
       }
     }
@@ -822,11 +802,18 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     window.renderStats = function() {
        const ratioContainer = document.getElementById('stats-ratio-chart');
        const barsContainer = document.getElementById('stats-bars-chart');
-       const filterMonth = document.getElementById('stats-month-filter').value;
+       const filterDays = document.getElementById('stats-month-filter').value;
        
        let filteredTrips = trips;
-       if(filterMonth !== "ALL") {
-          filteredTrips = trips.filter(t => t.date.startsWith(filterMonth));
+       if(filterDays !== "ALL") {
+          const daysNum = parseInt(filterDays);
+          const now = new Date();
+          const cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysNum);
+          filteredTrips = trips.filter(t => {
+             const parts = t.date.split('-');
+             const tDate = new Date(parts[0], parts[1]-1, parts[2]);
+             return tDate >= cutoff;
+          });
        }
        
        document.getElementById('stats-total-trips').innerText = filteredTrips.length;
@@ -860,7 +847,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        let statsDataAlpha = [...statsData].sort((a, b) => a.name.localeCompare(b.name));
        let ratioHtml = "";
        
-       // Linha contínua da média sem overshoot por baixo
+       // Linha delimitada estritamente entre as barras
        if(sumTotal > 0) {
            const linePos = `calc(80px + (100% - 130px) * ${globalRatioPct / 100})`;
            ratioHtml += `
