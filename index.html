@@ -33,9 +33,9 @@
   --weekend-border: #2c2520;
 }
 
-/* Ocultar scroll e desativar elastic bounce globalmente */
+/* Ocultar scroll. O overscroll nativo regressou para efeito elástico suave */
 ::-webkit-scrollbar { display: none; }
-html, body { -ms-overflow-style: none; scrollbar-width: none; overscroll-behavior-y: none; }
+html, body { -ms-overflow-style: none; scrollbar-width: none; overflow-x: hidden; }
 
 * { box-sizing: border-box; }
 html, body { min-height: 100vh; margin: 0; background: var(--bg); touch-action: manipulation; }
@@ -88,7 +88,6 @@ input, select { font-family: inherit; }
 .gh-btn.outline { background: transparent; border: 1px solid var(--border); }
 .gh-btn:disabled { opacity: 0.4; pointer-events: none; }
 
-/* Setinha nativa nos selects */
 select.input-text { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 32px; }
 .input-text { background: #010409; border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 10px 12px; font-size: 14px; width: 100%; outline: none; }
 .input-text:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(214, 107, 43, 0.25); }
@@ -109,10 +108,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .center-date { text-align: center; line-height: 1.2; font-size: 11px; }
 .center-date span { display: block; }
 
-/* Contentores para Swipe Suave */
+/* Swipe Suave com Pré-visualização Lado a Lado */
 .swipe-container { overflow: hidden; width: 100%; position: relative; }
-.swipe-track { display: flex; width: 100%; will-change: transform; flex-shrink: 0; }
-.streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 16px; width: 100%; flex-shrink: 0; }
+.swipe-track { display: flex; width: 300%; will-change: transform; transition: transform 0.2s ease; }
+.streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 16px; width: 33.3333%; flex-shrink: 0; }
+
 .s-day { background: var(--card2); border-radius: 6px; padding: 12px 2px 4px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--border); cursor: pointer; position: relative; }
 .s-month-badge { position: absolute; top: 2px; left: 0; right: 0; text-align: center; font-size: 7px; font-weight: 600; color: var(--muted); opacity: 0.8; }
 .s-day .s-date { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1; margin-top: 1px; }
@@ -139,13 +139,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .stats-section-title { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
 .stats-chart { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); position: relative; }
 .chart-bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; position: relative; z-index: 2; }
-.chart-label { width: 70px; color: var(--muted); font-weight: 500; text-align: right; }
+.chart-label { width: 70px; color: var(--muted); font-weight: 500; text-align: right; flex-shrink: 0; }
 .chart-track { flex: 1; background: var(--card2); height: 10px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); position: relative; }
 .chart-fill { height: 100%; background: var(--accent); border-radius: 4px; }
-.chart-val { width: 40px; font-weight: 600; color: var(--text); text-align: left; }
+.chart-val { width: 40px; font-weight: 600; color: var(--text); text-align: left; flex-shrink: 0; }
 
-.avg-line { position: absolute; top: 0; bottom: 20px; border-left: 1px dashed rgba(255,255,255,0.25); z-index: 1; }
-.avg-label { position: absolute; bottom: 0; transform: translateX(-50%); font-size: 9px; color: var(--muted); white-space: nowrap; font-weight: 500; }
+.avg-line { position: absolute; top: 0; bottom: 20px; border-left: 1px dashed rgba(255,255,255,0.25); z-index: 1; pointer-events: none; }
+.avg-label { position: absolute; bottom: 0; font-size: 9px; color: var(--muted); white-space: nowrap; font-weight: 500; transform: none; padding-left: 5px; pointer-events: none; }
 
 .chk-row { display: flex; align-items: center; gap: 10px; background: var(--card2); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); margin-top: 16px; cursor: pointer; }
 .chk-box { width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border); background: #010409; display: flex; align-items: center; justify-content: center; }
@@ -167,7 +167,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .car-header { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
 .car-header::before { content:''; display:block; width:3px; height:12px; background: var(--accent); border-radius:2px; }
 
-.modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; padding-top: calc(90px + env(safe-area-inset-top, 0px)); -ms-overflow-style: none; scrollbar-width: none; overscroll-behavior-y: none; }
+.modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; padding-top: calc(90px + env(safe-area-inset-top, 0px)); -ms-overflow-style: none; scrollbar-width: none; }
 .modal-overlay.active { display: block; }
 .modal-overlay::-webkit-scrollbar { display: none; }
 .modal-overlay .page { padding-bottom: 160px; } 
@@ -535,7 +535,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           trips = [];
           snapshot.forEach((doc) => { trips.push({ id: doc.id, ...doc.data() }); });
           recalculateAndRender();
-          showToast("Dados atualizados da cloud!");
+          showToast("Dados atualizados!");
        } catch (err) {
           showToast("Erro ao sincronizar dados!");
        } finally {
@@ -553,7 +553,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           // Desativa e reativa a rede para forçar flush da cache offline do Firebase
           await disableNetwork(db);
           await enableNetwork(db);
-          showToast("Backup forçado para a cloud!");
+          showToast("Backup forçado!");
        } catch(e) {
           showToast("Erro de ligação.");
        }
@@ -635,7 +635,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       }
     }
 
-    // Lógica para swipe suave 
+    // --- NOVA LÓGICA DE SWIPE (PANORÂMICA E SUAVE) ---
     function setupSwipeListener(containerId, trackId, onSwipeLeft, onSwipeRight) {
        const container = document.getElementById(containerId);
        if(!container) return;
@@ -656,27 +656,31 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           const deltaX = x - startX;
           const deltaY = y - startY;
 
-          // Se o swipe for mais horizontal que vertical, move o track
           if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
              currentX = deltaX;
              const track = document.getElementById(trackId);
-             if(track) track.style.transform = `translateX(${deltaX}px)`;
+             // -33.3333% é a posição central exata onde fica o mês atual visível
+             if(track) track.style.transform = `translateX(calc(-33.3333% + ${deltaX}px))`;
              if(e.cancelable) e.preventDefault();
           }
        }, {passive: false});
 
        container.addEventListener('touchend', e => {
+          if(!isDragging) return;
           isDragging = false;
           const track = document.getElementById(trackId);
           if(!track) return;
-          track.style.transition = 'transform 0.2s ease';
           
-          if (currentX < -50) {
-             onSwipeLeft();
-          } else if (currentX > 50) {
-             onSwipeRight();
+          track.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
+          
+          if (currentX < -60) {
+             track.style.transform = `translateX(-66.6666%)`; // Anima até mostrar o Próximo Mês
+             setTimeout(() => { onSwipeLeft(); }, 250);
+          } else if (currentX > 60) {
+             track.style.transform = `translateX(0%)`; // Anima até mostrar o Mês Anterior
+             setTimeout(() => { onSwipeRight(); }, 250);
           } else {
-             track.style.transform = `translateX(0)`; // Snap back
+             track.style.transform = `translateX(-33.3333%)`; // Cancela e volta ao Mês Atual
           }
           currentX = 0;
        }, {passive: true});
@@ -757,12 +761,10 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       PEOPLE.forEach(p => balances[p] = 0);
       
       trips.forEach(trip => {
-         // Nova estrutura suporta custos/lucros individuais
          if (trip.driverProfits && trip.passengerCosts) {
              Object.keys(trip.driverProfits).forEach(d => balances[d] += trip.driverProfits[d]);
              Object.keys(trip.passengerCosts).forEach(p => balances[p] -= trip.passengerCosts[p]);
          } else {
-             // Fallback para viagens antigas (1 carro)
              if(trip.passengers) trip.passengers.forEach(p => balances[p] -= trip.costPerPassenger);
              if(trip.drivers) trip.drivers.forEach(d => balances[d] += trip.profitPerDriver);
          }
@@ -838,10 +840,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           filteredTrips.forEach(t => {
              if(t.drivers.includes(person)) {
                 asDriver++;
-                // Contar total transportado por ele neste período
                 if(t.car1 && t.car1.driver === person) passCount += t.car1.passengers.length;
                 else if(t.car2 && t.car2.driver === person) passCount += t.car2.passengers.length;
-                else if(!t.car1) passCount += t.passengers.length; // Fallback
+                else if(!t.car1) passCount += t.passengers.length; 
              }
              if(t.passengers.includes(person)) {
                 asPassenger++;
@@ -852,20 +853,19 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           statsData.push({ name: person, asDriver, asPassenger, passCount, totalViagens, ratio });
        });
 
-       // Média do rácio global
        let sumDrvs = 0, sumTotal = 0;
        statsData.forEach(d => { sumDrvs += d.asDriver; sumTotal += d.totalViagens; });
        const globalRatioPct = sumTotal > 0 ? Math.round((sumDrvs / sumTotal) * 100) : 0;
 
-       // Ordenação do Rácio: Ordem Alfabética (A-Z)
        let statsDataAlpha = [...statsData].sort((a, b) => a.name.localeCompare(b.name));
        let ratioHtml = "";
        
-       // Linha Média Global no gráfico
+       // Linha de Média exata (80px + (100% - 130px) * %)
        if(sumTotal > 0) {
+           const linePos = `calc(80px + (100% - 130px) * ${globalRatioPct / 100})`;
            ratioHtml += `
-             <div class="avg-line" style="left: calc(70px + 10px + ${globalRatioPct}% * (100% - 120px) / 100);"></div>
-             <div class="avg-label" style="left: calc(70px + 10px + ${globalRatioPct}% * (100% - 120px) / 100);">${globalRatioPct}% em média</div>
+             <div class="avg-line" style="left: ${linePos};"></div>
+             <div class="avg-label" style="left: ${linePos};">${globalRatioPct}% de conduções em média</div>
            `;
        }
 
@@ -930,7 +930,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        if(newIso > todayISO) return;
        formDate = newIso;
        refreshFormUI();
-       document.getElementById("form-track").style.transform = 'translateX(0)'; // reset visual
     }
 
     window.resetFormWeekToToday = function() {
@@ -938,33 +937,15 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        refreshFormUI();
     }
 
-    function generateFormCalendarHTML(selectedDateISO, onClickAction) {
-       const parts = selectedDateISO.split('-');
-       const targetDate = new Date(parts[0], parts[1]-1, parts[2]);
-       
+    function getFormWeekGrid(targetDate, selectedDateISO, onClickAction) {
        const startDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
        startDate.setDate(startDate.getDate() - 3);
 
-       let html = `<div class="calendar-header-nav">
-          <div style="display:flex; gap:4px;">
-             <button onclick="changeFormDay(-7)" title="Semana Anterior"><span>◀</span><span>Sem</span></button>
-          </div>
-          <div class="center-date">
-             <span style="font-weight:700; color:var(--text); text-transform:uppercase; font-size:12px;">${monthNames[targetDate.getMonth()]}</span>
-             <span>${targetDate.getFullYear()}</span>
-          </div>
-          <div style="display:flex; gap:4px;">
-             <button onclick="changeFormDay(7)" title="Semana Seguinte"><span>▶</span><span>Sem</span></button>
-             <button onclick="resetFormWeekToToday()" style="background:#30363d; color:#ffffff; border-color:#8b949e;" title="Hoje"><span>▼</span><span>Hoje</span></button>
-          </div>
-       </div>`;
-
-       html += `<div id="form-swipe" class="swipe-container"><div id="form-track" class="swipe-track"><div class="streak-grid">`;
+       let html = `<div class="streak-grid">`;
        const shortDays = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
 
        for(let i=0; i<7; i++){
-          const d = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-          d.setDate(startDate.getDate() + i);
+          const d = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + i);
           const iso = getLocalDateISO(d);
           
           const isPast = iso < todayISO;
@@ -983,7 +964,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           
           const dayName = shortDays[jsDay];
           const dateNum = d.getDate();
-
           const isFirst = dateNum === 1;
           const isLast = dateNum === new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
           
@@ -995,7 +975,36 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           let clickAttr = isFuture ? '' : `onclick="${onClickAction}('${iso}')"`;
           html += `<div class="${c}" ${clickAttr}>${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
        }
-       return html + '</div></div></div>';
+       return html + `</div>`;
+    }
+
+    function generateFormCalendarHTML(selectedDateISO, onClickAction) {
+       const parts = selectedDateISO.split('-');
+       const targetDate = new Date(parts[0], parts[1]-1, parts[2]);
+       
+       let prevDate = new Date(targetDate); prevDate.setDate(prevDate.getDate() - 7);
+       let nextDate = new Date(targetDate); nextDate.setDate(nextDate.getDate() + 7);
+
+       let html = `<div class="calendar-header-nav">
+          <div style="display:flex; gap:4px;">
+             <button onclick="changeFormDay(-7)" title="Semana Anterior"><span>◀</span><span>Sem</span></button>
+          </div>
+          <div class="center-date">
+             <span style="font-weight:700; color:var(--text); text-transform:uppercase; font-size:12px;">${monthNames[targetDate.getMonth()]}</span>
+             <span>${targetDate.getFullYear()}</span>
+          </div>
+          <div style="display:flex; gap:4px;">
+             <button onclick="changeFormDay(7)" title="Semana Seguinte"><span>▶</span><span>Sem</span></button>
+             <button onclick="resetFormWeekToToday()" style="background:#30363d; color:#ffffff; border-color:#8b949e;" title="Hoje"><span>▼</span><span>Hoje</span></button>
+          </div>
+       </div>`;
+
+       html += `<div id="form-swipe" class="swipe-container"><div id="form-track" class="swipe-track" style="transform: translateX(-33.3333%);">`;
+       html += getFormWeekGrid(prevDate, selectedDateISO, onClickAction);
+       html += getFormWeekGrid(targetDate, selectedDateISO, onClickAction);
+       html += getFormWeekGrid(nextDate, selectedDateISO, onClickAction);
+       html += `</div></div>`;
+       return html;
     }
 
     window.changeHistoryMonth = function(delta) {
@@ -1006,8 +1015,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        if(newIso < "2025-11-01") return;
        historySelectedDate = newIso;
        renderHistoryCalendar();
-       const track = document.getElementById("history-track");
-       if(track) track.style.transform = 'translateX(0)';
     }
     
     window.changeHistoryYear = function(delta) {
@@ -1024,12 +1031,75 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        renderHistoryCalendar();
     }
 
+    function getHistoryMonthGrid(targetYear, targetMonth, selectedDateISO, onClickAction) {
+       let html = `<div class="streak-grid">`;
+       const firstDayOfMonth = new Date(targetYear, targetMonth, 1);
+       const jsDayFirst = firstDayOfMonth.getDay();
+       const monBasedFirst = (jsDayFirst + 6) % 7; 
+       const startDate = new Date(targetYear, targetMonth, 1 - monBasedFirst);
+
+       const lastDayOfMonth = new Date(targetYear, targetMonth + 1, 0);
+       const jsDayLast = lastDayOfMonth.getDay();
+       const monBasedLast = (jsDayLast + 6) % 7;
+       const endDate = new Date(targetYear, targetMonth + 1, 0 + (6 - monBasedLast));
+       const shortDays = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
+
+       for(let d = new Date(startDate.getTime()); d <= endDate; d.setDate(d.getDate() + 1)){
+         const iso = getLocalDateISO(d);
+         const isPast = iso < todayISO;
+         const isFuture = iso > todayISO;
+         const isSelected = iso === selectedDateISO;
+         const realJsDay = d.getDay();
+         const isWeekend = (realJsDay === 0 || realJsDay === 6);
+         const isOtherMonth = d.getMonth() !== targetMonth;
+         
+         let tripClass = "";
+         if (currentHistoryFilter === "ALL") {
+            const hasTrip = trips.some(t => t.date === iso);
+            if (hasTrip) tripClass = "has-trip";
+         } else {
+            const personTrips = trips.filter(t => t.date === iso && (t.drivers.includes(currentHistoryFilter) || t.passengers.includes(currentHistoryFilter)));
+            if (personTrips.length > 0) {
+               const isDriver = personTrips.some(t => t.drivers.includes(currentHistoryFilter));
+               tripClass = isDriver ? "has-trip-driver" : "has-trip-passenger";
+            }
+         }
+         
+         let c = "s-day";
+         if(isPast) c += " past";
+         if(isFuture) c += " future-day";
+         if(isWeekend) c += " weekend";
+         if(isSelected) c += " selected";
+         if(tripClass) c += " " + tripClass;
+         if(isOtherMonth) c += " other-month";
+         
+         const dayName = shortDays[(realJsDay + 6) % 7];
+         const dateNum = d.getDate();
+         const isFirst = dateNum === 1;
+         const isLast = dateNum === new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+           
+         let badgeHtml = "";
+         if(isFirst || isLast) {
+              badgeHtml = `<div class="s-month-badge">${shortMonths[d.getMonth()]}</div>`;
+         }
+
+         let clickAttr = isFuture ? '' : `onclick="${onClickAction}('${iso}')"`;
+         html += `<div class="${c}" ${clickAttr}>${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
+       }
+       return html + `</div>`;
+    }
+
     function generateHistoryCalendarHTML(selectedDateISO, onClickAction) {
       const parts = selectedDateISO.split('-');
       const targetDate = new Date(parts[0], parts[1]-1, parts[2]);
       const targetYear = targetDate.getFullYear();
       const targetMonth = targetDate.getMonth();
       const canGoPrev = !(targetYear === 2025 && targetMonth === 10);
+
+      let prevYear = targetYear, prevMonth = targetMonth - 1;
+      if(prevMonth < 0) { prevMonth = 11; prevYear--; }
+      let nextYear = targetYear, nextMonth = targetMonth + 1;
+      if(nextMonth > 11) { nextMonth = 0; nextYear++; }
 
       let html = `<div class="calendar-header-nav">
           <div style="display:flex; gap:4px;">
@@ -1047,62 +1117,12 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           </div>
        </div>`;
 
-      html += `<div id="hist-swipe" class="swipe-container"><div id="history-track" class="swipe-track"><div class="streak-grid">`;
-      
-      const firstDayOfMonth = new Date(targetYear, targetMonth, 1);
-      const jsDayFirst = firstDayOfMonth.getDay();
-      const monBasedFirst = (jsDayFirst + 6) % 7; 
-      const startDate = new Date(targetYear, targetMonth, 1 - monBasedFirst);
-
-      const lastDayOfMonth = new Date(targetYear, targetMonth + 1, 0);
-      const jsDayLast = lastDayOfMonth.getDay();
-      const monBasedLast = (jsDayLast + 6) % 7;
-      const endDate = new Date(targetYear, targetMonth + 1, 0 + (6 - monBasedLast));
-      const shortDays = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
-
-      for(let d = new Date(startDate.getTime()); d <= endDate; d.setDate(d.getDate() + 1)){
-        const iso = getLocalDateISO(d);
-        const isPast = iso < todayISO;
-        const isFuture = iso > todayISO;
-        const isSelected = iso === selectedDateISO;
-        const realJsDay = d.getDay();
-        const isWeekend = (realJsDay === 0 || realJsDay === 6);
-        const isOtherMonth = d.getMonth() !== targetMonth;
-        
-        let tripClass = "";
-        if (currentHistoryFilter === "ALL") {
-           const hasTrip = trips.some(t => t.date === iso);
-           if (hasTrip) tripClass = "has-trip";
-        } else {
-           const personTrips = trips.filter(t => t.date === iso && (t.drivers.includes(currentHistoryFilter) || t.passengers.includes(currentHistoryFilter)));
-           if (personTrips.length > 0) {
-              const isDriver = personTrips.some(t => t.drivers.includes(currentHistoryFilter));
-              tripClass = isDriver ? "has-trip-driver" : "has-trip-passenger";
-           }
-        }
-        
-        let c = "s-day";
-        if(isPast) c += " past";
-        if(isFuture) c += " future-day";
-        if(isWeekend) c += " weekend";
-        if(isSelected) c += " selected";
-        if(tripClass) c += " " + tripClass;
-        if(isOtherMonth) c += " other-month";
-        
-        const dayName = shortDays[(realJsDay + 6) % 7];
-        const dateNum = d.getDate();
-        const isFirst = dateNum === 1;
-        const isLast = dateNum === new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
-          
-        let badgeHtml = "";
-        if(isFirst || isLast) {
-             badgeHtml = `<div class="s-month-badge">${shortMonths[d.getMonth()]}</div>`;
-        }
-
-        let clickAttr = isFuture ? '' : `onclick="${onClickAction}('${iso}')"`;
-        html += `<div class="${c}" ${clickAttr}>${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
-      }
-      return html + '</div></div></div>';
+      html += `<div id="hist-swipe" class="swipe-container"><div id="history-track" class="swipe-track" style="transform: translateX(-33.3333%);">`;
+      html += getHistoryMonthGrid(prevYear, prevMonth, selectedDateISO, onClickAction);
+      html += getHistoryMonthGrid(targetYear, targetMonth, selectedDateISO, onClickAction);
+      html += getHistoryMonthGrid(nextYear, nextMonth, selectedDateISO, onClickAction);
+      html += `</div></div>`;
+      return html;
     }
 
     function renderHistoryCalendar() {
@@ -1127,7 +1147,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        
        if(dayTrips.length === 0) {
           const isFuture = historySelectedDate > todayISO;
-          // Botão Registo Visível para Todos os Filtros
           let btnHtml = isFuture ? '' : `<button class="gh-btn primary" style="margin:0 auto; padding:10px 16px; width:auto; font-size:13px;" onclick="openModalWithDate('${historySelectedDate}')">Registar Viagem</button>`;
           let msgText = currentHistoryFilter !== "ALL" 
              ? `Nenhum registo para ${currentHistoryFilter} neste dia.` 
@@ -1434,7 +1453,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             finalCalc.passengers = allPass;
 
             if (!splitCostMode) {
-               // MATEMÁTICA CONJUNTA (Partilhada e Justa 50/50)
                let cost0 = c0Calc.totalCost;
                let cost1 = c1Calc.totalCost;
                const c0Size = 1 + p0.length; const c1Size = 1 + p1.length;
@@ -1445,7 +1463,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                }
                const combinedCost = cost0 + cost1;
                const costPerPass = allPass.length > 0 ? combinedCost / allPass.length : 0;
-               const profitPerDriver = combinedCost / 2; // 50/50 divisão do lucro
+               const profitPerDriver = combinedCost / 2;
 
                allPass.forEach(p => finalCalc.passengerCosts[p] = costPerPass);
                finalCalc.driverProfits[d0] = profitPerDriver;
@@ -1459,7 +1477,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                   <div style="display:flex; justify-content:space-between; color:var(--green)"><span>Crédito/condut.:</span> <strong>+${fmt(profitPerDriver)} 🪙</strong></div>
                `;
             } else {
-               // MATEMÁTICA SEPARADA
                p0.forEach(p => finalCalc.passengerCosts[p] = c0Calc.costPerPassenger);
                p1.forEach(p => finalCalc.passengerCosts[p] = c1Calc.costPerPassenger);
                finalCalc.driverProfits[d0] = c0Calc.profitPerDriver;
