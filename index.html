@@ -40,6 +40,10 @@ html, body { -ms-overflow-style: none; scrollbar-width: none; overflow-x: hidden
 html, body { min-height: 100vh; margin: 0; background: var(--bg); touch-action: manipulation; }
 button, a, img, select { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif; color: var(--text); -webkit-tap-highlight-color: transparent; padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px)); }
+
+/* Classe dinâmica para bloquear o scroll apenas no ecrã inicial */
+body.locked-scroll { overflow: hidden; height: 100vh; }
+
 h1, h2, h3, h4 { font-weight: 600; margin: 0; }
 p { margin: 0; line-height: 1.5; color: var(--muted); font-size: 13.5px; }
 button { font-family: inherit; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease; }
@@ -134,16 +138,17 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .hist-actions { display: flex; gap: 8px; margin-top: 12px; }
 
 .stats-section-title { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
-.stats-chart { display: flex; flex-direction: column; gap: 8px; margin-bottom: 25px; padding-bottom: 16px; border-bottom: 1px solid var(--border); position: relative; overflow: visible; }
-.chart-bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; position: relative; z-index: 2; }
+.stats-chart { display: flex; flex-direction: column; margin-bottom: 25px; padding-bottom: 16px; border-bottom: 1px solid var(--border); position: relative; overflow: visible; }
+.chart-bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; position: relative; z-index: 2; margin-bottom: 8px; }
+.chart-bar-row:last-child { margin-bottom: 0; }
 .chart-label { width: 70px; color: var(--muted); font-weight: 500; text-align: right; flex-shrink: 0; }
 .chart-track { flex: 1; background: var(--card2); height: 10px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); position: relative; }
 .chart-fill { height: 100%; background: var(--accent); border-radius: 4px; }
 .chart-val { width: 40px; font-weight: 600; color: var(--text); text-align: left; flex-shrink: 0; }
 
-/* Linha da média estritamente entre as barras e texto logo abaixo */
-.avg-line { position: absolute; top: 4px; bottom: 8px; border-left: 1px solid rgba(255,255,255,0.4); z-index: 1; pointer-events: none; }
-.avg-label { position: absolute; bottom: -14px; font-size: 8.5px; color: var(--muted); white-space: nowrap; font-weight: 500; transform: translateX(-50%); pointer-events: none; z-index: 3; }
+/* A linha média agora ocupa apenas a altura exata do contentor das barras */
+.avg-line { position: absolute; top: 0; bottom: 0; border-left: 1px solid rgba(255,255,255,0.4); z-index: 1; pointer-events: none; }
+.avg-label { position: absolute; top: 0; font-size: 8.5px; color: var(--muted); white-space: nowrap; font-weight: 500; transform: translateX(-50%); pointer-events: none; z-index: 3; }
 
 .chk-row { display: flex; align-items: center; gap: 10px; background: var(--card2); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); margin-top: 16px; cursor: pointer; }
 .chk-box { width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border); background: #010409; display: flex; align-items: center; justify-content: center; }
@@ -234,24 +239,20 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       </div>
     </div>
 
-    <!-- TAB 1: INÍCIO (Com scroll bloqueado e ajuste perfeito ao ecrã) -->
-    <div id="tab-home" class="page tab-content" style="height: calc(100vh - 90px); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
-      <div>
-        <div class="eyebrow" style="margin-bottom: 6px;">Balanços Atuais</div>
-        <div class="card no-pad-top" style="margin-bottom: 10px;">
-          <ul class="list" id="balance-list"></ul>
-        </div>
+    <!-- TAB 1: INÍCIO (Tamanho natural, sem gap enorme) -->
+    <div id="tab-home" class="page tab-content" style="display: none;">
+      <div class="eyebrow" style="margin-bottom: 6px;">Balanços Atuais</div>
+      <div class="card no-pad-top" style="margin-bottom: 16px;">
+        <ul class="list" id="balance-list"></ul>
       </div>
 
-      <div style="padding-bottom: 10px;">
-        <button class="gh-btn primary" onclick="openModal()" style="padding: 12px; font-size: 14px; margin-bottom: 8px;">
-          <b>Registar Nova Viagem</b>
-        </button>
+      <button class="gh-btn primary" onclick="openModal()" style="padding: 14px; font-size: 15px; margin-bottom: 12px;">
+        <b>Registar Nova Viagem</b>
+      </button>
 
-        <button id="btn-refresh" class="gh-btn outline" onclick="forceRefresh()" style="border-style: dashed; color: #fff; margin-bottom: 0; font-size: 12.5px; padding: 10px;">
-          Atualizar Dados ☁️
-        </button>
-      </div>
+      <button id="btn-refresh" class="gh-btn outline" onclick="forceRefresh()" style="border-style: dashed; color: #fff; margin-bottom: 0; font-size: 13px; padding: 10px;">
+        Atualizar Dados ☁️
+      </button>
     </div>
 
     <!-- TAB 2: HISTÓRICO -->
@@ -296,7 +297,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         <div id="stats-ratio-chart" class="stats-chart"></div>
 
         <div class="stats-section-title">Métricas de Participação (Nº de Vezes)</div>
-        <div id="stats-bars-chart" class="stats-chart" style="border-bottom: none; margin-bottom: 0;"></div>
+        <div id="stats-bars-chart" class="stats-chart" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;"></div>
       </div>
     </div>
     
@@ -573,8 +574,15 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
        document.querySelectorAll('.botnav button').forEach(el => el.classList.remove('active'));
        
-       document.getElementById('tab-' + tabName).style.display = tabName === 'home' ? 'flex' : 'block';
+       document.getElementById('tab-' + tabName).style.display = 'block';
        document.getElementById('nav-' + tabName).classList.add('active');
+       
+       // Aplica a classe de bloqueio de scroll na página inicial
+       if(tabName === 'home') {
+          document.body.classList.add('locked-scroll');
+       } else {
+          document.body.classList.remove('locked-scroll');
+       }
        
        if(tabName === 'history') {
           historySelectedDate = getLocalDateISO();
@@ -671,6 +679,10 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       renderHeaderDate();
       renderWeekBar();
       initHistoryFilterDropdown();
+      
+      // Força a ativação da aba principal (incluindo o bloqueio de scroll)
+      switchTab('home');
+
       if (USE_FIREBASE) {
         const q = query(collection(db, "trips"), orderBy("date", "desc"));
         onSnapshot(q, (snapshot) => {
@@ -845,15 +857,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        const globalRatioPct = sumTotal > 0 ? Math.round((sumDrvs / sumTotal) * 100) : 0;
 
        let statsDataAlpha = [...statsData].sort((a, b) => a.name.localeCompare(b.name));
-       let ratioHtml = "";
        
-       // Linha delimitada estritamente entre as barras
+       // Criação de um Contentor Interno Relativo apenas para as barras (para que a linha ocupe apenas a sua altura exata)
+       let ratioHtml = `<div style="position: relative;">`; 
+       
        if(sumTotal > 0) {
            const linePos = `calc(80px + (100% - 130px) * ${globalRatioPct / 100})`;
-           ratioHtml += `
-             <div class="avg-line" style="left: ${linePos};"></div>
-             <div class="avg-label" style="left: ${linePos};">média de ${globalRatioPct}%</div>
-           `;
+           ratioHtml += `<div class="avg-line" style="left: ${linePos};"></div>`;
        }
 
        statsDataAlpha.forEach(d => {
@@ -866,6 +876,20 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
              <div class="chart-val">${pct}%</div>
           </div>`;
        });
+       
+       // Fecho do Contentor das barras
+       ratioHtml += `</div>`; 
+
+       // Adição da Etiqueta de Texto num Contentor separado POR BAIXO das barras
+       if(sumTotal > 0) {
+           const linePos = `calc(80px + (100% - 130px) * ${globalRatioPct / 100})`;
+           ratioHtml += `
+             <div style="position: relative; height: 16px; margin-top: 4px;">
+                <div class="avg-label" style="left: ${linePos};">média de ${globalRatioPct}%</div>
+             </div>
+           `;
+       }
+
        ratioContainer.innerHTML = ratioHtml;
 
        const maxVal = Math.max(...statsData.map(d => Math.max(d.totalViagens, d.asDriver, d.asPassenger, d.passCount)), 1);
@@ -894,7 +918,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                 <div class="chart-track"><div class="chart-fill" style="width: ${pPas}%; background:var(--muted)"></div></div>
                 <div class="chart-val">${d.asPassenger}</div>
              </div>
-             <div class="chart-bar-row">
+             <div class="chart-bar-row" style="margin-bottom:0;">
                 <div class="chart-label" style="font-size:9px;">Transportados</div>
                 <div class="chart-track"><div class="chart-fill" style="width: ${pTra}%; background:#f59e0b"></div></div>
                 <div class="chart-val">${d.passCount}</div>
