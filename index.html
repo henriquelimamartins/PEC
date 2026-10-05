@@ -33,9 +33,9 @@
   --weekend-border: #2c2520;
 }
 
-/* Ocultar a barra de scroll globalmente e desativar "elastic bounce" */
+/* Ocultar scroll e desativar elastic bounce globalmente */
 ::-webkit-scrollbar { display: none; }
-html, body { -ms-overflow-style: none; scrollbar-width: none; overscroll-behavior: none; }
+html, body { -ms-overflow-style: none; scrollbar-width: none; overscroll-behavior-y: none; }
 
 * { box-sizing: border-box; }
 html, body { min-height: 100vh; margin: 0; background: var(--bg); touch-action: manipulation; }
@@ -43,7 +43,8 @@ button, a, img, select { -webkit-user-select: none; user-select: none; -webkit-t
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif; color: var(--text); -webkit-tap-highlight-color: transparent; padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px)); }
 h1, h2, h3, h4 { font-weight: 600; margin: 0; }
 p { margin: 0; line-height: 1.5; color: var(--muted); font-size: 13.5px; }
-button { font-family: inherit; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease; }
+button { font-family: inherit; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease; }
+button:active { transform: scale(0.97); }
 input, select { font-family: inherit; }
 
 #app-screen, #login-screen { max-width: 520px; margin: 0 auto; min-height: 100vh; }
@@ -87,6 +88,7 @@ input, select { font-family: inherit; }
 .gh-btn.outline { background: transparent; border: 1px solid var(--border); }
 .gh-btn:disabled { opacity: 0.4; pointer-events: none; }
 
+/* Setinha nativa nos selects */
 select.input-text { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 32px; }
 .input-text { background: #010409; border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 10px 12px; font-size: 14px; width: 100%; outline: none; }
 .input-text:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(214, 107, 43, 0.25); }
@@ -107,7 +109,10 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .center-date { text-align: center; line-height: 1.2; font-size: 11px; }
 .center-date span { display: block; }
 
-.streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 16px; }
+/* Contentores para Swipe Suave */
+.swipe-container { overflow: hidden; width: 100%; position: relative; }
+.swipe-track { display: flex; width: 100%; will-change: transform; flex-shrink: 0; }
+.streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 16px; width: 100%; flex-shrink: 0; }
 .s-day { background: var(--card2); border-radius: 6px; padding: 12px 2px 4px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--border); cursor: pointer; position: relative; }
 .s-month-badge { position: absolute; top: 2px; left: 0; right: 0; text-align: center; font-size: 7px; font-weight: 600; color: var(--muted); opacity: 0.8; }
 .s-day .s-date { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1; margin-top: 1px; }
@@ -120,7 +125,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .s-day.selected { border-color: var(--accent) !important; background: rgba(214, 107, 43, 0.15) !important; }
 .s-day.selected .s-date { color: var(--accent); }
 
-/* Variações de marcadores no calendário */
 .s-day.has-trip { border-bottom: 3px solid var(--green); }
 .s-day.has-trip-driver { border-bottom: 3px solid var(--accent); }
 .s-day.has-trip-passenger { border-bottom: 3px solid var(--yellow); }
@@ -133,12 +137,15 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .hist-actions { display: flex; gap: 8px; margin-top: 12px; }
 
 .stats-section-title { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
-.stats-chart { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
-.chart-bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.stats-chart { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); position: relative; }
+.chart-bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; position: relative; z-index: 2; }
 .chart-label { width: 70px; color: var(--muted); font-weight: 500; text-align: right; }
 .chart-track { flex: 1; background: var(--card2); height: 10px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); position: relative; }
 .chart-fill { height: 100%; background: var(--accent); border-radius: 4px; }
 .chart-val { width: 40px; font-weight: 600; color: var(--text); text-align: left; }
+
+.avg-line { position: absolute; top: 0; bottom: 20px; border-left: 1px dashed rgba(255,255,255,0.25); z-index: 1; }
+.avg-label { position: absolute; bottom: 0; transform: translateX(-50%); font-size: 9px; color: var(--muted); white-space: nowrap; font-weight: 500; }
 
 .chk-row { display: flex; align-items: center; gap: 10px; background: var(--card2); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); margin-top: 16px; cursor: pointer; }
 .chk-box { width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border); background: #010409; display: flex; align-items: center; justify-content: center; }
@@ -160,7 +167,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .car-header { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
 .car-header::before { content:''; display:block; width:3px; height:12px; background: var(--accent); border-radius:2px; }
 
-.modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; padding-top: calc(90px + env(safe-area-inset-top, 0px)); -ms-overflow-style: none; scrollbar-width: none; overscroll-behavior: none; }
+.modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; padding-top: calc(90px + env(safe-area-inset-top, 0px)); -ms-overflow-style: none; scrollbar-width: none; overscroll-behavior-y: none; }
 .modal-overlay.active { display: block; }
 .modal-overlay::-webkit-scrollbar { display: none; }
 .modal-overlay .page { padding-bottom: 160px; } 
@@ -177,4 +184,1358 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
   display: flex; flex-direction: column; gap: 20px;
 }
 .car-visual::before { 
-  content: ''; position: absolute; top:
+  content: ''; position: absolute; top: 8px; left: 16px; right: 16px; height: 12px; 
+  background: rgba(255,255,255,0.06); border-radius: 4px 4px 2px 2px; 
+}
+.car-row { display: flex; width: 100%; justify-content: center; }
+.front-row, .back-row-2 { gap: 14px; }
+.back-row-3 { gap: 6px; }
+.seat { 
+  background: var(--card2); border-radius: 50%; width: 26px; height: 26px; 
+  display: flex; align-items: center; justify-content: center; 
+  font-size: 9px; font-weight: 600; color: var(--text); border: 1px solid var(--border); 
+}
+.seat.empty { background: transparent; border-color: transparent; color: transparent; }
+.seat.driver-seat { background: #30363d; border-color: var(--accent); color: var(--accent); }
+.seat.pass-seat { background: #9c4b1d; border-color: #d66b2b; color: #fff; }
+
+.summary-panel { background: var(--card2); padding: 14px; border-radius: 6px; border: 1px solid var(--border); border-left: 3px solid var(--accent); font-size: 13px; color: var(--text); margin-bottom: 16px; line-height: 1.5; }
+
+.botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; }
+.botnav button { flex: 1; background: none; border: none; color: var(--muted); font-size: 10px; font-weight: 500; text-transform: uppercase; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; }
+.botnav button .ic { font-size: 18px; }
+.botnav button.active { color: var(--accent); }
+
+.toast { position: fixed; left: 50%; bottom: 80px; transform: translateX(-50%) translateY(20px); background: var(--green); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; z-index: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.4); opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; text-align: center; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+  <!-- Ecrã Login -->
+  <div id="login-screen">
+    <div style="text-align: center; margin-bottom: 24px;">
+      <h1 class="brand" style="font-size: 20px; margin-bottom: 6px; justify-content: center;">GESTÃO DE <span>BOLEIAS</span> PEC</h1>
+      <p style="color: var(--muted); font-size: 12px;">Ponte de Lima</p>
+    </div>
+    <input type="password" id="password-input" class="input-text" placeholder="Palavra-passe" style="text-align: center; margin-bottom: 12px; max-width: 280px;">
+    <button class="gh-btn primary" onclick="checkLogin()" style="width: 100%; max-width: 280px; justify-content: center;">Entrar na App</button>
+  </div>
+
+  <!-- App Principal -->
+  <div id="app-screen" style="display: none;">
+    <!-- Topbar Fixa Global -->
+    <div class="topbar">
+      <div class="topbar-header">
+        <div class="brand">GESTÃO DE <span>BOLEIAS</span> PEC</div>
+        <div class="header-date" id="header-date"></div>
+      </div>
+      <div id="week-bar">
+         <div class="phasebar" id="wb-segments"></div>
+         <div class="plabels" id="wb-labels"></div>
+      </div>
+    </div>
+
+    <!-- TAB 1: INÍCIO -->
+    <div id="tab-home" class="page tab-content">
+      <div class="eyebrow">Balanços Atuais</div>
+      <div class="card no-pad-top">
+        <ul class="list" id="balance-list"></ul>
+      </div>
+
+      <button class="gh-btn primary" onclick="openModal()" style="padding: 14px; font-size: 15px;">
+        <b>Registar Nova Viagem</b>
+      </button>
+
+      <button id="btn-refresh" class="gh-btn outline" onclick="forceRefresh()" style="border-style: dashed; color: #fff; margin-top: 10px; font-size: 13px;">
+        Atualizar Dados ☁️
+      </button>
+    </div>
+
+    <!-- TAB 2: HISTÓRICO -->
+    <div id="tab-history" class="page tab-content" style="display: none;">
+      <div class="eyebrow">Registo Temporal</div>
+      
+      <div style="margin-bottom: 16px;">
+         <select id="history-filter" class="input-text" onchange="applyHistoryFilter()">
+            <option value="ALL">Visualização Global</option>
+         </select>
+      </div>
+
+      <div class="card" id="history-card-container">
+        <div id="history-calendar"></div>
+        <div id="history-details-container"></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: ESTATÍSTICAS -->
+    <div id="tab-stats" class="page tab-content" style="display: none;">
+      <div class="eyebrow">MÉTRICAS E RESUMO</div>
+      
+      <div style="margin-bottom: 16px;">
+         <select id="stats-month-filter" class="input-text" onchange="renderStats()">
+            <option value="ALL">Todo o tempo</option>
+         </select>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom: 8px;">Estatísticas Gerais</h3>
+        
+        <div style="font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 20px; display: flex; align-items: baseline; gap: 8px;">
+          <span id="stats-total-trips">0</span>
+          <span style="font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase;">Viagens Registadas</span>
+        </div>
+        
+        <div class="stats-section-title">RÁCIO (CONDUÇÃO/VIAGENS)</div>
+        <div id="stats-ratio-chart" class="stats-chart"></div>
+
+        <div class="stats-section-title">Métricas de Participação (Nº de Vezes)</div>
+        <div id="stats-bars-chart" class="stats-chart" style="border-bottom: none; margin-bottom: 0;"></div>
+      </div>
+    </div>
+    
+    <!-- TAB 4: INFO -->
+    <div id="tab-info" class="page tab-content" style="display: none;">
+      <div class="eyebrow">Sobre o Sistema</div>
+      <div class="card">
+        <h3 style="margin-bottom: 12px; color: var(--text);">Como funciona a aplicação?</h3>
+        <p style="margin-bottom: 16px; color: var(--muted); line-height: 1.6; text-align: justify;">
+          Esta aplicação foi criada para gerir de forma justa e totalmente automática quem deve ser o próximo condutor nas boleias de grupo.
+        </p>
+        
+        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">1. O Balanço (🪙)</h4>
+        <p style="margin-bottom: 16px; line-height: 1.6; color: var(--text); text-align: justify;">
+          Funciona como uma economia virtual. Sempre que conduzes, <strong>ganhas</strong> créditos por cada passageiro que transportas. Quando vais à boleia no carro de alguém, <strong>gastas</strong> créditos para pagar a tua viagem.<br><br>
+          <em>A pessoa com o balanço mais negativo é sempre a sugerida para pegar no carro a seguir!</em>
+        </p>
+
+        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">2. Desempates e Rácio</h4>
+        <p style="margin-bottom: 16px; line-height: 1.6; color: var(--text); text-align: justify;">
+          Se existirem duas ou mais pessoas com o mesmo valor de balanço, a app escolhe de forma inteligente a que tem o <strong>menor Rácio</strong> (ou seja, quem conduziu percentualmente menos vezes em relação às vezes que foi à boleia). Se ainda assim houver empate, é chamado quem não conduz há mais tempo.
+        </p>
+        
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center;">
+          <p style="font-size: 11.5px; margin-bottom: 10px; color: var(--muted); white-space: nowrap;">Ainda com dúvidas sobre estes algoritmos complexos?</p>
+          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 13px;">> CLICA AQUI <</a>
+        </div>
+      </div>
+
+      <button id="btn-force-backup" class="gh-btn outline" onclick="forceBackup()" style="border-style: dashed; color: var(--muted); margin-top: 20px; font-size: 12px; padding: 10px;">
+        Forçar Backup ☁️
+      </button>
+    </div>
+
+    <!-- Barra de Navegação Inferior Fixa -->
+    <div class="botnav">
+       <button onclick="switchTab('home')" class="active" id="nav-home">
+          <span class="ic">🏠</span>Início
+       </button>
+       <button onclick="switchTab('history')" id="nav-history">
+          <span class="ic">📅</span>Histórico
+       </button>
+       <button onclick="switchTab('stats')" id="nav-stats">
+          <span class="ic">📊</span>Estatísticas
+       </button>
+       <button onclick="switchTab('info')" id="nav-info">
+          <span class="ic">ℹ️</span>Info
+       </button>
+    </div>
+  </div>
+
+  <!-- Modal Nova Viagem -->
+  <div id="modal-trip" class="modal-overlay">
+    <div class="page form-container" id="modal-form-content" style="position: relative;">
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+        <h2 style="font-size: 16px; margin: 0; color: var(--text);">Registo de Viagem</h2>
+        <button onclick="closeModal()" style="background:var(--card2); border:1px solid var(--border); color:var(--text); width:32px; height:32px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer;" title="Fechar">✕</button>
+      </div>
+
+      <div class="fg">
+        <label>Data da Viagem</label>
+        <div id="form-calendar-wrapper">
+          <div id="new-trip-calendar"></div>
+        </div>
+      </div>
+
+      <!-- Carro 1 -->
+      <div class="car-config-section">
+        <div class="car-header" id="car1-header">CARRO 1</div>
+        <div class="fg">
+          <label>Condutor</label>
+          <div class="people-grid" id="grid-c1-drivers"></div>
+        </div>
+        <div class="fg" style="margin-bottom: 0;">
+          <label>Passageiros (Máx. 4)</label>
+          <div class="people-grid" id="grid-c1-pass"></div>
+        </div>
+        <div class="cars-container" id="car1-visual"></div>
+        <div class="chk-row" onclick="toggleOneWay(0)">
+          <div class="chk-box" id="trip-oneway-box-0"></div>
+          <div class="chk-lbl">Só ida? <span style="color:var(--muted); font-weight:400; font-size:11px;">(Custo a metade)</span></div>
+        </div>
+      </div>
+
+      <!-- Carro 2 -->
+      <div class="car-config-section" id="car2-section" style="display:none;">
+        <div class="car-header">CARRO 2</div>
+        <div class="fg">
+          <label>Condutor</label>
+          <div class="people-grid" id="grid-c2-drivers"></div>
+        </div>
+        <div class="fg" style="margin-bottom: 0;">
+          <label>Passageiros (Máx. 4)</label>
+          <div class="people-grid" id="grid-c2-pass"></div>
+        </div>
+        <div class="cars-container" id="car2-visual"></div>
+        <div class="chk-row" onclick="toggleOneWay(1)">
+          <div class="chk-box" id="trip-oneway-box-1"></div>
+          <div class="chk-lbl">Só ida? <span style="color:var(--muted); font-weight:400; font-size:11px;">(Custo a metade)</span></div>
+        </div>
+      </div>
+
+      <div id="split-cost-container" style="margin-bottom: 12px; display: none;">
+         <div class="chk-row" onclick="toggleSplitCost()">
+           <div class="chk-box" id="split-cost-box"></div>
+           <div class="chk-lbl">Separar custo dos carros <span style="color:var(--muted); font-weight:400; font-size:11px;">(Calculados individualmente)</span></div>
+         </div>
+      </div>
+
+      <div id="add-car2-container" style="margin-bottom: 12px;">
+         <button class="gh-btn outline" style="border-style: dashed;" onclick="setCars(2)">+ Adicionar Carro 2</button>
+      </div>
+      <div id="remove-car2-container" style="margin-bottom: 20px; display: none;">
+         <button class="gh-btn danger" onclick="setCars(1)">- Remover Carro 2</button>
+      </div>
+
+      <div class="summary-panel" id="summary-box">
+        Selecione os condutores e passageiros para calcular custos.
+      </div>
+
+      <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+        <button class="gh-btn outline" style="flex:1; padding: 14px; font-size: 15px; margin: 0;" onclick="closeModal()">Cancelar</button>
+        <button class="gh-btn primary" style="flex:1; padding: 14px; font-size: 15px; margin: 0;" id="btn-save-trip" onclick="saveTrip()" disabled>Guardar</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal In-App Confirmar Apagar -->
+  <div id="custom-confirm" class="modal-overlay" style="z-index: 300;">
+     <div class="confirm-box" style="margin: 0 auto; margin-top: 20vh;">
+        <h3 id="confirm-title">Apagar Viagem?</h3>
+        <p id="confirm-msg" style="color: var(--muted); font-size: 13px; margin-bottom: 16px;">Esta ação vai recalcular todos os balanços.</p>
+        <div style="display:flex; gap:8px;">
+           <button class="gh-btn outline" style="flex:1; margin:0;" onclick="closeConfirm()">Cancelar</button>
+           <button class="gh-btn danger" style="flex:1; margin:0;" id="confirm-btn">Sim, Apagar</button>
+        </div>
+     </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log("Service Worker registado com sucesso!"))
+        .catch((err) => console.log("Erro ao registar Service Worker:", err));
+    }
+  </script>
+
+  <script type="module">
+    const USE_FIREBASE = true; // Firebase Ativado
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCEhvEeluGLKUi3YE28j8hFZIvSWXRfS68",
+      authDomain: "boleias-pec.firebaseapp.com",
+      projectId: "boleias-pec",
+      storageBucket: "boleias-pec.firebasestorage.app",
+      messagingSenderId: "920930610974",
+      appId: "1:920930610974:web:600d31aeaaebc9aef0230f"
+    };
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, getDocs, disableNetwork, enableNetwork } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+    let db;
+    if (USE_FIREBASE) {
+      const app = initializeApp(firebaseConfig);
+      db = initializeFirestore(app, {
+        localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
+      });
+    }
+
+    const PEOPLE = ["Ana", "André", "Henrique", "Joana", "João", "Luciano", "Luís", "Mariana"];
+    const FEMALES = ["Ana", "Joana", "Mariana"];
+    const INITIALS = { "Ana": "AC", "Luciano": "LF", "Luís": "LA", "André": "AS", "Henrique": "HL", "Joana": "JF", "João": "JC", "Mariana": "MB" };
+    const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const shortMonths = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+    
+    function getLocalDateISO(d = new Date()) {
+       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    let trips = []; 
+    let balances = {}; 
+    
+    let todayISO = getLocalDateISO();
+    let historySelectedDate = todayISO;
+    let currentHistoryFilter = "ALL"; 
+    
+    let formDate = todayISO;
+    let selectedCars = 1;
+    let splitCostMode = false;
+    let carsData = [
+      { driver: null, passengers: [], isOneWay: false },
+      { driver: null, passengers: [], isOneWay: false }
+    ];
+    let editingTripId = null;
+
+    function initHistoryFilterDropdown() {
+       const select = document.getElementById("history-filter");
+       select.innerHTML = '<option value="ALL">Visualização Global</option>';
+       PEOPLE.forEach(person => {
+          let opt = document.createElement('option');
+          opt.value = person;
+          const isFemale = FEMALES.includes(person);
+          opt.innerHTML = isFemale ? `Viagens da ${person}` : `Viagens do ${person}`;
+          select.appendChild(opt);
+       });
+    }
+
+    function initStatsMonthDropdown() {
+       const select = document.getElementById("stats-month-filter");
+       const currentVal = select.value;
+       select.innerHTML = '<option value="ALL">Todo o tempo</option>';
+       
+       let monthsSet = new Set();
+       trips.forEach(t => {
+          const parts = t.date.split('-');
+          monthsSet.add(`${parts[0]}-${parts[1]}`); // YYYY-MM
+       });
+       
+       Array.from(monthsSet).sort().reverse().forEach(ym => {
+          const [y, m] = ym.split('-');
+          let opt = document.createElement('option');
+          opt.value = ym;
+          opt.innerHTML = `${monthNames[parseInt(m)-1]} ${y}`;
+          select.appendChild(opt);
+       });
+       if(Array.from(monthsSet).includes(currentVal)) select.value = currentVal;
+    }
+
+    window.forceRefresh = async function() {
+       if(!USE_FIREBASE) return;
+       const btn = document.getElementById("btn-refresh");
+       btn.innerText = "A atualizar...";
+       btn.disabled = true;
+       try {
+          const q = query(collection(db, "trips"), orderBy("date", "desc"));
+          const snapshot = await getDocs(q);
+          trips = [];
+          snapshot.forEach((doc) => { trips.push({ id: doc.id, ...doc.data() }); });
+          recalculateAndRender();
+          showToast("Dados atualizados da cloud!");
+       } catch (err) {
+          showToast("Erro ao sincronizar dados!");
+       } finally {
+          btn.innerHTML = "Atualizar Dados ☁️";
+          btn.disabled = false;
+       }
+    }
+
+    window.forceBackup = async function() {
+       if(!USE_FIREBASE) return;
+       const btn = document.getElementById("btn-force-backup");
+       const origText = btn.innerText;
+       btn.innerText = "A Sincronizar...";
+       try {
+          // Desativa e reativa a rede para forçar flush da cache offline do Firebase
+          await disableNetwork(db);
+          await enableNetwork(db);
+          showToast("Backup forçado para a cloud!");
+       } catch(e) {
+          showToast("Erro de ligação.");
+       }
+       btn.innerText = origText;
+    }
+
+    window.showToast = function(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2500);
+    }
+    
+    const fmt = (num) => parseFloat(num.toFixed(2)).toString();
+
+    let confirmCallback = null;
+    window.showConfirm = function(title, msg, callback) {
+       document.getElementById("confirm-title").innerText = title;
+       document.getElementById("confirm-msg").innerText = msg;
+       confirmCallback = callback;
+       document.getElementById("custom-confirm").classList.add("active");
+    }
+    window.closeConfirm = function() {
+       document.getElementById("custom-confirm").classList.remove("active");
+       confirmCallback = null;
+    }
+    document.getElementById("confirm-btn").onclick = function() {
+       if(confirmCallback) confirmCallback();
+       closeConfirm();
+    }
+
+    window.switchTab = function(tabName) {
+       document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+       document.querySelectorAll('.botnav button').forEach(el => el.classList.remove('active'));
+       
+       document.getElementById('tab-' + tabName).style.display = 'block';
+       document.getElementById('nav-' + tabName).classList.add('active');
+       
+       if(tabName === 'history') {
+          historySelectedDate = getLocalDateISO();
+          document.getElementById('history-filter').value = "ALL"; 
+          currentHistoryFilter = "ALL";
+          renderHistoryCalendar();
+       }
+       if(tabName === 'stats') {
+          initStatsMonthDropdown();
+          renderStats();
+       }
+       window.scrollTo(0,0);
+    }
+
+    async function hashString(string) {
+      const msgUint8 = new TextEncoder().encode(string);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    window.checkLogin = async function() {
+      const pwd = document.getElementById("password-input").value;
+      const targetHash = "2496e57975c7cb484c2049d5bf599e0339cb1d43a14434241cd64d4b1a1ea0f9"; 
+      const enteredHash = await hashString(pwd);
+
+      if (enteredHash === targetHash || pwd === "pec2026") {
+        localStorage.setItem("pec_auth", "true");
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("app-screen").style.display = "block";
+        initApp();
+      } else {
+        alert("Password incorreta.");
+      }
+    }
+
+    window.onload = function() {
+      if (localStorage.getItem("pec_auth") === "true") {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("app-screen").style.display = "block";
+        initApp();
+      }
+    }
+
+    // Lógica para swipe suave 
+    function setupSwipeListener(containerId, trackId, onSwipeLeft, onSwipeRight) {
+       const container = document.getElementById(containerId);
+       if(!container) return;
+       let startX = 0, startY = 0, isDragging = false, currentX = 0;
+
+       container.addEventListener('touchstart', e => {
+          startX = e.changedTouches[0].screenX;
+          startY = e.changedTouches[0].screenY;
+          isDragging = true;
+          const track = document.getElementById(trackId);
+          if(track) track.style.transition = 'none';
+       }, {passive: true});
+
+       container.addEventListener('touchmove', e => {
+          if(!isDragging) return;
+          const x = e.changedTouches[0].screenX;
+          const y = e.changedTouches[0].screenY;
+          const deltaX = x - startX;
+          const deltaY = y - startY;
+
+          // Se o swipe for mais horizontal que vertical, move o track
+          if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+             currentX = deltaX;
+             const track = document.getElementById(trackId);
+             if(track) track.style.transform = `translateX(${deltaX}px)`;
+             if(e.cancelable) e.preventDefault();
+          }
+       }, {passive: false});
+
+       container.addEventListener('touchend', e => {
+          isDragging = false;
+          const track = document.getElementById(trackId);
+          if(!track) return;
+          track.style.transition = 'transform 0.2s ease';
+          
+          if (currentX < -50) {
+             onSwipeLeft();
+          } else if (currentX > 50) {
+             onSwipeRight();
+          } else {
+             track.style.transform = `translateX(0)`; // Snap back
+          }
+          currentX = 0;
+       }, {passive: true});
+    }
+
+    function initApp() {
+      renderHeaderDate();
+      renderWeekBar();
+      initHistoryFilterDropdown();
+      if (USE_FIREBASE) {
+        const q = query(collection(db, "trips"), orderBy("date", "desc"));
+        onSnapshot(q, (snapshot) => {
+          trips = [];
+          snapshot.forEach((doc) => { trips.push({ id: doc.id, ...doc.data() }); });
+          recalculateAndRender();
+        });
+      } else {
+        const localTrips = localStorage.getItem("pec_trips_v20");
+        if(localTrips) trips = JSON.parse(localTrips);
+        recalculateAndRender();
+      }
+    }
+
+    function renderHeaderDate() {
+       const now = new Date();
+       document.getElementById("header-date").innerText = `${String(now.getDate()).padStart(2, '0')} ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+    }
+
+    function renderWeekBar() {
+       const today = new Date(); 
+       const shortDays = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
+       const segsContainer = document.getElementById("wb-segments");
+       const labelsContainer = document.getElementById("wb-labels");
+       
+       let segsHtml = "";
+       let labelsHtml = "";
+       
+       for(let i = -3; i <= 3; i++) {
+          const d = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+          d.setDate(d.getDate() + i);
+          const dayIdx = d.getDay();
+          
+          let cls = "pseg ";
+          if(i < 0) cls += "past";
+          else if(i === 0) cls += "today";
+          else cls += "future";
+          
+          segsHtml += `<div class="${cls}"><i></i></div>`;
+          labelsHtml += `<span class="${i === 0 ? 'cur' : ''}">${shortDays[dayIdx]}</span>`;
+       }
+       segsContainer.innerHTML = segsHtml;
+       labelsContainer.innerHTML = labelsHtml;
+    }
+
+    function getLastDrivenTime(personName) {
+       let latest = 0;
+       for(let t of trips) {
+          if(t.drivers && t.drivers.includes(personName)) {
+             let parts = t.date.split('-');
+             let dTime = new Date(parts[0], parts[1]-1, parts[2]).getTime();
+             if(dTime > latest) latest = dTime;
+          }
+       }
+       return latest;
+    }
+
+    function getPersonRatio(personName) {
+       let drv = 0, pas = 0;
+       trips.forEach(t => {
+          if(t.drivers.includes(personName)) drv++;
+          if(t.passengers.includes(personName)) pas++;
+       });
+       let total = drv + pas;
+       return total === 0 ? 0 : (drv / total);
+    }
+
+    function recalculateAndRender() {
+      PEOPLE.forEach(p => balances[p] = 0);
+      
+      trips.forEach(trip => {
+         // Nova estrutura suporta custos/lucros individuais
+         if (trip.driverProfits && trip.passengerCosts) {
+             Object.keys(trip.driverProfits).forEach(d => balances[d] += trip.driverProfits[d]);
+             Object.keys(trip.passengerCosts).forEach(p => balances[p] -= trip.passengerCosts[p]);
+         } else {
+             // Fallback para viagens antigas (1 carro)
+             if(trip.passengers) trip.passengers.forEach(p => balances[p] -= trip.costPerPassenger);
+             if(trip.drivers) trip.drivers.forEach(d => balances[d] += trip.profitPerDriver);
+         }
+      });
+
+      const sortedPeople = PEOPLE.map(name => ({
+        name, 
+        val: balances[name],
+        ratio: getPersonRatio(name),
+        lastTime: getLastDrivenTime(name)
+      })).sort((a, b) => {
+        if (a.val !== b.val) return a.val - b.val;
+        if (a.ratio !== b.ratio) return a.ratio - b.ratio;
+        if (a.lastTime !== b.lastTime) return a.lastTime - b.lastTime;
+        return a.name.localeCompare(b.name); 
+      });
+      
+      const list = document.getElementById("balance-list");
+      list.innerHTML = "";
+      
+      sortedPeople.forEach((p, index) => {
+        const li = document.createElement("li");
+        li.className = "list-item";
+        
+        let badge = '';
+        if (index === 0) {
+           const isFemale = FEMALES.includes(p.name);
+           const tagText = isFemale ? "CONDUTORA SUGERIDA" : "CONDUTOR SUGERIDO";
+           badge = `<span class="next-driver-tag">${tagText}</span>`;
+        }
+
+        let valClass = p.val < 0 ? 'negative' : (p.val > 0 ? 'positive' : '');
+        let prefix = p.val > 0 ? '+' : '';
+        let valStr = Math.abs(p.val).toFixed(2);
+        let sign = p.val < 0 ? '-' : prefix;
+        
+        li.innerHTML = `
+          <div class="balance-name">${p.name}</div>
+          <div class="balance-right">
+             ${badge}
+             <div class="balance-val ${valClass}">${sign}${valStr} 🪙</div>
+          </div>
+        `;
+        list.appendChild(li);
+      });
+
+      renderHistoryCalendar();
+      renderWeekBar();
+      if(document.getElementById('tab-stats').style.display === 'block') {
+         initStatsMonthDropdown();
+         renderStats();
+      }
+    }
+
+    window.renderStats = function() {
+       const ratioContainer = document.getElementById('stats-ratio-chart');
+       const barsContainer = document.getElementById('stats-bars-chart');
+       const filterMonth = document.getElementById('stats-month-filter').value;
+       
+       let filteredTrips = trips;
+       if(filterMonth !== "ALL") {
+          filteredTrips = trips.filter(t => t.date.startsWith(filterMonth));
+       }
+       
+       document.getElementById('stats-total-trips').innerText = filteredTrips.length;
+       
+       let statsData = [];
+       PEOPLE.forEach(person => {
+          let asDriver = 0;
+          let asPassenger = 0;
+          let passCount = 0;
+
+          filteredTrips.forEach(t => {
+             if(t.drivers.includes(person)) {
+                asDriver++;
+                // Contar total transportado por ele neste período
+                if(t.car1 && t.car1.driver === person) passCount += t.car1.passengers.length;
+                else if(t.car2 && t.car2.driver === person) passCount += t.car2.passengers.length;
+                else if(!t.car1) passCount += t.passengers.length; // Fallback
+             }
+             if(t.passengers.includes(person)) {
+                asPassenger++;
+             }
+          });
+          const totalViagens = asDriver + asPassenger;
+          const ratio = totalViagens > 0 ? (asDriver / totalViagens) : 0;
+          statsData.push({ name: person, asDriver, asPassenger, passCount, totalViagens, ratio });
+       });
+
+       // Média do rácio global
+       let sumDrvs = 0, sumTotal = 0;
+       statsData.forEach(d => { sumDrvs += d.asDriver; sumTotal += d.totalViagens; });
+       const globalRatioPct = sumTotal > 0 ? Math.round((sumDrvs / sumTotal) * 100) : 0;
+
+       // Ordenação do Rácio: Ordem Alfabética (A-Z)
+       let statsDataAlpha = [...statsData].sort((a, b) => a.name.localeCompare(b.name));
+       let ratioHtml = "";
+       
+       // Linha Média Global no gráfico
+       if(sumTotal > 0) {
+           ratioHtml += `
+             <div class="avg-line" style="left: calc(70px + 10px + ${globalRatioPct}% * (100% - 120px) / 100);"></div>
+             <div class="avg-label" style="left: calc(70px + 10px + ${globalRatioPct}% * (100% - 120px) / 100);">${globalRatioPct}% em média</div>
+           `;
+       }
+
+       statsDataAlpha.forEach(d => {
+          const pct = Math.round(d.ratio * 100);
+          ratioHtml += `<div class="chart-bar-row">
+             <div class="chart-label">${d.name}</div>
+             <div class="chart-track">
+                <div class="chart-fill" style="width: ${pct}%"></div>
+             </div>
+             <div class="chart-val">${pct}%</div>
+          </div>`;
+       });
+       ratioContainer.innerHTML = ratioHtml;
+
+       const maxVal = Math.max(...statsData.map(d => Math.max(d.totalViagens, d.asDriver, d.asPassenger, d.passCount)), 1);
+       let barsHtml = "";
+       statsDataAlpha.forEach(d => {
+          const pTot = Math.round((d.totalViagens / maxVal) * 100);
+          const pDrv = Math.round((d.asDriver / maxVal) * 100);
+          const pPas = Math.round((d.asPassenger / maxVal) * 100);
+          const pTra = Math.round((d.passCount / maxVal) * 100);
+
+          barsHtml += `<div style="margin-bottom: 12px; background: var(--card2); padding: 8px; border-radius: 6px; border: 1px solid var(--border);">
+             <div style="font-size: 12px; font-weight:600; color:var(--text); margin-bottom:6px;">${d.name}</div>
+             
+             <div class="chart-bar-row" style="margin-bottom:3px;">
+                <div class="chart-label" style="font-size:9px;">Total Viagens</div>
+                <div class="chart-track"><div class="chart-fill" style="width: ${pTot}%; background:var(--accent)"></div></div>
+                <div class="chart-val">${d.totalViagens}</div>
+             </div>
+             <div class="chart-bar-row" style="margin-bottom:3px;">
+                <div class="chart-label" style="font-size:9px;">Condutor</div>
+                <div class="chart-track"><div class="chart-fill" style="width: ${pDrv}%; background:var(--green)"></div></div>
+                <div class="chart-val">${d.asDriver}</div>
+             </div>
+             <div class="chart-bar-row" style="margin-bottom:3px;">
+                <div class="chart-label" style="font-size:9px;">Passageiro</div>
+                <div class="chart-track"><div class="chart-fill" style="width: ${pPas}%; background:var(--muted)"></div></div>
+                <div class="chart-val">${d.asPassenger}</div>
+             </div>
+             <div class="chart-bar-row">
+                <div class="chart-label" style="font-size:9px;">Transportados</div>
+                <div class="chart-track"><div class="chart-fill" style="width: ${pTra}%; background:#f59e0b"></div></div>
+                <div class="chart-val">${d.passCount}</div>
+             </div>
+          </div>`;
+       });
+       barsContainer.innerHTML = barsHtml;
+    }
+
+    window.applyHistoryFilter = function() {
+       currentHistoryFilter = document.getElementById("history-filter").value;
+       renderHistoryCalendar();
+    }
+
+    window.changeFormDay = function(deltaDays) {
+       let parts = formDate.split('-');
+       let currDate = new Date(parts[0], parts[1]-1, parts[2]);
+       currDate.setDate(currDate.getDate() + deltaDays);
+       let newIso = getLocalDateISO(currDate);
+       if(newIso > todayISO) return;
+       formDate = newIso;
+       refreshFormUI();
+       document.getElementById("form-track").style.transform = 'translateX(0)'; // reset visual
+    }
+
+    window.resetFormWeekToToday = function() {
+       formDate = todayISO;
+       refreshFormUI();
+    }
+
+    function generateFormCalendarHTML(selectedDateISO, onClickAction) {
+       const parts = selectedDateISO.split('-');
+       const targetDate = new Date(parts[0], parts[1]-1, parts[2]);
+       
+       const startDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+       startDate.setDate(startDate.getDate() - 3);
+
+       let html = `<div class="calendar-header-nav">
+          <div style="display:flex; gap:4px;">
+             <button onclick="changeFormDay(-7)" title="Semana Anterior"><span>◀</span><span>Sem</span></button>
+          </div>
+          <div class="center-date">
+             <span style="font-weight:700; color:var(--text); text-transform:uppercase; font-size:12px;">${monthNames[targetDate.getMonth()]}</span>
+             <span>${targetDate.getFullYear()}</span>
+          </div>
+          <div style="display:flex; gap:4px;">
+             <button onclick="changeFormDay(7)" title="Semana Seguinte"><span>▶</span><span>Sem</span></button>
+             <button onclick="resetFormWeekToToday()" style="background:#30363d; color:#ffffff; border-color:#8b949e;" title="Hoje"><span>▼</span><span>Hoje</span></button>
+          </div>
+       </div>`;
+
+       html += `<div id="form-swipe" class="swipe-container"><div id="form-track" class="swipe-track"><div class="streak-grid">`;
+       const shortDays = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
+
+       for(let i=0; i<7; i++){
+          const d = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+          d.setDate(startDate.getDate() + i);
+          const iso = getLocalDateISO(d);
+          
+          const isPast = iso < todayISO;
+          const isFuture = iso > todayISO;
+          const isSelected = iso === selectedDateISO;
+          const hasTrip = trips.some(t => t.date === iso);
+          const jsDay = d.getDay();
+          const isWeekend = (jsDay === 0 || jsDay === 6); 
+          
+          let c = "s-day";
+          if(isPast) c += " past";
+          if(isFuture) c += " future-day";
+          if(isWeekend) c += " weekend";
+          if(isSelected) c += " selected";
+          if(hasTrip) c += " has-trip";
+          
+          const dayName = shortDays[jsDay];
+          const dateNum = d.getDate();
+
+          const isFirst = dateNum === 1;
+          const isLast = dateNum === new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+          
+          let badgeHtml = "";
+          if(isFirst || isLast) {
+             badgeHtml = `<div class="s-month-badge">${shortMonths[d.getMonth()]}</div>`;
+          }
+
+          let clickAttr = isFuture ? '' : `onclick="${onClickAction}('${iso}')"`;
+          html += `<div class="${c}" ${clickAttr}>${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
+       }
+       return html + '</div></div></div>';
+    }
+
+    window.changeHistoryMonth = function(delta) {
+       let parts = historySelectedDate.split('-');
+       let currDate = new Date(parts[0], parts[1]-1, parts[2]);
+       currDate.setMonth(currDate.getMonth() + delta);
+       let newIso = getLocalDateISO(currDate);
+       if(newIso < "2025-11-01") return;
+       historySelectedDate = newIso;
+       renderHistoryCalendar();
+       const track = document.getElementById("history-track");
+       if(track) track.style.transform = 'translateX(0)';
+    }
+    
+    window.changeHistoryYear = function(delta) {
+       let parts = historySelectedDate.split('-');
+       let currDate = new Date(parts[0], parts[1]-1, parts[2]);
+       currDate.setFullYear(currDate.getFullYear() + delta);
+       let newIso = getLocalDateISO(currDate);
+       if(newIso < "2025-11-01") return;
+       historySelectedDate = newIso;
+       renderHistoryCalendar();
+    }
+    window.resetHistoryToToday = function() {
+       historySelectedDate = todayISO;
+       renderHistoryCalendar();
+    }
+
+    function generateHistoryCalendarHTML(selectedDateISO, onClickAction) {
+      const parts = selectedDateISO.split('-');
+      const targetDate = new Date(parts[0], parts[1]-1, parts[2]);
+      const targetYear = targetDate.getFullYear();
+      const targetMonth = targetDate.getMonth();
+      const canGoPrev = !(targetYear === 2025 && targetMonth === 10);
+
+      let html = `<div class="calendar-header-nav">
+          <div style="display:flex; gap:4px;">
+             <button onclick="changeHistoryYear(-1)" ${!canGoPrev ? 'disabled' : ''} title="Ano Anterior"><span>◀</span><span>Ano</span></button>
+             <button onclick="changeHistoryMonth(-1)" ${!canGoPrev ? 'disabled' : ''} title="Mês Anterior"><span>◀</span><span>Mês</span></button>
+          </div>
+          <div class="center-date">
+             <span style="font-weight:700; color:var(--text); text-transform:uppercase; font-size:12px;">${monthNames[targetMonth]}</span>
+             <span>${targetYear}</span>
+          </div>
+          <div style="display:flex; gap:4px;">
+             <button onclick="changeHistoryMonth(1)" title="Mês Seguinte"><span>▶</span><span>Mês</span></button>
+             <button onclick="changeHistoryYear(1)" title="Ano Seguinte"><span>▶</span><span>Ano</span></button>
+             <button onclick="resetHistoryToToday()" style="background:#30363d; color:#ffffff; border-color:#8b949e;" title="Hoje"><span>▼</span><span>Hoje</span></button>
+          </div>
+       </div>`;
+
+      html += `<div id="hist-swipe" class="swipe-container"><div id="history-track" class="swipe-track"><div class="streak-grid">`;
+      
+      const firstDayOfMonth = new Date(targetYear, targetMonth, 1);
+      const jsDayFirst = firstDayOfMonth.getDay();
+      const monBasedFirst = (jsDayFirst + 6) % 7; 
+      const startDate = new Date(targetYear, targetMonth, 1 - monBasedFirst);
+
+      const lastDayOfMonth = new Date(targetYear, targetMonth + 1, 0);
+      const jsDayLast = lastDayOfMonth.getDay();
+      const monBasedLast = (jsDayLast + 6) % 7;
+      const endDate = new Date(targetYear, targetMonth + 1, 0 + (6 - monBasedLast));
+      const shortDays = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
+
+      for(let d = new Date(startDate.getTime()); d <= endDate; d.setDate(d.getDate() + 1)){
+        const iso = getLocalDateISO(d);
+        const isPast = iso < todayISO;
+        const isFuture = iso > todayISO;
+        const isSelected = iso === selectedDateISO;
+        const realJsDay = d.getDay();
+        const isWeekend = (realJsDay === 0 || realJsDay === 6);
+        const isOtherMonth = d.getMonth() !== targetMonth;
+        
+        let tripClass = "";
+        if (currentHistoryFilter === "ALL") {
+           const hasTrip = trips.some(t => t.date === iso);
+           if (hasTrip) tripClass = "has-trip";
+        } else {
+           const personTrips = trips.filter(t => t.date === iso && (t.drivers.includes(currentHistoryFilter) || t.passengers.includes(currentHistoryFilter)));
+           if (personTrips.length > 0) {
+              const isDriver = personTrips.some(t => t.drivers.includes(currentHistoryFilter));
+              tripClass = isDriver ? "has-trip-driver" : "has-trip-passenger";
+           }
+        }
+        
+        let c = "s-day";
+        if(isPast) c += " past";
+        if(isFuture) c += " future-day";
+        if(isWeekend) c += " weekend";
+        if(isSelected) c += " selected";
+        if(tripClass) c += " " + tripClass;
+        if(isOtherMonth) c += " other-month";
+        
+        const dayName = shortDays[(realJsDay + 6) % 7];
+        const dateNum = d.getDate();
+        const isFirst = dateNum === 1;
+        const isLast = dateNum === new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+          
+        let badgeHtml = "";
+        if(isFirst || isLast) {
+             badgeHtml = `<div class="s-month-badge">${shortMonths[d.getMonth()]}</div>`;
+        }
+
+        let clickAttr = isFuture ? '' : `onclick="${onClickAction}('${iso}')"`;
+        html += `<div class="${c}" ${clickAttr}>${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
+      }
+      return html + '</div></div></div>';
+    }
+
+    function renderHistoryCalendar() {
+       document.getElementById("history-calendar").innerHTML = generateHistoryCalendarHTML(historySelectedDate, 'selectHistoryDate');
+       setupSwipeListener('hist-swipe', 'history-track', () => changeHistoryMonth(1), () => changeHistoryMonth(-1));
+       renderHistoryDetails();
+    }
+
+    window.selectHistoryDate = function(iso) {
+       if(iso > todayISO) return;
+       historySelectedDate = iso;
+       renderHistoryCalendar(); 
+    }
+
+    function renderHistoryDetails() {
+       const container = document.getElementById("history-details-container");
+       let dayTrips = trips.filter(t => t.date === historySelectedDate);
+       
+       if (currentHistoryFilter !== "ALL") {
+          dayTrips = dayTrips.filter(t => t.drivers.includes(currentHistoryFilter) || t.passengers.includes(currentHistoryFilter));
+       }
+       
+       if(dayTrips.length === 0) {
+          const isFuture = historySelectedDate > todayISO;
+          // Botão Registo Visível para Todos os Filtros
+          let btnHtml = isFuture ? '' : `<button class="gh-btn primary" style="margin:0 auto; padding:10px 16px; width:auto; font-size:13px;" onclick="openModalWithDate('${historySelectedDate}')">Registar Viagem</button>`;
+          let msgText = currentHistoryFilter !== "ALL" 
+             ? `Nenhum registo para ${currentHistoryFilter} neste dia.` 
+             : `Sem viagens registadas neste dia.`;
+          
+          container.innerHTML = `
+            <div class="hist-details" style="text-align:center; padding: 24px 14px;">
+              <div style="color:var(--muted); font-size:13px; margin-bottom:16px;">${msgText}</div>
+              ${btnHtml}
+            </div>
+          `;
+          return;
+       }
+
+       const isFemale = name => FEMALES.includes(name);
+       let html = "";
+       dayTrips.forEach((trip, index) => {
+          const allDriversFemale = trip.drivers.length > 0 && trip.drivers.every(isFemale);
+          const allPassFemale = trip.passengers.length > 0 && trip.passengers.every(isFemale);
+
+          let driverLabel = "Condutores";
+          if (trip.drivers.length === 1) {
+             driverLabel = isFemale(trip.drivers[0]) ? "Condutora" : "Condutor";
+          } else if (allDriversFemale) {
+             driverLabel = "Condutoras";
+          }
+
+          let passLabel = "Passageiros";
+          if (trip.passengers.length === 1) {
+             passLabel = isFemale(trip.passengers[0]) ? "Passageira" : "Passageiro";
+          } else if (allPassFemale) {
+             passLabel = "Passageiras";
+          }
+
+          const passAlfab = [...trip.passengers].sort((a,b) => a.localeCompare(b)).join(", ");
+          const typeLabel = (trip.cars === 2 ? 'Viagem 2 Carros' : 'Viagem Normal') + (trip.splitCostMode ? ' (Separados)' : '');
+            
+          html += `<div class="hist-details" style="margin-top: ${index > 0 ? '10px' : '0'};">
+             <div class="hist-info">
+               <span class="hist-type">
+                  ${typeLabel}
+               </span>
+               <span class="hist-driver-row"><strong style="color:var(--accent)">${driverLabel}:</strong> ${trip.drivers.join(" e ")}</span>
+               <span><strong style="color:var(--muted)">${passLabel}:</strong> ${passAlfab || "Nenhum"}</span>
+               <div style="margin-top:8px; display:flex; justify-content:space-between; font-size:12px; color:var(--text)">
+                  <span>Custo Total: <strong>${fmt(trip.totalCost)} 🪙</strong></span>
+               </div>
+             </div>
+             <div class="hist-actions">
+                <button class="gh-btn outline" style="flex:1; padding: 6px;" onclick="editTrip('${trip.id}')">Editar</button>
+                <button class="gh-btn danger" style="flex:1; padding: 6px;" onclick="requestDelete('${trip.id}')">Apagar</button>
+             </div>
+          </div>`;
+       });
+       container.innerHTML = html;
+    }
+
+    window.requestDelete = function(id) {
+       showConfirm("Apagar Viagem?", "Esta ação vai recalcular todos os balanços.", async () => {
+          if (USE_FIREBASE) {
+            await deleteDoc(doc(db, "trips", id));
+          } else {
+            trips = trips.filter(t => t.id !== id);
+            localStorage.setItem("pec_trips_v20", JSON.stringify(trips));
+            recalculateAndRender();
+          }
+          showToast("Viagem apagada!");
+       });
+    }
+
+    window.openModal = function() {
+      editingTripId = null;
+      formDate = todayISO;
+      selectedCars = 1; 
+      splitCostMode = false;
+      carsData = [ { driver: null, passengers: [], isOneWay: false }, { driver: null, passengers: [], isOneWay: false } ];
+      refreshFormUI();
+      document.getElementById("modal-trip").classList.add("active");
+      document.getElementById("modal-trip").scrollTop = 0;
+    }
+
+    window.openModalWithDate = function(dateIso) {
+      if(dateIso > todayISO) return;
+      openModal();
+      formDate = dateIso;
+      refreshFormUI();
+    }
+
+    window.editTrip = function(id) {
+      const trip = trips.find(t => t.id === id);
+      if(!trip) return;
+      editingTripId = id;
+      formDate = trip.date;
+      
+      if(trip.cars === 2 && trip.car1 && trip.car2) {
+         selectedCars = 2;
+         splitCostMode = !!trip.splitCostMode;
+         carsData = [
+            { driver: trip.car1.driver, passengers: [...trip.car1.passengers], isOneWay: trip.car1.isOneWay },
+            { driver: trip.car2.driver, passengers: [...trip.car2.passengers], isOneWay: trip.car2.isOneWay }
+         ];
+      } else {
+         selectedCars = 1;
+         splitCostMode = false;
+         carsData = [
+            { driver: trip.drivers[0], passengers: [...trip.passengers], isOneWay: trip.car1 ? trip.car1.isOneWay : trip.isOneWay }, 
+            { driver: null, passengers: [], isOneWay: false } 
+         ];
+      }
+      
+      refreshFormUI();
+      document.getElementById("modal-trip").classList.add("active");
+      document.getElementById("modal-trip").scrollTop = 0;
+    }
+
+    function refreshFormUI() {
+      document.getElementById("new-trip-calendar").innerHTML = generateFormCalendarHTML(formDate, 'selectFormDate');
+      setupSwipeListener('form-swipe', 'form-track', () => changeFormDay(7), () => changeFormDay(-7));
+
+      document.getElementById("trip-oneway-box-0").classList.toggle("on", carsData[0].isOneWay);
+      document.getElementById("trip-oneway-box-1").classList.toggle("on", carsData[1].isOneWay);
+      document.getElementById("split-cost-box").classList.toggle("on", splitCostMode);
+      
+      document.getElementById("car2-section").style.display = selectedCars === 2 ? "block" : "none";
+      document.getElementById("add-car2-container").style.display = selectedCars === 1 ? "block" : "none";
+      document.getElementById("remove-car2-container").style.display = selectedCars === 2 ? "block" : "none";
+      document.getElementById("split-cost-container").style.display = selectedCars === 2 ? "block" : "none";
+      
+      document.getElementById("car1-header").innerText = selectedCars === 2 ? "CARRO 1" : "CONFIGURAÇÃO";
+
+      renderCarGrid(0, "grid-c1-drivers", "grid-c1-pass");
+      if(selectedCars === 2) renderCarGrid(1, "grid-c2-drivers", "grid-c2-pass");
+      
+      drawCars();
+      updateSummary();
+    }
+
+    window.selectFormDate = function(iso) {
+       if(iso > todayISO) return;
+       formDate = iso;
+       refreshFormUI();
+    }
+    
+    window.closeModal = function() { document.getElementById("modal-trip").classList.remove("active"); }
+    
+    window.toggleOneWay = function(carIndex) {
+      carsData[carIndex].isOneWay = !carsData[carIndex].isOneWay;
+      refreshFormUI();
+    }
+
+    window.toggleSplitCost = function() {
+      splitCostMode = !splitCostMode;
+      refreshFormUI();
+    }
+
+    window.setCars = function(num) {
+      if(num < selectedCars) {
+         carsData[1].passengers.forEach(p => carsData[0].passengers.push(p));
+         carsData[1] = { driver: null, passengers: [], isOneWay: false };
+      }
+      selectedCars = num;
+      refreshFormUI();
+    }
+
+    function getAllSelectedDrivers() { return [carsData[0].driver, carsData[1].driver].filter(Boolean); }
+    function getAllSelectedPassengers(carIndexToIgnore = -1) {
+       let list = [];
+       for(let i=0; i<selectedCars; i++) {
+          if(i === carIndexToIgnore) continue;
+          list.push(...carsData[i].passengers);
+       }
+       return list;
+    }
+
+    function handlePassengerClick(person, clickedCarIndex) {
+       const car = carsData[clickedCarIndex];
+       const otherCarIndex = clickedCarIndex === 0 ? 1 : 0;
+       const otherCar = carsData[otherCarIndex];
+       const allowCross = carsData[0].isOneWay || carsData[1].isOneWay || splitCostMode;
+
+       if (car.passengers.includes(person)) {
+          car.passengers = car.passengers.filter(p => p !== person);
+       } else {
+          if (!allowCross && otherCar.passengers.includes(person)) {
+             if (car.passengers.length < 4) {
+                 otherCar.passengers = otherCar.passengers.filter(p => p !== person);
+                 car.passengers.push(person);
+             } else { showToast("Capacidade máxima atingida neste carro!"); }
+          } else {
+             if (car.passengers.length < 4) {
+                 car.passengers.push(person);
+             } else if (selectedCars === 1 && clickedCarIndex === 0) {
+                 setCars(2);
+                 carsData[1].passengers.push(person);
+             } else { showToast("Capacidade máxima atingida neste carro!"); }
+          }
+       }
+       refreshFormUI();
+    }
+
+    function renderCarGrid(carIndex, dGridId, pGridId) {
+      const dGrid = document.getElementById(dGridId);
+      const pGrid = document.getElementById(pGridId);
+      dGrid.innerHTML = ""; pGrid.innerHTML = "";
+
+      const globalDrivers = getAllSelectedDrivers();
+      const car = carsData[carIndex];
+      const allowCross = carsData[0].isOneWay || carsData[1].isOneWay || splitCostMode;
+
+      PEOPLE.forEach(person => {
+        const isThisDriver = car.driver === person;
+        const isOtherDriver = globalDrivers.includes(person) && !isThisDriver;
+        const isThisPass = car.passengers.includes(person);
+        const isOtherPass = !allowCross && getAllSelectedPassengers(carIndex).includes(person) && !isThisPass;
+        
+        const dBtn = document.createElement("button");
+        dBtn.className = `person-btn ${isThisDriver ? 'is-driver' : ''}`;
+        dBtn.innerText = person;
+        dBtn.disabled = isOtherDriver || isThisPass || isOtherPass; 
+        dBtn.onclick = () => { carsData[carIndex].driver = isThisDriver ? null : person; refreshFormUI(); }
+        dGrid.appendChild(dBtn);
+
+        const pBtn = document.createElement("button");
+        pBtn.className = `person-btn ${isThisPass ? 'is-pass' : ''}`;
+        pBtn.innerText = person;
+        pBtn.disabled = globalDrivers.includes(person); 
+        pBtn.onclick = () => handlePassengerClick(person, carIndex);
+        pGrid.appendChild(pBtn);
+      });
+    }
+
+    function drawCar(carIndex, containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+      const car = carsData[carIndex];
+      
+      const carDiv = document.createElement("div");
+      carDiv.className = "car-visual";
+      
+      const driverName = car.driver ? INITIALS[car.driver] : '';
+      const driverClass = driverName ? 'seat driver-seat' : 'seat empty';
+      
+      let pList = car.passengers;
+      const getPSeat = (index) => {
+         return index < pList.length 
+            ? `<div class="seat pass-seat">${INITIALS[pList[index]]}</div>` 
+            : `<div class="seat empty"></div>`;
+      };
+      
+      let backRowHTML = (pList.length === 4) 
+        ? `<div class="car-row back-row-3">${getPSeat(1)}${getPSeat(2)}${getPSeat(3)}</div>`
+        : `<div class="car-row back-row-2">${getPSeat(1)}${getPSeat(2)}</div>`;
+
+      carDiv.innerHTML = `
+         <div class="car-row front-row">
+            <div class="${driverClass}">${driverName}</div>
+            ${getPSeat(0)}
+         </div>
+         ${backRowHTML}
+      `;
+      container.appendChild(carDiv);
+    }
+
+    function drawCars() {
+       drawCar(0, "car1-visual");
+       if(selectedCars === 2) drawCar(1, "car2-visual");
+    }
+
+    function calculateCar(car) {
+       const numPass = car.passengers.length;
+       if(!car.driver || numPass === 0) return null;
+       let total = 1 + (0.5 * numPass);
+       if(numPass === 1) total = 1; 
+       if(car.isOneWay) total /= 2;
+       return { totalCost: total, costPerPassenger: total / numPass, profitPerDriver: total };
+    }
+
+    window.updateSummary = function() {
+      const btnSave = document.getElementById("btn-save-trip");
+      let html = "";
+      let valid = true;
+      let finalCalc = { driverProfits: {}, passengerCosts: {}, totalCost: 0, drivers: [], passengers: [] };
+
+      const d0 = carsData[0].driver;
+      const p0 = carsData[0].passengers;
+      const c0Calc = calculateCar(carsData[0]);
+
+      if (selectedCars === 2) {
+         const d1 = carsData[1].driver;
+         const p1 = carsData[1].passengers;
+         const c1Calc = calculateCar(carsData[1]);
+
+         if (!d0 || !d1) {
+            html = `<div style="color:var(--danger); font-size:12px;">Falta selecionar condutores para os 2 carros.</div>`;
+            valid = false;
+         } else if (p0.length === 0 && p1.length === 0) {
+            html = `<div style="color:var(--danger); font-size:12px;">Selecione passageiros.</div>`;
+            valid = false;
+         } else if(!c0Calc || !c1Calc) {
+            valid = false;
+         } else {
+            const allPass = [...new Set([...p0, ...p1])];
+            finalCalc.drivers = [d0, d1];
+            finalCalc.passengers = allPass;
+
+            if (!splitCostMode) {
+               // MATEMÁTICA CONJUNTA (Partilhada e Justa 50/50)
+               let cost0 = c0Calc.totalCost;
+               let cost1 = c1Calc.totalCost;
+               const c0Size = 1 + p0.length; const c1Size = 1 + p1.length;
+               
+               if ((c0Size === 2 && c1Size >= 3) || (c1Size === 2 && c0Size >= 3)) {
+                  if (c0Size === 2) cost0 = carsData[0].isOneWay ? 0.75 : 1.5;
+                  else cost1 = carsData[1].isOneWay ? 0.75 : 1.5;
+               }
+               const combinedCost = cost0 + cost1;
+               const costPerPass = allPass.length > 0 ? combinedCost / allPass.length : 0;
+               const profitPerDriver = combinedCost / 2; // 50/50 divisão do lucro
+
+               allPass.forEach(p => finalCalc.passengerCosts[p] = costPerPass);
+               finalCalc.driverProfits[d0] = profitPerDriver;
+               finalCalc.driverProfits[d1] = profitPerDriver;
+               finalCalc.totalCost = combinedCost;
+
+               html = `
+                  <strong style="color:var(--text); font-size:13px; font-weight:600;">VIAGEM 2 CARROS (PARTILHADO)</strong><br>
+                  <div style="display:flex; justify-content:space-between; margin-top:6px; margin-bottom:2px;"><span>Custo Total:</span> <strong style="color:var(--text)">${fmt(combinedCost)} 🪙</strong></div>
+                  <div style="display:flex; justify-content:space-between; margin-bottom:2px;"><span>Custo/passag.:</span> <strong style="color:var(--text)">${fmt(costPerPass)} 🪙</strong></div>
+                  <div style="display:flex; justify-content:space-between; color:var(--green)"><span>Crédito/condut.:</span> <strong>+${fmt(profitPerDriver)} 🪙</strong></div>
+               `;
+            } else {
+               // MATEMÁTICA SEPARADA
+               p0.forEach(p => finalCalc.passengerCosts[p] = c0Calc.costPerPassenger);
+               p1.forEach(p => finalCalc.passengerCosts[p] = c1Calc.costPerPassenger);
+               finalCalc.driverProfits[d0] = c0Calc.profitPerDriver;
+               finalCalc.driverProfits[d1] = c1Calc.profitPerDriver;
+               finalCalc.totalCost = c0Calc.totalCost + c1Calc.totalCost;
+
+               html = `
+                  <strong style="color:var(--text); font-size:13px; font-weight:600;">VIAGEM 2 CARROS (SEPARADOS)</strong><br>
+                  <div style="display:flex; justify-content:space-between; margin-top:6px; font-size:12px;"><span>Carro 1 (${d0}):</span> <strong>${fmt(c0Calc.totalCost)} 🪙</strong></div>
+                  <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:12px; color:var(--muted)"><span>Custo Passageiro:</span> <strong>${fmt(c0Calc.costPerPassenger)} 🪙</strong></div>
+                  
+                  <div style="display:flex; justify-content:space-between; font-size:12px;"><span>Carro 2 (${d1}):</span> <strong>${fmt(c1Calc.totalCost)} 🪙</strong></div>
+                  <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted)"><span>Custo Passageiro:</span> <strong>${fmt(c1Calc.costPerPassenger)} 🪙</strong></div>
+               `;
+            }
+         }
+      } else {
+         if(!d0 || p0.length === 0) {
+            html += `<div style="color:var(--danger); font-size:12px;">Falta selecionar condutor ou passageiros.</div>`;
+            valid = false;
+         } else if(c0Calc) {
+            finalCalc.drivers = [d0];
+            finalCalc.passengers = p0;
+            p0.forEach(p => finalCalc.passengerCosts[p] = c0Calc.costPerPassenger);
+            finalCalc.driverProfits[d0] = c0Calc.profitPerDriver;
+            finalCalc.totalCost = c0Calc.totalCost;
+
+            html = `
+               <strong style="color:var(--text); font-size:13px; font-weight:600;">VIAGEM NORMAL (1 CARRO)</strong><br>
+               <div style="display:flex; justify-content:space-between; margin-top:6px; margin-bottom:2px;"><span>Custo Total:</span> <strong style="color:var(--text)">${fmt(c0Calc.totalCost)} 🪙</strong></div>
+               <div style="display:flex; justify-content:space-between;"><span>Custo/passag.:</span> <strong style="color:var(--text)">${fmt(c0Calc.costPerPassenger)} 🪙</strong></div>
+            `;
+         }
+      }
+
+      document.getElementById("summary-box").innerHTML = html;
+      btnSave.disabled = !valid;
+      window.currentTripFinalCalc = finalCalc;
+    }
+
+    window.saveTrip = async function() {
+      const calc = window.currentTripFinalCalc;
+      const newTrip = {
+         date: formDate,
+         cars: selectedCars,
+         splitCostMode: splitCostMode,
+         driverProfits: calc.driverProfits,
+         passengerCosts: calc.passengerCosts,
+         drivers: calc.drivers,
+         passengers: calc.passengers,
+         totalCost: calc.totalCost,
+         car1: { driver: carsData[0].driver, passengers: [...carsData[0].passengers], isOneWay: carsData[0].isOneWay },
+         car2: selectedCars === 2 ? { driver: carsData[1].driver, passengers: [...carsData[1].passengers], isOneWay: carsData[1].isOneWay } : null
+      };
+
+      if(USE_FIREBASE) {
+          if(editingTripId) await updateDoc(doc(db, "trips", editingTripId), newTrip);
+          else await addDoc(collection(db, "trips"), newTrip);
+      } else {
+          if(editingTripId) {
+             trips = trips.map(t => t.id === editingTripId ? { id: editingTripId, ...newTrip } : t);
+          } else {
+             newTrip.id = Date.now().toString(); 
+             trips.push(newTrip);
+          }
+          localStorage.setItem("pec_trips_v20", JSON.stringify(trips));
+          recalculateAndRender();
+      }
+      
+      closeModal();
+      showToast("Viagem guardada com sucesso!");
+      historySelectedDate = formDate;
+      document.getElementById('history-filter').value = "ALL";
+      currentHistoryFilter = "ALL";
+      applyHistoryFilter();
+    }
+  </script>
+</body>
+</html>
