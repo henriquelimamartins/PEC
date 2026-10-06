@@ -111,11 +111,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .center-date { text-align: center; line-height: 1.2; font-size: 11px; }
 .center-date span { display: block; }
 
-/* Transição de altura adicionada ao contentor */
 .swipe-container { overflow: hidden; width: 100%; position: relative; transition: height 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
-/* align-items: flex-start previne que os meses mais pequenos estiquem para o tamanho do maior */
 .swipe-track { display: flex; align-items: flex-start; width: 300%; will-change: transform; transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
-/* Alterado de margin-bottom para padding-bottom para que a altura seja capturada perfeitamente no JS */
 .streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 46px; gap: 6px; padding-bottom: 16px; width: 33.3333%; flex-shrink: 0; }
 
 .s-day { background: var(--card2); border-radius: 6px; height: 46px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--border); cursor: pointer; position: relative; }
@@ -279,7 +276,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       
       <div style="margin-bottom: 16px;">
          <select id="stats-month-filter" class="input-text" onchange="renderStats()">
-            <option value="ALL">Total</option>
+            <option value="ALL">Desde Sempre</option>
             <option value="30">Últimos 30 dias</option>
             <option value="90">Últimos 90 dias</option>
             <option value="180">Últimos 180 dias</option>
@@ -632,7 +629,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        if(!container) return;
        let startX = 0, startY = 0, isDragging = false, currentX = 0;
 
-       // Helper inteligente para ajustar a altura da caixa baseada no mês visível
        const adjustHeight = (childIndex) => {
            const track = document.getElementById(trackId);
            if (track && track.children[childIndex]) {
@@ -640,7 +636,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
            }
        };
 
-       // Ajuste inicial de altura logo após renderizar
        setTimeout(() => adjustHeight(1), 0);
 
        container.addEventListener('touchstart', e => {
@@ -676,11 +671,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           
           if (currentX < -60) {
              track.style.transform = `translateX(-66.6666%)`; 
-             adjustHeight(2); // Expande/contrai magicamente para o próximo mês
+             adjustHeight(2); 
              setTimeout(() => { onSwipeLeft(); }, 250);
           } else if (currentX > 60) {
              track.style.transform = `translateX(0%)`; 
-             adjustHeight(0); // Expande/contrai magicamente para o mês anterior
+             adjustHeight(0); 
              setTimeout(() => { onSwipeRight(); }, 250);
           } else {
              track.style.transform = `translateX(-33.3333%)`; 
@@ -1205,6 +1200,18 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
           const passAlfab = [...trip.passengers].sort((a,b) => a.localeCompare(b)).join(", ");
           const typeLabel = (trip.cars === 2 ? 'Viagem 2 Carros' : 'Viagem Normal') + (trip.splitCostMode ? ' (Separados)' : '');
+          
+          // Lógica para mostrar o custo por passageiro (com suporte a custos variáveis caso haja separação de carros)
+          let costPassStr = "0 🪙";
+          if (trip.passengerCosts && trip.passengers.length > 0) {
+              let pCosts = trip.passengers.map(p => trip.passengerCosts[p]).filter(c => c !== undefined);
+              let uniqueCosts = [...new Set(pCosts)];
+              if (uniqueCosts.length > 0) {
+                  costPassStr = uniqueCosts.map(c => fmt(c) + " 🪙").join(" / ");
+              }
+          } else if (trip.costPerPassenger) {
+              costPassStr = fmt(trip.costPerPassenger) + " 🪙";
+          }
             
           html += `<div class="hist-details" style="margin-top: ${index > 0 ? '10px' : '0'};">
              <div class="hist-info">
@@ -1213,8 +1220,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                </span>
                <span class="hist-driver-row"><strong style="color:var(--accent)">${driverLabel}:</strong> ${trip.drivers.join(" e ")}</span>
                <span><strong style="color:var(--muted)">${passLabel}:</strong> ${passAlfab || "Nenhum"}</span>
-               <div style="margin-top:8px; display:flex; justify-content:space-between; font-size:12px; color:var(--text)">
+               <div style="margin-top:8px; display:flex; justify-content:space-between; font-size:12px; color:var(--text); margin-bottom: 2px;">
                   <span>Custo Total: <strong>${fmt(trip.totalCost)} 🪙</strong></span>
+               </div>
+               <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted)">
+                  <span>Custo/passag.: <strong>${costPassStr}</strong></span>
                </div>
              </div>
              <div class="hist-actions">
