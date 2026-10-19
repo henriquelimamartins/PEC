@@ -44,7 +44,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helv
 body.locked-scroll { overflow: hidden; height: 100vh; }
 
 h1, h2, h3, h4 { font-weight: 600; margin: 0; }
-p { margin: 0; line-height: 1.5; color: var(--muted); font-size: 13.5px; }
+p { margin: 0; line-height: 1.5; color: var(--muted); font-size: 13.5px; text-align: justify; }
 button { font-family: inherit; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease; }
 button:active { transform: scale(0.97); }
 input, select { font-family: inherit; }
@@ -131,7 +131,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .s-day.has-trip-passenger { border-bottom: 3px solid var(--yellow); }
 
 .hist-details { background: var(--card2); border-radius: 6px; padding: 14px; margin-top: 10px; border: 1px solid var(--border); }
-.hist-info { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.hist-info { font-size: 13px; color: var(--muted); line-height: 1.5; text-align: justify; }
 .hist-type { font-weight: 600; color: var(--text); display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .hist-driver-row { display: block; margin-bottom: 4px; }
 .hist-actions { display: flex; gap: 8px; margin-top: 12px; }
@@ -200,12 +200,12 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .seat.driver-seat { background: #30363d; border-color: var(--accent); color: var(--accent); }
 .seat.pass-seat { background: #9c4b1d; border-color: #d66b2b; color: #fff; }
 
-.summary-panel { background: var(--card2); padding: 14px; border-radius: 6px; border: 1px solid var(--border); border-left: 3px solid var(--accent); font-size: 13px; color: var(--text); margin-bottom: 16px; line-height: 1.5; }
+.summary-panel { background: var(--card2); padding: 14px; border-radius: 6px; border: 1px solid var(--border); border-left: 3px solid var(--accent); font-size: 13px; color: var(--text); margin-bottom: 16px; line-height: 1.5; text-align: justify; }
 
-/* Altura fixa e idêntica garantida para a área de conteúdo da poupança */
-#savings-content-area { min-height: 380px; }
+/* Altura fixa e idêntica garantida para a área de conteúdo da poupança e estatísticas */
+#savings-content-area, #stats-content-area { min-height: 380px; }
 
-/* Barra inferior com espaçamento dictado pela largura natural das palavras (space-between) */
+/* Barra inferior com espaçamento ditado pela largura natural das palavras (space-between) */
 .botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; justify-content: space-between; }
 .botnav button { flex: 0 1 auto; min-width: 0; background: none; border: none; color: var(--muted); font-size: 9px; font-weight: 500; text-transform: uppercase; padding: 4px 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; text-align: center; }
 .botnav button .ic { font-size: 17px; }
@@ -277,8 +277,15 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     <div id="tab-stats" class="page tab-content" style="display: none;">
       <div class="eyebrow">MÉTRICAS E RESUMO</div>
       
-      <div style="margin-bottom: 16px;">
-         <select id="stats-month-filter" class="input-text" onchange="renderStats()">
+      <!-- Modos de Visualização: Resumo Global vs Mensal nas Estatísticas -->
+      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+         <button id="btn-stats-view-global" class="gh-btn primary" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setStatsView('global')">Resumo Global</button>
+         <button id="btn-stats-view-monthly" class="gh-btn outline" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setStatsView('monthly')">Análise Mensal</button>
+      </div>
+
+      <!-- Drop-down temporal global para estatísticas -->
+      <div id="stats-period-container" style="margin-bottom: 12px;">
+         <select id="stats-month-filter" class="input-text" style="height: 44px; padding: 0 12px; line-height: 42px;" onchange="renderStats()">
             <option value="ALL">Desde Sempre</option>
             <option value="30">Últimos 30 dias</option>
             <option value="90">Últimos 90 dias</option>
@@ -287,20 +294,17 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          </select>
       </div>
 
-      <div class="card">
-        <h3 style="margin-bottom: 8px;">Estatísticas Gerais</h3>
-        
-        <div style="font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 20px; display: flex; align-items: baseline; gap: 8px;">
-          <span id="stats-total-trips">0</span>
-          <span style="font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase;">Viagens Registadas</span>
-        </div>
-        
-        <div class="stats-section-title">RÁCIO (CONDUÇÃO/VIAGENS)</div>
-        <div id="stats-ratio-chart" class="stats-chart"></div>
-
-        <div class="stats-section-title">Métricas de Participação (Nº de Vezes)</div>
-        <div id="stats-bars-chart" class="stats-chart" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;"></div>
+      <!-- Navegador Mensal de Estatísticas -->
+      <div id="stats-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: transparent; padding: 0; border: none; height: 44px;">
+         <button onclick="changeStatsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;">◀</button>
+         <div style="display:flex; gap:6px; align-items: center; flex: 1; margin: 0 6px; height: 44px;">
+            <select id="stats-year-sel" onchange="onStatsYearChange()" class="input-text" style="padding: 0 28px 0 10px; font-size:14px; height: 44px; flex: 1; line-height: 42px;"></select>
+            <select id="stats-month-sel" onchange="jumpStatsMonth()" class="input-text" style="padding: 0 28px 0 10px; font-size:14px; height: 44px; flex: 1.5; line-height: 42px;"></select>
+         </div>
+         <button onclick="changeStatsMonth(1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;" id="btn-next-stats-month">▶</button>
       </div>
+
+      <div id="stats-content-area"></div>
     </div>
 
     <!-- TAB 4: POUPANÇA E IMPACTO -->
@@ -366,17 +370,17 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       
       <!-- Link Discreto do Rickroll no Topo -->
       <div style="text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
-        <p style="font-size: 13px; margin-bottom: 6px; color: var(--muted);">Para quê ler isto tudo?</p>
+        <p style="font-size: 13px; margin-bottom: 6px; color: var(--muted); text-align: center;">Para quê ler isto tudo?</p>
         <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 14px;">> CLICA AQUI <</a>
       </div>
 
       <div class="eyebrow" style="margin-bottom: 12px;">Manual Operacional Técnico</div>
 
-      <!-- Blocos de Texto Organizados -->
+      <!-- Blocos de Texto Organizados com texto justificado -->
       <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px;">
          <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px;"><span>🧮</span> Sistema de Créditos</h4>
          <p style="color: var(--text); font-size: 12.5px; margin-bottom: 8px;">O custo de uma viagem padrão equivale sempre a:<br><strong>1 + (0.5 × Nº de Passageiros)</strong></p>
-         <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0 0 12px 0; line-height: 1.5;">
+         <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0 0 12px 0; line-height: 1.5; text-align: justify;">
             <li><strong style="color: var(--green);">Condutor:</strong> Recebe a totalidade (+2.5 🪙).</li>
             <li><strong style="color: var(--danger);">Passageiros:</strong> Dividem o custo (-0.83 🪙 cada).</li>
          </ul>
@@ -388,7 +392,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px;">
          <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px;"><span>⚖️</span> Algoritmo de Desempate</h4>
          <p style="color: var(--text); font-size: 12.5px; margin-bottom: 8px;">Em caso de saldo exato, a app aplica 2 critérios:</p>
-         <ol style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5;">
+         <ol style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5; text-align: justify;">
             <li style="margin-bottom: 6px;"><strong>Rácio de Participação (%):</strong> Compara total de conduções sobre o total de viagens feitas. O menor rácio conduz.</li>
             <li><strong>Tempo de Latência:</strong> O membro que não conduz há mais tempo (pela data do último registo) assume o volante.</li>
          </ol>
@@ -397,20 +401,20 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px;">
          <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px;"><span>🚗</span> Modos Multi-Carro</h4>
          <p style="color: var(--muted); font-size: 12px; margin-bottom: 10px; line-height: 1.5;">Quando é preciso ativar o 2º carro, a matemática suporta duas vias:</p>
-         <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5;">
+         <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5; text-align: justify;">
             <li style="margin-bottom: 6px;"><strong style="color: var(--text);">Custo Partilhado:</strong> Os custos de ambos os veículos são fundidos e repartidos de igual forma por todos os passageiros.</li>
             <li style="margin-bottom: 6px;"><strong style="color: var(--text);">Custo Separado:</strong> Cada veículo funciona de forma estanque. Pagas apenas a lotação do teu carro.</li>
             <li><strong style="color: var(--text);">Só Ida:</strong> Corta os custos exatos do respetivo carro pela metade (0.5x).</li>
          </ul>
       </div>
 
-      <!-- Bloco de Cálculo da Poupança movido para depois do Multi-Carro -->
+      <!-- Bloco de Cálculo da Poupança após o Multi-Carro -->
       <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px;">
          <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px;"><span>🌱</span> Cálculo da Poupança</h4>
          <p style="color: var(--muted); font-size: 12px; margin-bottom: 10px; line-height: 1.5;">
             A poupança reflete o dinheiro e combustível que cada passageiro poupa ao viajar à boleia em vez de conduzir sozinho:
          </p>
-         <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5;">
+         <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5; text-align: justify;">
             <li style="margin-bottom: 6px;"><strong>Distância Base:</strong> Considera automaticamente 29 km (se todos forem do grupo de Braga) ou 26 km (Vila Verde). O valor é duplicado para viagens de ida e volta.</li>
             <li style="margin-bottom: 6px;"><strong>Conversão Monetária:</strong> Baseia-se nos litros por 100 km e no preço por litro definidos pelo utilizador.</li>
             <li><strong>CO2 Evitado:</strong> Calculado com base num fator de emissão padrão de 2.48 kg de CO2 por litro de combustível queimado.</li>
@@ -587,6 +591,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     
     let currentSavingsView = "global";
     let savingsSelectedMonth = todayISO.substring(0, 7); 
+
+    let currentStatsView = "global";
+    let statsSelectedMonth = todayISO.substring(0, 7);
     
     let formDate = todayISO;
     let selectedCars = 1;
@@ -668,6 +675,112 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        updateSavingsMonthOptions();
        savingsSelectedMonth = `${yearSel.value}-${monthSel.value}`;
        updateSavings();
+    }
+
+    // Dropdowns de Análise Mensal para Estatísticas
+    function populateStatsYearDropdown() {
+       const yearSel = document.getElementById("stats-year-sel");
+       if(!yearSel) return;
+       const currentYear = new Date().getFullYear();
+       let htmlY = "";
+       for(let y = 2025; y <= currentYear; y++) {
+          htmlY += `<option value="${y}">${y}</option>`;
+       }
+       yearSel.innerHTML = htmlY;
+       yearSel.value = new Date().getFullYear();
+    }
+
+    function updateStatsMonthOptions() {
+       const yearSel = document.getElementById("stats-year-sel");
+       const monthSel = document.getElementById("stats-month-sel");
+       if(!yearSel || !monthSel) return;
+
+       const selectedYear = parseInt(yearSel.value);
+       const currentDate = new Date();
+       const currentYear = currentDate.getFullYear();
+       const currentMonth = currentDate.getMonth() + 1; 
+
+       let htmlM = "";
+       let startMonth = (selectedYear === 2025) ? 11 : 1;
+       let endMonth = (selectedYear === currentYear) ? currentMonth : 12;
+
+       for(let i = startMonth; i <= endMonth; i++) {
+          htmlM += `<option value="${String(i).padStart(2,'0')}">${monthNames[i-1]}</option>`;
+       }
+       monthSel.innerHTML = htmlM;
+
+       let [currY, currM] = statsSelectedMonth.split('-');
+       if(parseInt(currY) === selectedYear) {
+          let options = Array.from(monthSel.options).map(o => o.value);
+          if(options.includes(currM)) {
+             monthSel.value = currM;
+          } else {
+             monthSel.value = options[options.length - 1];
+             statsSelectedMonth = `${selectedYear}-${monthSel.value}`;
+          }
+       } else {
+          monthSel.value = String(endMonth).padStart(2,'0');
+          statsSelectedMonth = `${selectedYear}-${monthSel.value}`;
+       }
+       
+       const btnNextM = document.getElementById("btn-next-stats-month");
+       if(btnNextM) {
+          const isAtCurrentMonth = (selectedYear === currentYear && parseInt(monthSel.value) === currentMonth);
+          btnNextM.disabled = isAtCurrentMonth;
+          btnNextM.style.opacity = isAtCurrentMonth ? "0.3" : "1";
+       }
+    }
+
+    window.onStatsYearChange = function() {
+       const yearSel = document.getElementById("stats-year-sel");
+       const monthSel = document.getElementById("stats-month-sel");
+       updateStatsMonthOptions();
+       statsSelectedMonth = `${yearSel.value}-${monthSel.value}`;
+       renderStats();
+    }
+
+    window.jumpStatsMonth = function() {
+       const m = document.getElementById("stats-month-sel").value;
+       const y = document.getElementById("stats-year-sel").value;
+       statsSelectedMonth = `${y}-${m}`;
+       renderStats();
+    }
+
+    window.changeStatsMonth = function(delta) {
+       let nextKey = getOffsetMonth(statsSelectedMonth, delta);
+       let [ny, nm] = nextKey.split('-');
+       let targetYear = parseInt(ny);
+       let targetMonth = parseInt(nm);
+       
+       let currentYear = new Date().getFullYear();
+       let currentMonth = new Date().getMonth() + 1;
+
+       if (targetYear === 2025 && targetMonth < 11) return;
+       if (targetYear > currentYear || (targetYear === currentYear && targetMonth > currentMonth)) return;
+
+       statsSelectedMonth = nextKey;
+       document.getElementById("stats-year-sel").value = ny;
+       updateStatsMonthOptions();
+       document.getElementById("stats-month-sel").value = nm;
+       renderStats();
+    }
+
+    window.setStatsView = function(viewMode) {
+       currentStatsView = viewMode;
+       document.getElementById('btn-stats-view-global').className = viewMode === 'global' ? "gh-btn primary" : "gh-btn outline";
+       document.getElementById('btn-stats-view-monthly').className = viewMode === 'monthly' ? "gh-btn primary" : "gh-btn outline";
+       
+       document.getElementById('stats-period-container').style.display = viewMode === 'monthly' ? "none" : "block";
+       document.getElementById('stats-monthly-nav').style.display = viewMode === 'monthly' ? "flex" : "none";
+       
+       if(viewMode === 'monthly') {
+          let [y, m] = statsSelectedMonth.split('-');
+          document.getElementById("stats-year-sel").value = y;
+          updateStatsMonthOptions();
+          document.getElementById("stats-month-sel").value = m;
+       }
+
+       renderStats();
     }
 
     window.forceRefresh = async function() {
@@ -788,7 +901,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       }
     }
 
-    function setupSwipeListener(containerId, trackId, onSwipeLeft, onSwipeRight, isMonthlySavingsNav = false) {
+    function setupSwipeListener(containerId, trackId, onSwipeLeft, onSwipeRight, isMonthlyNav = false) {
        const container = document.getElementById(containerId);
        if(!container) return;
        let startX = 0, startY = 0, isDragging = false, currentX = 0;
@@ -809,8 +922,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           const deltaY = y - startY;
 
           if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
-             if(isMonthlySavingsNav && deltaX < 0) {
-                 let [y, m] = savingsSelectedMonth.split('-');
+             if(isMonthlyNav && deltaX < 0) {
+                 let targetSelectedMonth = containerId.includes('stats') ? statsSelectedMonth : savingsSelectedMonth;
+                 let [y, m] = targetSelectedMonth.split('-');
                  let cur = new Date();
                  if(parseInt(y) === cur.getFullYear() && parseInt(m) === (cur.getMonth()+1)) {
                      return; 
@@ -832,8 +946,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           track.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
           
           if (currentX < -60) {
-             if(isMonthlySavingsNav) {
-                 let [y, m] = savingsSelectedMonth.split('-');
+             if(isMonthlyNav) {
+                 let targetSelectedMonth = containerId.includes('stats') ? statsSelectedMonth : savingsSelectedMonth;
+                 let [y, m] = targetSelectedMonth.split('-');
                  let cur = new Date();
                  if(parseInt(y) === cur.getFullYear() && parseInt(m) === (cur.getMonth()+1)) {
                      track.style.transform = `translateX(-33.3333%)`;
@@ -859,6 +974,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       
       populateSavingsYearDropdown();
       updateSavingsMonthOptions();
+      populateStatsYearDropdown();
+      updateStatsMonthOptions();
       renderHeaderDate();
       renderWeekBar();
       initHistoryFilterDropdown();
@@ -992,24 +1109,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       if(document.getElementById('tab-savings').style.display === 'block') updateSavings();
     }
 
-    window.renderStats = function() {
-       const ratioContainer = document.getElementById('stats-ratio-chart');
-       const barsContainer = document.getElementById('stats-bars-chart');
-       const filterDays = document.getElementById('stats-month-filter').value;
-       
-       let filteredTrips = trips;
-       if(filterDays !== "ALL") {
-          const daysNum = parseInt(filterDays);
-          const now = new Date();
-          const cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysNum);
-          filteredTrips = trips.filter(t => {
-             const parts = t.date.split('-');
-             const tDate = new Date(parts[0], parts[1]-1, parts[2]);
-             return tDate >= cutoff;
-          });
-       }
-       
-       document.getElementById('stats-total-trips').innerText = filteredTrips.length;
+    function generateStatsCardContent(filteredTrips) {
+       let totalTripsCount = filteredTrips.length;
        
        let statsData = [];
        PEOPLE.forEach(person => {
@@ -1043,7 +1144,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        let ratioHtml = `<div style="position: relative;">`; 
        
        if(sumTotal > 0) {
-           const linePos = `calc(80px + (100% - 130px) * ${globalRatioPct / 100})`;
+           const linePos = `calc(70px + (100% - 110px) * ${globalRatioPct / 100})`;
            ratioHtml += `<div class="avg-line" style="left: ${linePos};"></div>`;
        }
 
@@ -1063,15 +1164,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        ratioHtml += `</div>`; 
 
        if(sumTotal > 0) {
-           const linePos = `calc(80px + (100% - 130px) * ${globalRatioPct / 100})`;
+           const linePos = `calc(70px + (100% - 110px) * ${globalRatioPct / 100})`;
            ratioHtml += `
              <div style="position: relative; height: 16px; margin-top: 4px;">
                 <div class="avg-label" style="left: ${linePos};">média de ${globalRatioPct}%</div>
              </div>
            `;
        }
-
-       ratioContainer.innerHTML = ratioHtml;
 
        const maxVal = Math.max(...statsData.map(d => Math.max(d.totalViagens, d.asDriver, d.asPassenger, d.passCount)), 1);
        let barsHtml = "";
@@ -1106,7 +1205,67 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
              </div>
           </div>`;
        });
-       barsContainer.innerHTML = barsHtml;
+
+       return `
+          <div class="card">
+            <h3 style="margin-bottom: 8px;">Estatísticas Gerais</h3>
+            
+            <div style="font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 20px; display: flex; align-items: baseline; gap: 8px;">
+              <span>${totalTripsCount}</span>
+              <span style="font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase;">Viagens Registadas</span>
+            </div>
+            
+            <div class="stats-section-title">RÁCIO (CONDUÇÃO/VIAGENS)</div>
+            ${ratioHtml}
+
+            <div class="stats-section-title" style="margin-top: 20px;">Métricas de Participação (Nº de Vezes)</div>
+            ${barsHtml}
+          </div>
+       `;
+    }
+
+    window.renderStats = function() {
+       const container = document.getElementById('stats-content-area');
+       
+       if (currentStatsView === 'global') {
+          const filterDays = document.getElementById('stats-month-filter').value;
+          let filteredTrips = trips;
+          if(filterDays !== "ALL") {
+             const daysNum = parseInt(filterDays);
+             const now = new Date();
+             const cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysNum);
+             filteredTrips = trips.filter(t => {
+                const parts = t.date.split('-');
+                const tDate = new Date(parts[0], parts[1]-1, parts[2]);
+                return tDate >= cutoff;
+             });
+          }
+          container.innerHTML = generateStatsCardContent(filteredTrips);
+       } else {
+          let [y, m] = statsSelectedMonth.split('-');
+          document.getElementById("stats-year-sel").value = y;
+          updateStatsMonthOptions();
+          document.getElementById("stats-month-sel").value = m;
+
+          const buildMonthStatsHTML = (mKey) => {
+             let monthlyTrips = trips.filter(t => t.date.startsWith(mKey));
+             return generateStatsCardContent(monthlyTrips);
+          };
+
+          let prev = getOffsetMonth(statsSelectedMonth, -1);
+          let next = getOffsetMonth(statsSelectedMonth, 1);
+
+          container.innerHTML = `
+             <div id="stats-list-swipe" class="swipe-container" style="min-height: 380px;">
+                 <div id="stats-list-track" class="swipe-track" style="transform: translateX(-33.3333%); align-items: flex-start;">
+                    <div style="width: 33.3333%; flex-shrink:0;">${buildMonthStatsHTML(prev)}</div>
+                    <div style="width: 33.3333%; flex-shrink:0;">${buildMonthStatsHTML(statsSelectedMonth)}</div>
+                    <div style="width: 33.3333%; flex-shrink:0;">${buildMonthStatsHTML(next)}</div>
+                 </div>
+             </div>
+          `;
+          setupSwipeListener('stats-list-swipe', 'stats-list-track', () => changeStatsMonth(1), () => changeStatsMonth(-1), true);
+       }
     }
 
     /* === SECÇÃO POUPANÇA E IMPACTO === */
@@ -1165,7 +1324,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        updateSavings();
     }
 
-    function buildSavingsChartHTML(dataArr, maxEuros, monthsCount = 1) {
+    function buildSavingsChartHTML(dataArr, maxEuros, showMonthlyAvg = true, monthsCount = 1) {
         if (dataArr.length === 0) return `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px; width: 100%;">Nenhuma viagem registada.</div>`;
         
         let chartStr = `<div class="stats-chart" style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">`;
@@ -1176,9 +1335,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             
             chartStr += `
             <div class="chart-bar-row">
-               <div class="chart-label" style="width: 60px;">${d.name}</div>
-               <div class="chart-track"><div class="chart-fill" style="width: ${pct}%; background: ${color};"></div></div>
-               <div class="chart-val" style="width: auto; min-width: 50px; text-align: right;">${fmtMoney(d.euros)}€ <span style="font-size:9px; color:var(--muted); font-weight:500;">(${d.km}km)</span></div>
+               <div class="chart-label" style="width: 70px; flex-shrink: 0; text-align: right;">${d.name}</div>
+               <div class="chart-track" style="flex: 1;"><div class="chart-fill" style="width: ${pct}%; background: ${color};"></div></div>
+               <div class="chart-val" style="width: 70px; flex-shrink: 0; text-align: left; font-size: 11px;">${fmtMoney(d.euros)}€ <span style="font-size:9px; color:var(--muted); font-weight:500;">(${d.km}km)</span></div>
             </div>`;
         });
         
@@ -1186,8 +1345,12 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         
         let listStr = "";
         dataArr.forEach(d => {
-            let monthlyEur = monthsCount > 0 ? d.euros / monthsCount : d.euros;
-            let monthlyKm = monthsCount > 0 ? d.km / monthsCount : d.km;
+            let monthlyInfoHtml = "";
+            if (showMonthlyAvg) {
+                let monthlyEur = monthsCount > 0 ? d.euros / monthsCount : d.euros;
+                let monthlyKm = monthsCount > 0 ? d.km / monthsCount : d.km;
+                monthlyInfoHtml = `<div style="font-size: 9.5px; color: var(--green); margin-top: 1px;">Média mensal: ${fmtMoney(monthlyEur)} € / ${fmtMoney(monthlyKm)} km</div>`;
+            }
             
             listStr += `
             <li class="list-item">
@@ -1195,7 +1358,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                 <div style="text-align: right;">
                     <div style="font-size: 13.5px;"><span style="font-weight: 600; color: var(--text);">${fmtMoney(d.euros)} €</span> <span style="font-size: 10px; color: var(--muted); font-weight: 400;">poupados</span></div>
                     <div style="font-size: 10.5px; color: var(--muted);">${d.km} km à boleia</div>
-                    <div style="font-size: 9.5px; color: var(--green); margin-top: 1px;">Média mensal: ${fmtMoney(monthlyEur)} € / ${fmtMoney(monthlyKm)} km</div>
+                    ${monthlyInfoHtml}
                 </div>
             </li>`;
         });
@@ -1302,24 +1465,24 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         if (currentSavingsView === 'global') {
             let sortedPeopleAlpha = [...PEOPLE].sort((a, b) => a.localeCompare(b, 'pt'));
             let pData = [];
-            let maxVal = 0;
+            let maxEuros = 0;
 
             sortedPeopleAlpha.forEach(p => {
                 let km = globalSavingsData[p].km;
                 if (km > 0) {
                     let euros = (km / 100) * cons * price;
-                    if (euros > maxVal) maxVal = euros;
+                    if (euros > maxEuros) maxEuros = euros;
                     pData.push({ name: p, km, euros });
                 }
             });
 
             let uniqueMonths = Object.keys(monthlySavingsData).length || 1;
-            container.innerHTML = buildSavingsChartHTML(pData, maxVal, uniqueMonths);
+            container.innerHTML = buildSavingsChartHTML(pData, maxEuros, true, uniqueMonths);
 
         } else {
             const buildMonthHTML = (mKey) => {
                  let mData = [];
-                 let maxVal = 0;
+                 let maxEuros = 0;
 
                  if (monthlySavingsData[mKey]) {
                      let sorted = [...PEOPLE].sort((a,b) => a.localeCompare(b, 'pt'));
@@ -1327,12 +1490,12 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                          const km = monthlySavingsData[mKey][p].km;
                          if (km > 0) {
                              let euros = (km / 100) * cons * price;
-                             if (euros > maxVal) maxVal = euros;
+                             if (euros > maxEuros) maxEuros = euros;
                              mData.push({ name: p, km, euros });
                          }
                      });
                  }
-                 return buildSavingsChartHTML(mData, maxVal, 1);
+                 return buildSavingsChartHTML(mData, maxEuros, false, 1);
             };
 
             let prev = getOffsetMonth(savingsSelectedMonth, -1);
