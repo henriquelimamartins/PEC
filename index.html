@@ -346,14 +346,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             </select>
          </div>
 
-         <!-- Navegador Mensal de Poupança (Altura e padding rigorosamente ajustados) -->
-         <div id="savings-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: #010409; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border);">
-            <button onclick="changeSavingsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 4px 8px; font-size: 14px; width:auto; border-color:transparent;">◀</button>
-            <div style="display:flex; gap:6px; align-items: center;">
-               <select id="savings-year-sel" onchange="onSavingsYearChange()" class="input-text" style="padding: 10px 28px 10px 10px; font-size:14px; min-width: 80px; height: 42px;"></select>
-               <select id="savings-month-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 10px 28px 10px 10px; font-size:14px; min-width: 120px; height: 42px;"></select>
+         <!-- Navegador Mensal de Poupança (Com altura e paddings idênticos ao select único) -->
+         <div id="savings-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: transparent; padding: 0; border: none;">
+            <button onclick="changeSavingsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 42px; border-color:var(--border); background: #010409;">◀</button>
+            <div style="display:flex; gap:6px; align-items: center; flex: 1; margin: 0 6px;">
+               <select id="savings-year-sel" onchange="onSavingsYearChange()" class="input-text" style="padding: 10px 28px 10px 10px; font-size:14px; height: 42px; flex: 1;"></select>
+               <select id="savings-month-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 10px 28px 10px 10px; font-size:14px; height: 42px; flex: 1.5;"></select>
             </div>
-            <button onclick="changeSavingsMonth(1)" class="gh-btn outline" style="margin:0; padding: 4px 8px; font-size: 14px; width:auto; border-color:transparent;" id="btn-next-month">▶</button>
+            <button onclick="changeSavingsMonth(1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 42px; border-color:var(--border); background: #010409;" id="btn-next-month">▶</button>
          </div>
 
          <!-- Área de conteúdo com largura e altura padronizadas -->
