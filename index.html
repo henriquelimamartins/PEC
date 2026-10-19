@@ -363,45 +363,50 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     
     <!-- TAB 5: INFO -->
     <div id="tab-info" class="page tab-content" style="display: none;">
-      <div class="eyebrow">Sobre o Sistema</div>
-      <div class="card">
-        <!-- Secção do Vídeo no Topo -->
-        <div style="text-align: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border);">
-          <p style="font-size: 13px; margin-bottom: 10px; color: var(--muted);">Para quê ler as instruções quando podes só ver um vídeo?</p>
-          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 14px;">> CLICA AQUI <</a>
-        </div>
-
-        <h3 style="margin-bottom: 12px; color: var(--text);">Manual Operacional Técnico</h3>
-        <p style="margin-bottom: 14px; color: var(--muted); line-height: 1.6; text-align: justify;">
-          Esta aplicação automatiza a gestão e auditoria das boleias do grupo PEC (Ponte de Lima). Todos os custos de deslocação são representados no sistema através de "Moedas" (🪙), garantindo uma distribuição e rotação exata entre condutores.
-        </p>
-
-        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">1. Sistema Matemático de Créditos</h4>
-        <p style="margin-bottom: 14px; line-height: 1.6; color: var(--text); text-align: justify;">
-          A matemática base do sistema determina que o custo de uma viagem padrão equivale a <strong>1 + (0.5 × Nº de Passageiros)</strong>. Por exemplo, uma viagem com 1 condutor e 3 passageiros tem o custo total de 2.5 🪙.<br>
-          • <strong>Condutor (Credor):</strong> Recebe +2.5 🪙 no seu saldo global.<br>
-          • <strong>Passageiros (Devedores):</strong> Dividem o custo igualmente. Cada passageiro é descontado em -0.83 🪙.<br>
-          <em>Critério Primário:</em> O membro do grupo com o saldo mais baixo (mais negativo) assume automaticamente o dever de ser o próximo condutor sugerido.
-        </p>
-
-        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">2. Algoritmo de Desempate (Cascata)</h4>
-        <p style="margin-bottom: 14px; line-height: 1.6; color: var(--text); text-align: justify;">
-          Em situações de empate exato no saldo de créditos (🪙), o algoritmo utiliza sucessivos critérios para apurar a prioridade da condução:<br>
-          1. <strong>Rácio de Participação (%):</strong> Compara o volume total de vezes conduzidas sobre o total de viagens feitas (condutor + passageiro). O membro com o valor percentual mais reduzido conduz.<br>
-          2. <strong>Tempo de Latência:</strong> Caso o empate em rácio prevaleça, o sistema processa a data (timestamp) em que cada membro conduziu pela última vez. O que não conduz há mais tempo assume o volante.
-        </p>
-
-        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">3. Modos Multi-Carro</h4>
-        <p style="margin-bottom: 16px; line-height: 1.6; color: var(--text); text-align: justify;">
-          Em dias em que se atinge a capacidade máxima de um veículo (4 passageiros + 1 condutor), é ativado o 2º Carro. A gestão financeira do segundo veículo suporta duas vias distintas:<br>
-          • <strong>Custo Partilhado (Por defeito):</strong> Todos os custos de ambos os veículos são fundidos e repartidos igualmente por todos os passageiros de todos os carros.<br>
-          • <strong>Custo Separado:</strong> Cada veículo funciona de forma estanque. Os passageiros pagam exclusivamente as 🪙 relativas à lotação do seu próprio veículo.<br>
-          <em>Nota:</em> O modo "Só ida" corta todos os cálculos do custo inerente pela metade (0.5x).
-        </p>
+      
+      <!-- Cartão em Destaque: Vídeo -->
+      <div class="card" style="text-align: center; border-color: var(--accent); background: rgba(214, 107, 43, 0.05); padding: 24px 16px;">
+         <div style="font-size: 32px; margin-bottom: 12px;">🍿</div>
+         <p style="font-size: 14.5px; font-weight: 600; margin-bottom: 16px; color: var(--text);">Para quê ler isto tudo?</p>
+         <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" class="gh-btn primary" style="display: inline-flex; width: auto; padding: 12px 24px; font-size: 13px; font-weight: 700; text-decoration: none; border-radius: 30px; margin: 0 auto; box-shadow: 0 4px 12px rgba(214, 107, 43, 0.25);">> VÊ O VÍDEO <</a>
       </div>
 
-      <button id="btn-force-backup" class="gh-btn outline" onclick="forceBackup()" style="border-style: dashed; color: var(--muted); margin-top: 20px; font-size: 12px; padding: 10px;">
-        Forçar Backup ☁️
+      <div class="eyebrow" style="margin-top: 24px; margin-bottom: 12px;">Manual Operacional Técnico</div>
+
+      <!-- Blocos de Texto Organizados -->
+      <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px;">
+         <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px;"><span>🧮</span> Sistema de Créditos (🪙)</h4>
+         <p style="color: var(--text); font-size: 12.5px; margin-bottom: 8px;">O custo de uma viagem padrão equivale sempre a <strong>1 + (0.5 × Nº de Passageiros)</strong>.</p>
+         <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0 0 12px 0; line-height: 1.5;">
+            <li><strong style="color: var(--green);">Condutor (Credor):</strong> Recebe a totalidade (+2.5 🪙).</li>
+            <li><strong style="color: var(--danger);">Passageiros (Devedores):</strong> Dividem o custo (-0.83 🪙 cada).</li>
+         </ul>
+         <p style="color: var(--muted); font-size: 11.5px; border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 10px;">
+            <em>A Regra de Ouro:</em> O membro do grupo com o saldo mais negativo assume automaticamente o dever de ser o próximo condutor.
+         </p>
+      </div>
+
+      <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px;">
+         <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px;"><span>⚖️</span> Algoritmo de Desempate</h4>
+         <p style="color: var(--text); font-size: 12.5px; margin-bottom: 8px;">Em caso de saldo exato, a app aplica 2 critérios em cascata:</p>
+         <ol style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5;">
+            <li style="margin-bottom: 6px;"><strong>Rácio de Participação (%):</strong> Compara total de conduções sobre o total de viagens feitas. O menor rácio conduz.</li>
+            <li><strong>Tempo de Latência:</strong> O membro que não conduz há mais tempo (pela data do último registo) assume o volante.</li>
+         </ol>
+      </div>
+
+      <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+         <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px;"><span>🚗</span> Modos Multi-Carro</h4>
+         <p style="color: var(--muted); font-size: 12px; margin-bottom: 10px; line-height: 1.5;">Quando é preciso ativar o 2º carro, a matemática suporta duas vias:</p>
+         <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5;">
+            <li style="margin-bottom: 6px;"><strong style="color: var(--text);">Custo Partilhado:</strong> Os custos de ambos os veículos são fundidos e repartidos de igual forma por todos os passageiros.</li>
+            <li style="margin-bottom: 6px;"><strong style="color: var(--text);">Custo Separado:</strong> Cada veículo funciona de forma estanque. Pagas apenas a lotação do teu carro.</li>
+            <li><strong style="color: var(--text);">Só Ida:</strong> Corta os custos exatos do respetivo carro pela metade (0.5x).</li>
+         </ul>
+      </div>
+
+      <button id="btn-force-backup" class="gh-btn outline" onclick="forceBackup()" style="border-style: dashed; color: var(--muted); margin-top: 24px; font-size: 12px; padding: 10px;">
+        Forçar Backup da Base de Dados ☁️
       </button>
     </div>
 
@@ -555,6 +560,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
     const shortMonths = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
     
+    // Função utilitária para apresentar cêntimos dinamicamente (ex: 23.50 -> 23.5)
+    const fmtMoney = (v) => parseFloat(v.toFixed(2));
+
     function getLocalDateISO(d = new Date()) {
        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
@@ -1143,6 +1151,52 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        updateSavings();
     }
 
+    function buildSavingsChartHTML(dataArr, maxEuros) {
+        if (dataArr.length === 0) return `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px; width: 100%;">Nenhuma viagem registada.</div>`;
+        
+        let total = dataArr.reduce((acc, d) => acc + d.euros, 0);
+        let avg = total / dataArr.length;
+        let avgPct = maxEuros > 0 ? (avg / maxEuros) * 100 : 0;
+        
+        let chartStr = `<div class="stats-chart" style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); position: relative;">`;
+        
+        const linePos = `calc(70px + (100% - 130px) * ${avgPct / 100})`;
+        chartStr += `<div class="avg-line" style="left: ${linePos}; border-left: 1px dashed rgba(255,255,255,0.25);"></div>`;
+        
+        dataArr.forEach(d => {
+            let pct = maxEuros > 0 ? (d.euros / maxEuros) * 100 : 0;
+            // Sombreia as barras menores (mantém apenas o máximo verde vibrante)
+            let color = d.euros === maxEuros ? "var(--green)" : "rgba(35, 134, 54, 0.45)"; 
+            
+            chartStr += `
+            <div class="chart-bar-row">
+               <div class="chart-label" style="width: 60px;">${d.name}</div>
+               <div class="chart-track"><div class="chart-fill" style="width: ${pct}%; background: ${color};"></div></div>
+               <div class="chart-val" style="width: auto; min-width: 50px; text-align: right;">${fmtMoney(d.euros)}€ <span style="font-size:9px; color:var(--muted); font-weight:500;">(${d.km}km)</span></div>
+            </div>`;
+        });
+        
+        chartStr += `
+          <div style="position: relative; height: 16px; margin-top: 4px;">
+             <div class="avg-label" style="left: ${linePos};">média: ${fmtMoney(avg)}€</div>
+          </div>
+        </div>`;
+        
+        let listStr = "";
+        dataArr.forEach(d => {
+            listStr += `
+            <li class="list-item">
+                <div class="balance-name">${d.name}</div>
+                <div style="text-align: right;">
+                    <div style="font-size: 13.5px;"><span style="font-weight: 600; color: var(--text);">${fmtMoney(d.euros)} €</span> <span style="font-size: 10px; color: var(--muted); font-weight: 400;">poupados</span></div>
+                    <div style="font-size: 10.5px; color: var(--muted);">${d.km} km à boleia</div>
+                </div>
+            </li>`;
+        });
+        
+        return chartStr + `<ul class="list">${listStr}</ul>`;
+    }
+
     window.updateSavings = function() {
         const periodVal = document.getElementById('calc-period') ? document.getElementById('calc-period').value : "ALL";
         const cons = parseFloat(document.getElementById('calc-cons').value) || 0;
@@ -1217,14 +1271,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         const displayEuros = displayLiters * price;
         const displayCO2Kg = displayLiters * 2.48; 
         
-        // Formatação Cêntimos apenas se inferior a 1k
-        const fmtEuros = displayEuros < 1000 ? displayEuros.toFixed(2) : displayEuros.toFixed(0);
+        // Conversão 'k' mantém-se para valores totais a partir de 1000€
+        const fmtEuros = displayEuros >= 1000 ? (displayEuros / 1000).toFixed(2) + 'k' : fmtMoney(displayEuros);
         
         let fmtCO2;
         if (displayCO2Kg >= 1000) {
             fmtCO2 = (displayCO2Kg / 1000).toFixed(2) + ' t';
         } else {
-            fmtCO2 = displayCO2Kg.toFixed(1) + ' kg';
+            fmtCO2 = fmtMoney(displayCO2Kg) + ' kg';
         }
 
         document.getElementById('savings-global-results').innerHTML = `
@@ -1254,35 +1308,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                 }
             });
 
-            if (pData.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
-                return;
-            }
-
-            let chartHTML = `<div class="stats-chart" style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">`;
-            let listHTML = "";
-
-            pData.forEach(d => {
-                let pct = maxVal > 0 ? Math.round((d.euros / maxVal) * 100) : 0;
-                
-                chartHTML += `
-                <div class="chart-bar-row">
-                   <div class="chart-label" style="width: 60px;">${d.name}</div>
-                   <div class="chart-track"><div class="chart-fill" style="width: ${pct}%; background: var(--green);"></div></div>
-                   <div class="chart-val" style="width: auto; min-width: 50px; text-align: right;">${d.euros.toFixed(0)}€ <span style="font-size:9px; color:var(--muted); font-weight:500;">(${d.km}km)</span></div>
-                </div>`;
-
-                listHTML += `
-                <div class="list-item">
-                    <div class="balance-name">${d.name}</div>
-                    <div style="text-align: right;">
-                        <div style="font-size: 13.5px;"><span style="font-weight: 600; color: var(--text);">${d.euros.toFixed(2)} €</span> <span style="font-size: 10px; color: var(--muted); font-weight: 400;">poupados</span></div>
-                        <div style="font-size: 10.5px; color: var(--muted);">${d.km} km à boleia</div>
-                    </div>
-                </div>`;
-            });
-            chartHTML += `</div>`;
-            container.innerHTML = chartHTML + `<ul class="list">${listHTML}</ul>`;
+            container.innerHTML = buildSavingsChartHTML(pData, maxVal);
 
         } else {
             const buildMonthHTML = (mKey) => {
@@ -1300,33 +1326,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                          }
                      });
                  }
-
-                 if(mData.length === 0) return `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px; width: 100%;">Nenhuma viagem registada neste mês.</div>`;
-
-                 let chartStr = `<div class="stats-chart" style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">`;
-                 let listStr = "";
-
-                 mData.forEach(d => {
-                     let pct = maxVal > 0 ? Math.round((d.euros / maxVal) * 100) : 0;
-                     chartStr += `
-                     <div class="chart-bar-row">
-                        <div class="chart-label" style="width: 60px;">${d.name}</div>
-                        <div class="chart-track"><div class="chart-fill" style="width: ${pct}%; background: var(--green);"></div></div>
-                        <div class="chart-val" style="width: auto; min-width: 50px; text-align: right;">${d.euros.toFixed(0)}€ <span style="font-size:9px; color:var(--muted); font-weight:500;">(${d.km}km)</span></div>
-                     </div>`;
-
-                     listStr += `
-                     <li class="list-item">
-                         <div class="balance-name">${d.name}</div>
-                         <div style="text-align: right;">
-                             <div style="font-size: 13.5px;"><span style="font-weight: 600; color: var(--text);">${d.euros.toFixed(2)} €</span> <span style="font-size: 10px; color: var(--muted); font-weight: 400;">poupados</span></div>
-                             <div style="font-size: 10.5px; color: var(--muted);">${d.km} km à boleia</div>
-                         </div>
-                     </li>`;
-                 });
-                 chartStr += `</div>`;
-
-                 return chartStr + `<ul class="list">${listStr}</ul>`;
+                 return buildSavingsChartHTML(mData, maxVal);
             };
 
             let prev = getOffsetMonth(savingsSelectedMonth, -1);
