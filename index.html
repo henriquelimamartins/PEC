@@ -1489,7 +1489,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         const displayEuros = displayLiters * price;
         const displayCO2Kg = displayLiters * 2.48; 
         
-        const fmtEuros = displayEuros >= 1000 ? parseFloat((displayEuros / 1000).toFixed(2)) + ' k' : fmtMoney(displayEuros);
+        const fmtEuros = displayEuros >= 1000 ? parseFloat((displayEuros / 1000).toFixed(2)) + ' k'fmtMoney(displayEuros);
         
         let fmtLiters;
         if (displayLiters >= 1000) {
@@ -1512,7 +1512,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             </div>
             <div style="text-align: center; flex: 1; border-right: 1px solid var(--border); padding: 0 2px;">
                <span style="font-size: 18px; font-weight: 700; color: var(--text);">${fmtLiters}</span><br>
-               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Litros Poupados</span>
+               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Comb. Poupado</span>
             </div>
             <div style="text-align: center; flex: 1; padding: 0 2px;">
                <span style="font-size: 18px; font-weight: 700; color: var(--accent);">${fmtCO2}</span><br>
