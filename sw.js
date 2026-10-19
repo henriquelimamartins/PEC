@@ -1,16 +1,30 @@
-const CACHE_NAME = 'pec-boleias-v1'; // Sempre que quiseres forçar uma grande limpeza, muda para v2, v3, etc.
+const CACHE_NAME = 'pec-boleias-cache-v1';
 
-// Instalação: o Service Worker assume o controlo imediatamente sem esperar
-self.addEventListener('install', (event) => {
+// Ficheiros para guardar offline logo no primeiro carregamento
+const urlsToCache = [
+  './',
+  './index.html',
+  './manifest.json',
+  // Se tiveres as imagens na mesma pasta, podes descomentar:
+  // './favicon.png',
+  // './apple-touch-icon.png'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        return cache.addAll(urlsToCache);
+      })
+  );
   self.skipWaiting();
 });
 
-// Ativação: Limpa caches antigas para libertar espaço
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map((cacheName) => {
+        cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
             return caches.delete(cacheName);
           }
@@ -21,23 +35,28 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Interceção dos pedidos: Estratégia "Network First" (Rede primeiro, Cache como plano B)
-self.addEventListener('fetch', (event) => {
-  // Ignorar pedidos que não sejam GET (ex: POST para o Firebase)
-  if (event.request.method !== 'GET') return;
+self.addEventListener('fetch', event => {
+  // Ignora requisições a APIs externas (como a da Firebase) e foca apenas nos ficheiros locais
+  if (!event.request.url.startsWith(self.location.origin)) {
+    return;
+  }
 
   event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        // Se a rede funcionou e encontrou o ficheiro novo, atualiza o cache silenciosamente
-        return caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, networkResponse.clone());
-          return networkResponse;
+    caches.match(event.request)
+      .then(response => {
+        // Retorna o que está em cache (offline), ou faz o pedido à net
+        return response || fetch(event.request).then(fetchRes => {
+          return caches.open(CACHE_NAME).then(cache => {
+            // Guarda dinamicamente coisas novas que sejam abertas (fontes, etc)
+            cache.put(event.request, fetchRes.clone());
+            return fetchRes;
+          });
         });
-      })
-      .catch(() => {
-        // Se a rede falhar (estás offline), devolve o que está guardado no cache
-        return caches.match(event.request);
+      }).catch(() => {
+        // Se a net for abaixo e não tiver o ficheiro em cache, recai para o index.html
+        if (event.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
       })
   );
 });
