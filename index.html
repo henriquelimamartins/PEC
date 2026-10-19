@@ -18,18 +18,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0d1117;          
-  --card: #161b22;        
-  --card2: #21262d;       
-  --border: #30363d;      
-  --accent: #d66b2b;      
-  --green: #238636;       
+  --bg: #0d1117;        
+  --card: #161b22;       
+  --card2: #21262d;      
+  --border: #30363d;     
+  --accent: #d66b2b;     
+  --green: #238636;      
   --green-hover: #2ea043;
-  --yellow: #fbbf24;      
-  --danger: #f85149;      
-  --text: #f0f6fc;        
-  --muted: #8b949e;       
-  --weekend-bg: #1a1715;  
+  --yellow: #fbbf24;     
+  --danger: #f85149;     
+  --text: #f0f6fc;       
+  --muted: #8b949e;      
+  --weekend-bg: #1a1715; 
   --weekend-border: #2c2520;
 }
 
@@ -140,7 +140,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .stats-chart { display: flex; flex-direction: column; margin-bottom: 25px; padding-bottom: 16px; border-bottom: 1px solid var(--border); position: relative; overflow: visible; }
 .chart-bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; position: relative; z-index: 2; margin-bottom: 8px; }
 .chart-bar-row:last-child { margin-bottom: 0; }
-.chart-label { width: 70px; color: var(--muted); font-weight: 500; text-align: right; flex-shrink: 0; }
+.chart-label { width: 65px; color: var(--muted); font-weight: 500; text-align: right; flex-shrink: 0; }
 .chart-track { flex: 1; background: var(--card2); height: 10px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); position: relative; }
 .chart-fill { height: 100%; background: var(--accent); border-radius: 4px; }
 .chart-val { width: 40px; font-weight: 600; color: var(--text); text-align: left; flex-shrink: 0; }
@@ -1138,13 +1138,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        statsData.forEach(d => { sumDrvs += d.asDriver; sumTotal += d.totalViagens; });
        const globalRatioPct = sumTotal > 0 ? Math.round((sumDrvs / sumTotal) * 100) : 0;
 
-       let statsDataAlpha = [...statsData].sort((a, b) => a.name.localeCompare(b.name, 'pt'));
+       let statsDataAlpha = [...statsData].sort((a, b) => a.name.localeCompare(b, 'pt'));
        const maxRatioVal = Math.max(...statsData.map(d => d.ratio), 0);
        
        let ratioHtml = `<div style="position: relative;">`; 
        
        if(sumTotal > 0) {
-           const linePos = `calc(70px + (100% - 110px) * ${globalRatioPct / 100})`;
+           const linePos = `calc(65px + (100% - 105px) * ${globalRatioPct / 100})`;
            ratioHtml += `<div class="avg-line" style="left: ${linePos};"></div>`;
        }
 
@@ -1164,7 +1164,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        ratioHtml += `</div>`; 
 
        if(sumTotal > 0) {
-           const linePos = `calc(70px + (100% - 110px) * ${globalRatioPct / 100})`;
+           const linePos = `calc(65px + (100% - 105px) * ${globalRatioPct / 100})`;
            ratioHtml += `
              <div style="position: relative; height: 16px; margin-top: 4px;">
                 <div class="avg-label" style="left: ${linePos};">média de ${globalRatioPct}%</div>
@@ -1331,13 +1331,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         
         dataArr.forEach(d => {
             let pct = maxEuros > 0 ? (d.euros / maxEuros) * 100 : 0;
-            let color = d.euros === maxEuros ? "var(--green)" : "rgba(35, 134, 54, 0.45)"; 
+            let color = (d.euros === maxEuros && maxEuros > 0) ? "var(--green)" : "rgba(35, 134, 54, 0.45)"; 
             
             chartStr += `
             <div class="chart-bar-row">
-               <div class="chart-label" style="width: 70px; flex-shrink: 0; text-align: right;">${d.name}</div>
+               <div class="chart-label" style="width: 65px; flex-shrink: 0; text-align: right;">${d.name}</div>
                <div class="chart-track" style="flex: 1;"><div class="chart-fill" style="width: ${pct}%; background: ${color};"></div></div>
-               <div class="chart-val" style="width: 70px; flex-shrink: 0; text-align: left; font-size: 11px;">${fmtMoney(d.euros)}€ <span style="font-size:9px; color:var(--muted); font-weight:500;">(${d.km}km)</span></div>
+               <div class="chart-val" style="width: 110px; flex-shrink: 0; text-align: left; font-size: 11px; white-space: nowrap;">${fmtMoney(d.euros)} € <span style="font-size:9.5px; color:var(--muted); font-weight:500;">(${d.km} km)</span></div>
             </div>`;
         });
         
@@ -1345,22 +1345,32 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         
         let listStr = "";
         dataArr.forEach(d => {
-            let monthlyInfoHtml = "";
-            if (showMonthlyAvg) {
-                let monthlyEur = monthsCount > 0 ? d.euros / monthsCount : d.euros;
-                let monthlyKm = monthsCount > 0 ? d.km / monthsCount : d.km;
-                monthlyInfoHtml = `<div style="font-size: 9.5px; color: var(--green); margin-top: 1px;">Média mensal: ${fmtMoney(monthlyEur)} € / ${fmtMoney(monthlyKm)} km</div>`;
+            if (d.hasData === false) {
+                listStr += `
+                <li class="list-item">
+                    <div class="balance-name">${d.name}</div>
+                    <div style="text-align: right; color: var(--muted); font-size: 11.5px; font-style: italic;">
+                        Sem dados para este mês
+                    </div>
+                </li>`;
+            } else {
+                let monthlyInfoHtml = "";
+                if (showMonthlyAvg) {
+                    let monthlyEur = monthsCount > 0 ? d.euros / monthsCount : d.euros;
+                    let monthlyKm = monthsCount > 0 ? d.km / monthsCount : d.km;
+                    monthlyInfoHtml = `<div style="font-size: 9.5px; color: var(--green); margin-top: 1px;">Média mensal: ${fmtMoney(monthlyEur)} € / ${fmtMoney(monthlyKm)} km</div>`;
+                }
+                
+                listStr += `
+                <li class="list-item">
+                    <div class="balance-name">${d.name}</div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 13.5px;"><span style="font-weight: 600; color: var(--text);">${fmtMoney(d.euros)} €</span> <span style="font-size: 10px; color: var(--muted); font-weight: 400;">poupados</span></div>
+                        <div style="font-size: 10.5px; color: var(--muted);">${d.km} km à boleia</div>
+                        ${monthlyInfoHtml}
+                    </div>
+                </li>`;
             }
-            
-            listStr += `
-            <li class="list-item">
-                <div class="balance-name">${d.name}</div>
-                <div style="text-align: right;">
-                    <div style="font-size: 13.5px;"><span style="font-weight: 600; color: var(--text);">${fmtMoney(d.euros)} €</span> <span style="font-size: 10px; color: var(--muted); font-weight: 400;">poupados</span></div>
-                    <div style="font-size: 10.5px; color: var(--muted);">${d.km} km à boleia</div>
-                    ${monthlyInfoHtml}
-                </div>
-            </li>`;
         });
         
         return chartStr + `<ul class="list">${listStr}</ul>`;
@@ -1472,7 +1482,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                 if (km > 0) {
                     let euros = (km / 100) * cons * price;
                     if (euros > maxEuros) maxEuros = euros;
-                    pData.push({ name: p, km, euros });
+                    pData.push({ name: p, km, euros, hasData: true });
                 }
             });
 
@@ -1483,18 +1493,19 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             const buildMonthHTML = (mKey) => {
                  let mData = [];
                  let maxEuros = 0;
+                 let sorted = [...PEOPLE].sort((a,b) => a.localeCompare(b, 'pt'));
 
-                 if (monthlySavingsData[mKey]) {
-                     let sorted = [...PEOPLE].sort((a,b) => a.localeCompare(b, 'pt'));
-                     sorted.forEach(p => {
-                         const km = monthlySavingsData[mKey][p].km;
-                         if (km > 0) {
-                             let euros = (km / 100) * cons * price;
-                             if (euros > maxEuros) maxEuros = euros;
-                             mData.push({ name: p, km, euros });
-                         }
-                     });
-                 }
+                 sorted.forEach(p => {
+                     const km = (monthlySavingsData[mKey] && monthlySavingsData[mKey][p]) ? monthlySavingsData[mKey][p].km : 0;
+                     if (km > 0) {
+                         let euros = (km / 100) * cons * price;
+                         if (euros > maxEuros) maxEuros = euros;
+                         mData.push({ name: p, km, euros, hasData: true });
+                     } else {
+                         mData.push({ name: p, km: 0, euros: 0, hasData: false });
+                     }
+                 });
+
                  return buildSavingsChartHTML(mData, maxEuros, false, 1);
             };
 
@@ -1646,46 +1657,46 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        const shortDays = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
 
        for(let d = new Date(startDate.getTime()); d <= endDate; d.setDate(d.getDate() + 1)){
-         const iso = getLocalDateISO(d);
-         const isPast = iso < todayISO;
-         const isFuture = iso > todayISO;
-         const isSelected = iso === selectedDateISO;
-         const realJsDay = d.getDay();
-         const isWeekend = (realJsDay === 0 || realJsDay === 6);
-         const isOtherMonth = d.getMonth() !== targetMonth;
-         
-         let tripClass = "";
-         if (currentHistoryFilter === "ALL") {
-            const hasTrip = trips.some(t => t.date === iso);
-            if (hasTrip) tripClass = "has-trip";
-         } else {
-            const personTrips = trips.filter(t => t.date === iso && (t.drivers.includes(currentHistoryFilter) || t.passengers.includes(currentHistoryFilter)));
-            if (personTrips.length > 0) {
-               const isDriver = personTrips.some(t => t.drivers.includes(currentHistoryFilter));
-               tripClass = isDriver ? "has-trip-driver" : "has-trip-passenger";
-            }
-         }
-         
-         let c = "s-day";
-         if(isPast) c += " past";
-         if(isFuture) c += " future-day";
-         if(isWeekend) c += " weekend";
-         if(isSelected) c += " selected";
-         if(tripClass) c += " " + tripClass;
-         if(isOtherMonth) c += " other-month";
-         
-         const dayName = shortDays[(realJsDay + 6) % 7];
-         const dateNum = d.getDate();
-         const isFirst = dateNum === 1;
-         const isLast = dateNum === new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
-           
-         let badgeHtml = "";
-         if(isFirst || isLast) {
+          const iso = getLocalDateISO(d);
+          const isPast = iso < todayISO;
+          const isFuture = iso > todayISO;
+          const isSelected = iso === selectedDateISO;
+          const realJsDay = d.getDay();
+          const isWeekend = (realJsDay === 0 || realJsDay === 6);
+          const isOtherMonth = d.getMonth() !== targetMonth;
+          
+          let tripClass = "";
+          if (currentHistoryFilter === "ALL") {
+             const hasTrip = trips.some(t => t.date === iso);
+             if (hasTrip) tripClass = "has-trip";
+          } else {
+             const personTrips = trips.filter(t => t.date === iso && (t.drivers.includes(currentHistoryFilter) || t.passengers.includes(currentHistoryFilter)));
+             if (personTrips.length > 0) {
+                const isDriver = personTrips.some(t => t.drivers.includes(currentHistoryFilter));
+                tripClass = isDriver ? "has-trip-driver" : "has-trip-passenger";
+             }
+          }
+          
+          let c = "s-day";
+          if(isPast) c += " past";
+          if(isFuture) c += " future-day";
+          if(isWeekend) c += " weekend";
+          if(isSelected) c += " selected";
+          if(tripClass) c += " " + tripClass;
+          if(isOtherMonth) c += " other-month";
+          
+          const dayName = shortDays[(realJsDay + 6) % 7];
+          const dateNum = d.getDate();
+          const isFirst = dateNum === 1;
+          const isLast = dateNum === new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+            
+          let badgeHtml = "";
+          if(isFirst || isLast) {
               badgeHtml = `<div class="s-month-badge">${shortMonths[d.getMonth()]}</div>`;
-         }
+          }
 
-         let clickAttr = isFuture ? '' : `onclick="${onClickAction}('${iso}')"`;
-         html += `<div class="${c}" ${clickAttr}>${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
+          let clickAttr = isFuture ? '' : `onclick="${onClickAction}('${iso}')"`;
+          html += `<div class="${c}" ${clickAttr}>${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
        }
        return html + `</div>`;
     }
