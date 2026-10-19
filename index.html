@@ -41,7 +41,6 @@ html, body { min-height: 100vh; margin: 0; background: var(--bg); touch-action: 
 button, a, img, select { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif; color: var(--text); -webkit-tap-highlight-color: transparent; padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px)); }
 
-/* Classe dinâmica para bloquear o scroll apenas no ecrã inicial */
 body.locked-scroll { overflow: hidden; height: 100vh; }
 
 h1, h2, h3, h4 { font-weight: 600; margin: 0; }
@@ -204,8 +203,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .summary-panel { background: var(--card2); padding: 14px; border-radius: 6px; border: 1px solid var(--border); border-left: 3px solid var(--accent); font-size: 13px; color: var(--text); margin-bottom: 16px; line-height: 1.5; }
 
 .botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; }
-.botnav button { flex: 1; background: none; border: none; color: var(--muted); font-size: 10px; font-weight: 500; text-transform: uppercase; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; }
-.botnav button .ic { font-size: 18px; }
+.botnav button { flex: 1; background: none; border: none; color: var(--muted); font-size: 9.5px; font-weight: 500; text-transform: uppercase; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; }
+.botnav button .ic { font-size: 17px; }
 .botnav button.active { color: var(--accent); }
 
 .toast { position: fixed; left: 50%; bottom: 80px; transform: translateX(-50%) translateY(20px); background: var(--green); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; z-index: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.4); opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; text-align: center; }
@@ -298,9 +297,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         <div class="stats-section-title">Métricas de Participação (Nº de Vezes)</div>
         <div id="stats-bars-chart" class="stats-chart" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;"></div>
       </div>
+    </div>
 
-      <!-- SECÇÃO: CALCULADORA DE POUPANÇA E IMPACTO -->
-      <div class="card" style="margin-top: 16px;">
+    <!-- TAB 4: POUPANÇA E IMPACTO -->
+    <div id="tab-savings" class="page tab-content" style="display: none;">
+      <div class="eyebrow">Calculadora de Impacto</div>
+      
+      <div class="card">
          <h3 style="margin-bottom: 12px;">Poupança e Impacto 🌍</h3>
          
          <div style="background: var(--card2); padding: 12px; border-radius: 6px; margin-bottom: 16px;">
@@ -325,15 +328,15 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                </div>
                <div style="flex: 1;">
                   <label style="font-size: 10px; color: var(--muted); display: block; margin-bottom: 4px;">L/100km</label>
-                  <input type="number" id="calc-cons" class="input-text" value="6.0" step="0.1" style="padding: 8px; font-size: 12px;" oninput="updateSavings()">
+                  <input type="number" id="calc-cons" class="input-text" step="0.1" style="padding: 8px; font-size: 12px;" oninput="updateSavings()">
                </div>
                <div style="flex: 1;">
                   <label style="font-size: 10px; color: var(--muted); display: block; margin-bottom: 4px;">Preço (€/L)</label>
-                  <input type="number" id="calc-price" class="input-text" value="1.65" step="0.01" style="padding: 8px; font-size: 12px;" oninput="updateSavings()">
+                  <input type="number" id="calc-price" class="input-text" step="0.01" style="padding: 8px; font-size: 12px;" oninput="updateSavings()">
                </div>
             </div>
-            <p style="font-size: 10.5px; text-align: center; color: var(--muted); margin-top: 6px; line-height: 1.4;">
-               Cálculo automático: 29km (Braga) ou 26km (Vila Verde). O dobro caso não seja "só ida".
+            <p style="font-size: 10px; text-align: center; color: var(--muted); margin-top: 6px; line-height: 1.4;">
+               Cálculo automático: 29km (Braga) ou 26km (Vila Verde).
             </p>
          </div>
 
@@ -345,17 +348,25 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          <!-- Modos de Visualização: Resumo Global vs Mensal -->
          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
             <button id="btn-view-global" class="gh-btn primary" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setSavingsView('global')">Resumo Global</button>
-            <button id="btn-view-monthly" class="gh-btn outline" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setSavingsView('monthly')">Detalhamento Mensal</button>
+            <button id="btn-view-monthly" class="gh-btn outline" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setSavingsView('monthly')">Análise Mensal</button>
          </div>
 
-         <!-- Lista de poupança por pessoa (Alfabética) -->
-         <div id="savings-per-person-list" class="list">
-            <!-- Renderizado via JS -->
+         <!-- Navegador Mensal de Poupança -->
+         <div id="savings-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--card2); padding: 8px; border-radius: 6px; border: 1px solid var(--border);">
+            <button onclick="changeSavingsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 4px 8px; font-size: 14px; width:auto; border-color:transparent;">◀</button>
+            <div style="display:flex; gap:6px;">
+               <select id="savings-month-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 4px 20px 4px 8px; font-size:11px;"></select>
+               <select id="savings-year-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 4px 20px 4px 8px; font-size:11px;"></select>
+            </div>
+            <button onclick="changeSavingsMonth(1)" class="gh-btn outline" style="margin:0; padding: 4px 8px; font-size: 14px; width:auto; border-color:transparent;">▶</button>
          </div>
+
+         <!-- Área de conteúdo (Lista normal ou Swipe Track) -->
+         <div id="savings-content-area"></div>
       </div>
     </div>
     
-    <!-- TAB 4: INFO -->
+    <!-- TAB 5: INFO -->
     <div id="tab-info" class="page tab-content" style="display: none;">
       <div class="eyebrow">Sobre o Sistema</div>
       <div class="card">
@@ -396,6 +407,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        </button>
        <button onclick="switchTab('stats')" id="nav-stats">
           <span class="ic">📊</span>Estatísticas
+       </button>
+       <button onclick="switchTab('savings')" id="nav-savings">
+          <span class="ic">🌱</span>Poupança
        </button>
        <button onclick="switchTab('info')" id="nav-info">
           <span class="ic">ℹ️</span>Info
@@ -543,7 +557,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     let todayISO = getLocalDateISO();
     let historySelectedDate = todayISO;
     let currentHistoryFilter = "ALL"; 
+    
     let currentSavingsView = "global";
+    let savingsSelectedMonth = todayISO.substring(0, 7); 
     
     let formDate = todayISO;
     let selectedCars = 1;
@@ -564,6 +580,20 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           opt.innerHTML = isFemale ? `Viagens da ${person}` : `Viagens do ${person}`;
           select.appendChild(opt);
        });
+    }
+
+    function populateSavingsMonthDropdowns() {
+       const monthSel = document.getElementById("savings-month-sel");
+       const yearSel = document.getElementById("savings-year-sel");
+       if(!monthSel || !yearSel) return;
+       
+       let htmlM = "";
+       monthNames.forEach((m, i) => htmlM += `<option value="${String(i+1).padStart(2,'0')}">${m}</option>`);
+       monthSel.innerHTML = htmlM;
+       
+       let htmlY = "";
+       for(let y=2025; y<=2030; y++) htmlY += `<option value="${y}">${y}</option>`;
+       yearSel.innerHTML = htmlY;
     }
 
     window.forceRefresh = async function() {
@@ -647,6 +677,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        }
        if(tabName === 'stats') {
           renderStats();
+       }
+       if(tabName === 'savings') {
+          updateSavings();
        }
        window.scrollTo(0,0);
     }
@@ -743,6 +776,12 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     }
 
     function initApp() {
+      // Carregar Cache da Poupança
+      document.getElementById('calc-fuel').value = localStorage.getItem('pec_fuel') || 'gasoleo';
+      document.getElementById('calc-cons').value = localStorage.getItem('pec_cons') || '5.0';
+      document.getElementById('calc-price').value = localStorage.getItem('pec_price') || '2.00';
+      
+      populateSavingsMonthDropdowns();
       renderHeaderDate();
       renderWeekBar();
       initHistoryFilterDropdown();
@@ -872,9 +911,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
       renderHistoryCalendar();
       renderWeekBar();
-      if(document.getElementById('tab-stats').style.display === 'block') {
-         renderStats();
-      }
+      if(document.getElementById('tab-stats').style.display === 'block') renderStats();
+      if(document.getElementById('tab-savings').style.display === 'block') updateSavings();
     }
 
     window.renderStats = function() {
@@ -989,21 +1027,38 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           </div>`;
        });
        barsContainer.innerHTML = barsHtml;
+    }
 
+    /* === SECÇÃO POUPANÇA E IMPACTO === */
+
+    window.jumpSavingsMonth = function() {
+       const m = document.getElementById("savings-month-sel").value;
+       const y = document.getElementById("savings-year-sel").value;
+       savingsSelectedMonth = `${y}-${m}`;
+       updateSavings();
+    }
+
+    function getOffsetMonth(mKey, delta) {
+        let [y, m] = mKey.split('-');
+        let d = new Date(parseInt(y), parseInt(m)-1, 1);
+        d.setMonth(d.getMonth() + delta);
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    }
+
+    window.changeSavingsMonth = function(delta) {
+       savingsSelectedMonth = getOffsetMonth(savingsSelectedMonth, delta);
        updateSavings();
     }
 
     window.setSavingsView = function(viewMode) {
        currentSavingsView = viewMode;
-       const btnGlobal = document.getElementById('btn-view-global');
-       const btnMonthly = document.getElementById('btn-view-monthly');
-       if(viewMode === 'global') {
-          btnGlobal.className = "gh-btn primary";
-          btnMonthly.className = "gh-btn outline";
-       } else {
-          btnGlobal.className = "gh-btn outline";
-          btnMonthly.className = "gh-btn primary";
-       }
+       document.getElementById('btn-view-global').className = viewMode === 'global' ? "gh-btn primary" : "gh-btn outline";
+       document.getElementById('btn-view-monthly').className = viewMode === 'monthly' ? "gh-btn primary" : "gh-btn outline";
+       
+       document.getElementById('savings-monthly-nav').style.display = viewMode === 'monthly' ? "flex" : "none";
+       const track = document.getElementById('savings-list-track');
+       if(track) track.style.transform = 'translateX(-33.3333%)';
+       
        updateSavings();
     }
 
@@ -1013,15 +1068,17 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         const cons = parseFloat(document.getElementById('calc-cons').value) || 0;
         const price = parseFloat(document.getElementById('calc-price').value) || 0;
         
-        const co2Multiplier = fuelType === 'gasoleo' ? 2.64 : 2.31;
-        
-        // Filtragem temporal específica da calculadora
-        let filteredSavingsTrips = trips;
+        // Guardar Cache (User)
+        localStorage.setItem('pec_fuel', fuelType);
+        localStorage.setItem('pec_cons', cons);
+        localStorage.setItem('pec_price', price);
+
+        let filteredTrips = trips;
         if (periodVal !== "ALL") {
            const daysNum = parseInt(periodVal);
            const now = new Date();
            const cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysNum);
-           filteredSavingsTrips = trips.filter(t => {
+           filteredTrips = trips.filter(t => {
               const parts = t.date.split('-');
               const tDate = new Date(parts[0], parts[1]-1, parts[2]);
               return tDate >= cutoff;
@@ -1030,149 +1087,129 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
         let globalSavingsData = {};
         let monthlySavingsData = {}; 
-        
-        PEOPLE.forEach(p => { globalSavingsData[p] = { km: 0, tripsAsPass: 0 }; });
+        PEOPLE.forEach(p => globalSavingsData[p] = { km: 0 });
         let totalKmSaved = 0;
 
-        filteredSavingsTrips.forEach(trip => {
-            const monthKey = trip.date.substring(0, 7); // ex: "2026-10"
-            if (!monthlySavingsData[monthKey]) {
-                monthlySavingsData[monthKey] = {};
-                PEOPLE.forEach(p => { monthlySavingsData[monthKey][p] = { km: 0, tripsAsPass: 0 }; });
+        filteredTrips.forEach(trip => {
+            const mKey = trip.date.substring(0, 7);
+            if (!monthlySavingsData[mKey]) {
+                monthlySavingsData[mKey] = {};
+                PEOPLE.forEach(p => monthlySavingsData[mKey][p] = { km: 0 });
             }
 
             const processCar = (car) => {
                 if (!car || !car.driver || !car.passengers || car.passengers.length === 0) return;
                 
-                const allOccupants = [car.driver, ...car.passengers];
-                const onlyBraga = allOccupants.every(p => BRAGA_GROUP.includes(p));
-                
+                const onlyBraga = [car.driver, ...car.passengers].every(p => BRAGA_GROUP.includes(p));
                 const baseDist = onlyBraga ? 29 : 26;
                 const finalDist = car.isOneWay ? baseDist : (baseDist * 2);
 
                 car.passengers.forEach(p => {
-                    if (globalSavingsData[p]) {
-                       globalSavingsData[p].km += finalDist;
-                       globalSavingsData[p].tripsAsPass += 1;
-                       totalKmSaved += finalDist;
-                    }
-                    if (monthlySavingsData[monthKey] && monthlySavingsData[monthKey][p]) {
-                       monthlySavingsData[monthKey][p].km += finalDist;
-                       monthlySavingsData[monthKey][p].tripsAsPass += 1;
-                    }
+                    if (globalSavingsData[p]) globalSavingsData[p].km += finalDist;
+                    if (monthlySavingsData[mKey] && monthlySavingsData[mKey][p]) monthlySavingsData[mKey][p].km += finalDist;
+                    totalKmSaved += finalDist;
                 });
             };
 
             if (trip.cars === 2 && trip.car1 && trip.car2) {
-                processCar(trip.car1);
-                processCar(trip.car2);
+                processCar(trip.car1); processCar(trip.car2);
             } else {
-                let carInfo = trip.car1 ? trip.car1 : { 
-                    driver: trip.drivers ? trip.drivers[0] : null, 
-                    passengers: trip.passengers || [], 
-                    isOneWay: trip.isOneWay || false 
-                };
+                let carInfo = trip.car1 ? trip.car1 : { driver: trip.drivers ? trip.drivers[0] : null, passengers: trip.passengers || [], isOneWay: trip.isOneWay || false };
                 processCar(carInfo);
             }
         });
 
-        // Totais Globais
         const totalLiters = (totalKmSaved / 100) * cons;
         const totalEuros = totalLiters * price;
-        const totalCO2 = totalLiters * co2Multiplier;
+        const co2Multiplier = fuelType === 'gasoleo' ? 2.64 : 2.31;
+        const totalCO2Tonnes = (totalLiters * co2Multiplier) / 1000;
+        
+        const fmtEuros = totalEuros >= 1000 ? (totalEuros / 1000).toFixed(1) + 'k' : totalEuros.toFixed(2);
 
         document.getElementById('savings-global-results').innerHTML = `
             <div style="text-align: center; flex: 1; border-right: 1px solid var(--border);">
-               <span style="font-size: 22px; color: var(--green);">${totalEuros.toFixed(2)} €</span><br>
-               <span style="font-size: 10px; color: var(--muted); text-transform: uppercase;">Poupados pelo Grupo</span>
+               <span style="font-size: 22px; color: var(--green);">${fmtEuros} €</span><br>
+               <span style="font-size: 10px; color: var(--muted); text-transform: uppercase;">Poupança Total</span>
             </div>
             <div style="text-align: center; flex: 1;">
-               <span style="font-size: 22px; color: var(--accent);">${totalCO2.toFixed(1)} kg</span><br>
+               <span style="font-size: 22px; color: var(--accent);">${totalCO2Tonnes.toFixed(2)} t</span><br>
                <span style="font-size: 10px; color: var(--muted); text-transform: uppercase;">CO2 Evitado</span>
             </div>
         `;
 
-        let listHTML = "";
+        const container = document.getElementById('savings-content-area');
 
         if (currentSavingsView === 'global') {
-            // Nomes ordenados estritamente ALFABETICAMENTE
             let sortedPeopleAlpha = [...PEOPLE].sort((a, b) => a.localeCompare(b, 'pt'));
-            
+            let listHTML = "";
             let hasData = false;
+            
             sortedPeopleAlpha.forEach(p => {
                 let pKm = globalSavingsData[p].km;
                 if (pKm > 0) {
                     hasData = true;
-                    let pLiters = (pKm / 100) * cons;
-                    let pEuros = pLiters * price;
+                    let pEuros = (pKm / 100) * cons * price;
                     listHTML += `
                     <div class="list-item" style="padding: 10px 0;">
                         <div style="font-size: 13.5px; font-weight: 500;">${p}</div>
                         <div style="text-align: right;">
                             <div style="font-size: 13.5px; font-weight: 600; color: var(--text);">${pEuros.toFixed(2)} €</div>
-                            <div style="font-size: 10.5px; color: var(--muted);">${pKm} km não conduzidos</div>
+                            <div style="font-size: 10.5px; color: var(--muted);">${pKm} km à boleia</div>
                         </div>
                     </div>`;
                 }
             });
 
-            if (!hasData) {
-                listHTML = `<div style="text-align:center; padding: 20px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
-            }
+            if (!hasData) listHTML = `<div style="text-align:center; padding: 20px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
+            container.innerHTML = `<div class="list">${listHTML}</div>`;
         } else {
-            // Modo Mensal: Ordenar os meses do mais recente para o mais antigo
-            const sortedMonths = Object.keys(monthlySavingsData).sort((a, b) => b.localeCompare(a));
-            
-            if (sortedMonths.length === 0) {
-                listHTML = `<div style="text-align:center; padding: 20px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
-            } else {
-                sortedMonths.forEach(mKey => {
-                    const [year, month] = mKey.split('-');
-                    const monthName = monthNames[parseInt(month) - 1];
-                    
-                    // Nomes dentro de cada mês organizados ALFABETICAMENTE
-                    let sortedPeopleAlpha = [...PEOPLE].sort((a, b) => a.localeCompare(b, 'pt'));
-                    let monthRowsHTML = "";
-                    let monthTotalKm = 0;
+            // Detalhamento Mensal (Swipe View)
+            let [y, m] = savingsSelectedMonth.split('-');
+            document.getElementById("savings-month-sel").value = m;
+            document.getElementById("savings-year-sel").value = y;
 
-                    sortedPeopleAlpha.forEach(p => {
-                        const pData = monthlySavingsData[mKey][p];
-                        if (pData && pData.km > 0) {
-                            monthTotalKm += pData.km;
-                            let pLiters = (pData.km / 100) * cons;
-                            let pEuros = pLiters * price;
-                            monthRowsHTML += `
-                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px;">
-                                <div style="font-weight: 500; color: var(--text);">${p}</div>
-                                <div style="text-align: right;">
-                                    <span style="font-weight: 600; color: var(--green);">${pEuros.toFixed(2)} €</span>
-                                    <span style="color: var(--muted); font-size: 10px; margin-left: 6px;">(${pData.km} km)</span>
-                                </div>
-                            </div>`;
-                        }
-                    });
+            const buildMonthHTML = (mKey) => {
+                 let html = "";
+                 let mTotalKm = 0;
+                 if (monthlySavingsData[mKey]) {
+                     let sorted = [...PEOPLE].sort((a,b) => a.localeCompare(b, 'pt'));
+                     sorted.forEach(p => {
+                         const km = monthlySavingsData[mKey][p].km;
+                         if (km > 0) {
+                             mTotalKm += km;
+                             let euros = (km / 100) * cons * price;
+                             html += `
+                             <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px;">
+                                 <div style="font-weight: 500; color: var(--text);">${p}</div>
+                                 <div style="text-align: right;">
+                                     <div style="font-weight: 600; color: var(--text);">${euros.toFixed(2)} €</div>
+                                     <div style="color: var(--muted); font-size: 10.5px;">${km} km à boleia</div>
+                                 </div>
+                             </div>`;
+                         }
+                     });
+                 }
+                 if(mTotalKm === 0) return `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px; width: 100%;">Nenhuma viagem registada neste mês para o filtro escolhido.</div>`;
+                 return `<div class="list" style="width: 100%; padding: 0 4px;">${html}</div>`;
+            };
 
-                    if (monthTotalKm > 0) {
-                        let monthTotalEuros = ((monthTotalKm / 100) * cons) * price;
-                        listHTML += `
-                        <div style="margin-bottom: 16px; background: var(--card2); border: 1px solid var(--border); border-radius: 6px; padding: 12px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border);">
-                                <span style="font-size: 13px; font-weight: 700; color: var(--accent); text-transform: uppercase;">${monthName} ${year}</span>
-                                <span style="font-size: 12px; font-weight: 700; color: var(--green);">${monthTotalEuros.toFixed(2)} € total</span>
-                            </div>
-                            ${monthRowsHTML}
-                        </div>`;
-                    }
-                });
-
-                if (listHTML === "") {
-                    listHTML = `<div style="text-align:center; padding: 20px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
-                }
-            }
+            let prev = getOffsetMonth(savingsSelectedMonth, -1);
+            let next = getOffsetMonth(savingsSelectedMonth, 1);
+             
+            container.innerHTML = `
+                <div id="savings-list-swipe" class="swipe-container" style="min-height: 120px;">
+                    <div id="savings-list-track" class="swipe-track" style="transform: translateX(-33.3333%); align-items: flex-start;">
+                       <div style="width: 33.3333%; flex-shrink:0;">${buildMonthHTML(prev)}</div>
+                       <div style="width: 33.3333%; flex-shrink:0;">${buildMonthHTML(savingsSelectedMonth)}</div>
+                       <div style="width: 33.3333%; flex-shrink:0;">${buildMonthHTML(next)}</div>
+                    </div>
+                </div>
+            `;
+            setupSwipeListener('savings-list-swipe', 'savings-list-track', () => changeSavingsMonth(1), () => changeSavingsMonth(-1));
         }
-
-        document.getElementById('savings-per-person-list').innerHTML = listHTML;
     };
+
+    /* === RESTANTES FUNÇÕES (Cálculo, Histórico, Formulário) === */
 
     window.applyHistoryFilter = function() {
        currentHistoryFilter = document.getElementById("history-filter").value;
