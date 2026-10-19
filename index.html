@@ -202,8 +202,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
 .summary-panel { background: var(--card2); padding: 14px; border-radius: 6px; border: 1px solid var(--border); border-left: 3px solid var(--accent); font-size: 13px; color: var(--text); margin-bottom: 16px; line-height: 1.5; }
 
-/* Botnav com espaçamento rigorosamente consistente em proporção aos títulos das tabs */
-.botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; justify-content: space-around; }
+/* Altura mínima rigorosamente idêntica para o bloco de poupança (Global vs Mensal) */
+#savings-content-area { min-height: 310px; }
+
+/* Botnav com espaçamento e largura simétrica rigorosa */
+.botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; justify-content: space-around; }
 .botnav button { flex: 1; max-width: 20%; min-width: 0; background: none; border: none; color: var(--muted); font-size: 9px; font-weight: 500; text-transform: uppercase; padding: 4px 0; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; }
 .botnav button .ic { font-size: 17px; }
 .botnav button.active { color: var(--accent); }
@@ -353,8 +356,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             <button onclick="changeSavingsMonth(1)" class="gh-btn outline" style="margin:0; padding: 4px 8px; font-size: 14px; width:auto; border-color:transparent;">▶</button>
          </div>
 
-         <!-- Área de conteúdo (Com altura mínima garantida idêntica) -->
-         <div id="savings-content-area" style="min-height: 220px;"></div>
+         <!-- Área de conteúdo com altura mínima rigorosamente garantida -->
+         <div id="savings-content-area"></div>
       </div>
     </div>
     
@@ -362,20 +365,32 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     <div id="tab-info" class="page tab-content" style="display: none;">
       <div class="eyebrow">Sobre o Sistema</div>
       <div class="card">
-        <h3 style="margin-bottom: 12px; color: var(--text);">Como funciona a aplicação?</h3>
-        <p style="margin-bottom: 16px; color: var(--muted); line-height: 1.6; text-align: justify;">
-          Esta aplicação foi criada para gerir de forma justa e totalmente automática quem deve ser o próximo condutor nas boleias de grupo.
-        </p>
-        
-        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">1. O Balanço (🪙)</h4>
-        <p style="margin-bottom: 16px; line-height: 1.6; color: var(--text); text-align: justify;">
-          Funciona como uma economia virtual. Sempre que conduzes, <strong>ganhas</strong> créditos por cada passageiro que transportas. Quando vais à boleia no carro de alguém, <strong>gastas</strong> créditos para pagar a tua viagem.<br><br>
-          <em>A pessoa com o balanço mais negativo é sempre a sugerida para pegar no carro a seguir!</em>
+        <h3 style="margin-bottom: 12px; color: var(--text);">Manual Operacional e Regras do Grupo</h3>
+        <p style="margin-bottom: 14px; color: var(--muted); line-height: 1.6; text-align: justify;">
+          Esta aplicação foi desenvolvida de raiz para automatizar e descentralizar a gestão de boleias partilhadas do grupo PEC (Ponte de Lima). O objetivo principal é garantir uma distribuição 100% transparente, equitativa e auditável dos custos de transporte, eliminando qualquer necessidade de contabilidade manual ou cálculos complexos em papel.
         </p>
 
-        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">2. Desempates e Rácio</h4>
+        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">1. O Sistema de Balanços e Créditos (🪙)</h4>
+        <p style="margin-bottom: 14px; line-height: 1.6; color: var(--text); text-align: justify;">
+          O ecossistema funciona com base numa moeda virtual de compensação:<br>
+          • <strong>Condutores ganham créditos:</strong> Sempre que realizas uma viagem ao volante, o teu saldo acumula créditos proporcionais ao número de passageiros transportados.<br>
+          • <strong>Passageiros gastam créditos:</strong> Sempre que usufrues de uma boleia no carro de outro colega, o teu saldo é descontado proporcionalmente ao custo partilhado da rota.<br>
+          <em>Regra de ouro:</em> A pessoa que apresentar o balanço mais negativo (maior défice de créditos acumulados) é automaticamente sugerida pela app para conduzir na viagem seguinte, garantindo rotação justa.
+        </p>
+
+        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">2. Critérios de Desempate Inteligente</h4>
+        <p style="margin-bottom: 14px; line-height: 1.6; color: var(--text); text-align: justify;">
+          Se dois ou mais elementos registarem exatamente o mesmo saldo de créditos, a aplicação aplica critérios secundários em cascata:<br>
+          1. <strong>Rácio de Condução:</strong> É selecionado o elemento com menor rácio percentual entre viagens conduzidas e viagens totais efetuadas.<br>
+          2. <strong>Tempo de Inatividade:</strong> Em caso de persistência de igualdade, prioriza-se o membro que conduz há mais tempo (maior espaçamento temporal desde o seu último registo ao volante).
+        </p>
+
+        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">3. Parâmetros de Viagem e Custos</h4>
         <p style="margin-bottom: 16px; line-height: 1.6; color: var(--text); text-align: justify;">
-          Se existirem duas ou mais pessoas com o mesmo valor de balanço, a app escolhe de forma inteligente a que tem o <strong>menor Rácio</strong> (ou seja, quem conduziu percentualmente menos vezes em relação às vezes que foi à boleia). Se ainda assim houver empate, é chamado quem não conduz há mais tempo.
+          O sistema suporta configurações avançadas, tais como:<br>
+          • Gestão simultânea de um ou dois veículos por dia.<br>
+          • Divisão de custos personalizada ou partilhada entre carros.<br>
+          • Distâncias de referência automáticas com base na origem/destino (ex: Braga ou Vila Verde) e opções de trajetos de sentido único (*só ida*).
         </p>
         
         <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center;">
@@ -551,7 +566,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     let currentHistoryFilter = "ALL"; 
     
     let currentSavingsView = "global";
-    let savingsSelectedMonth = todayISO.substring(0, 7); // Default ao mês/ano presente
+    let savingsSelectedMonth = todayISO.substring(0, 7); 
     
     let formDate = todayISO;
     let selectedCars = 1;
@@ -594,7 +609,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        const selectedYear = parseInt(yearSel.value);
        const currentDate = new Date();
        const currentYear = currentDate.getFullYear();
-       const currentMonth = currentDate.getMonth() + 1; // 1-12
+       const currentMonth = currentDate.getMonth() + 1; 
 
        let htmlM = "";
        let startMonth = (selectedYear === 2025) ? 11 : 1;
@@ -754,7 +769,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        const adjustHeight = (childIndex) => {
            const track = document.getElementById(trackId);
            if (track && track.children[childIndex]) {
-               container.style.height = track.children[childIndex].offsetHeight + "px";
+               let h = track.children[childIndex].offsetHeight;
+               if(h > 310) container.style.height = h + "px";
+               else container.style.height = "310px";
            }
        };
 
@@ -1175,7 +1192,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         const avgCO2Multiplier = 2.48; 
         const totalCO2Tonnes = (totalLiters * avgCO2Multiplier) / 1000;
         
-        const fmtEuros = totalEuros >= 1000 ? (totalEuros / 1000).toFixed(2) + 'k' : totalEuros.toFixed(2);
+        // Precisão à unidade, com suporte a 'k' com espaço caso ultrapasse 1000€
+        const fmtEuros = totalEuros >= 1000 ? (totalEuros / 1000).toFixed(2) + ' k' : totalEuros.toFixed(0);
 
         document.getElementById('savings-global-results').innerHTML = `
             <div style="text-align: center; flex: 1; border-right: 1px solid var(--border);">
