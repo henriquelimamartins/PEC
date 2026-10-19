@@ -330,6 +330,10 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          <div id="savings-global-results" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: #010409; padding: 16px 8px; border-radius: 6px; border: 1px solid var(--border);">
          </div>
 
+         <!-- NOVO: Contador Dinâmico de Árvores -->
+         <div id="savings-tree-counter" style="text-align: center; margin-bottom: 16px; background: rgba(35, 134, 54, 0.1); border: 1px dashed var(--green); padding: 12px; border-radius: 6px; font-size: 12px; color: var(--text); line-height: 1.4;">
+         </div>
+
          <!-- Modos de Visualização: Resumo Global vs Mensal -->
          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
             <button id="btn-view-global" class="gh-btn primary" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setSavingsView('global')">Resumo Global</button>
@@ -892,8 +896,16 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     window.checkLogin = async function() {
       const pwd = document.getElementById("password-input").value;
       const targetHash = "2496e57975c7cb484c2049d5bf599e0339cb1d43a14434241cd64d4b1a1ea0f9"; 
-      const enteredHash = await hashString(pwd);
+      
+      let enteredHash = null;
+      try {
+         // Se o browser não deixar usar crypto (por ex: HTTP local), isto vai falhar, mas o catch apanha o erro.
+         enteredHash = await hashString(pwd);
+      } catch(e) {
+         console.warn("Crypto bloqueado pelo browser. A validar como texto...");
+      }
 
+      // Valida o hash (se disponível) ou testa a password crua
       if (enteredHash === targetHash || pwd === "pec2026") {
         localStorage.setItem("pec_auth", "true");
         document.getElementById("login-screen").style.display = "none";
@@ -1512,13 +1524,26 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             </div>
             <div style="text-align: center; flex: 1; border-right: 1px solid var(--border); padding: 0 2px;">
                <span style="font-size: 18px; font-weight: 700; color: var(--text);">${fmtLiters}</span><br>
-               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Comb. Poupado</span>
+               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Litros Poupados</span>
             </div>
             <div style="text-align: center; flex: 1; padding: 0 2px;">
                <span style="font-size: 18px; font-weight: 700; color: var(--accent);">${fmtCO2}</span><br>
                <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">CO2 Evitado</span>
             </div>
         `;
+
+        const treeCounterDiv = document.getElementById('savings-tree-counter');
+        if (treeCounterDiv) {
+            const numArvores = Math.floor(displayCO2Kg / 22); 
+            if (displayCO2Kg >= 1000) {
+                const co2Tons = (displayCO2Kg / 1000).toFixed(1);
+                treeCounterDiv.innerHTML = `🌲 <b>Impressionante!</b> ${co2Tons} t de CO₂ evitadas correspondem a uma plantação de <b>${numArvores} árvores adultas</b>!`;
+            } else if (displayCO2Kg >= 22) {
+                treeCounterDiv.innerHTML = `🌳 <b>Fantástico!</b> ${Math.floor(displayCO2Kg)} kg de CO₂ evitados equivalem ao trabalho de <b>${numArvores} árvores adultas</b> durante 1 ano!`;
+            } else {
+                treeCounterDiv.innerHTML = `🌱 Cada viagem conta! Estão no bom caminho para "plantar" a vossa primeira árvore (aos 22 kg de CO₂)!`;
+            }
+        }
 
         const container = document.getElementById('savings-content-area');
 
