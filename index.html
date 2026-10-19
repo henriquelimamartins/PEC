@@ -202,8 +202,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
 .summary-panel { background: var(--card2); padding: 14px; border-radius: 6px; border: 1px solid var(--border); border-left: 3px solid var(--accent); font-size: 13px; color: var(--text); margin-bottom: 16px; line-height: 1.5; }
 
+/* Botnav com espaçamento perfeitamente uniforme */
 .botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; }
-.botnav button { flex: 1; background: none; border: none; color: var(--muted); font-size: 9.5px; font-weight: 500; text-transform: uppercase; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; }
+.botnav button { flex: 1; min-width: 0; background: none; border: none; color: var(--muted); font-size: 9px; font-weight: 500; text-transform: uppercase; padding: 4px 0; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; }
 .botnav button .ic { font-size: 17px; }
 .botnav button.active { color: var(--accent); }
 
@@ -317,13 +318,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          <div style="background: var(--card2); padding: 12px; border-radius: 6px; margin-bottom: 16px;">
             <div style="display: flex; gap: 8px; margin-bottom: 6px;">
                <div style="flex: 1;">
-                  <label style="font-size: 10px; color: var(--muted); display: block; margin-bottom: 4px;">Combustível</label>
-                  <select id="calc-fuel" class="input-text" style="padding: 8px; font-size: 12px; background-position: right 8px center;" onchange="updateSavings()">
-                     <option value="gasoleo">Gasóleo</option>
-                     <option value="gasolina">Gasolina</option>
-                  </select>
-               </div>
-               <div style="flex: 1;">
                   <label style="font-size: 10px; color: var(--muted); display: block; margin-bottom: 4px;">L/100km</label>
                   <input type="number" id="calc-cons" class="input-text" step="0.1" style="padding: 8px; font-size: 12px;" oninput="updateSavings()">
                </div>
@@ -333,7 +327,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                </div>
             </div>
             <p style="font-size: 10px; text-align: center; color: var(--muted); margin-top: 6px; line-height: 1.4;">
-               Cálculo automático: 29km (Braga) ou 26km (Vila Verde).
+               Cálculo automático: 29 km (Braga) ou 26 km (Vila Verde).
             </p>
          </div>
 
@@ -348,18 +342,18 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             <button id="btn-view-monthly" class="gh-btn outline" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setSavingsView('monthly')">Análise Mensal</button>
          </div>
 
-         <!-- Navegador Mensal de Poupança -->
+         <!-- Navegador Mensal de Poupança (Ano à esquerda, Mês à direita) -->
          <div id="savings-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--card2); padding: 8px; border-radius: 6px; border: 1px solid var(--border);">
             <button onclick="changeSavingsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 4px 8px; font-size: 14px; width:auto; border-color:transparent;">◀</button>
             <div style="display:flex; gap:6px;">
-               <select id="savings-month-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 4px 28px 4px 8px; font-size:11px; min-width: 100px;"></select>
-               <select id="savings-year-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 4px 24px 4px 8px; font-size:11px;"></select>
+               <select id="savings-year-sel" onchange="onSavingsYearChange()" class="input-text" style="padding: 4px 28px 4px 10px; font-size:11px; min-width: 80px;"></select>
+               <select id="savings-month-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 4px 28px 4px 8px; font-size:11px; min-width: 110px;"></select>
             </div>
             <button onclick="changeSavingsMonth(1)" class="gh-btn outline" style="margin:0; padding: 4px 8px; font-size: 14px; width:auto; border-color:transparent;">▶</button>
          </div>
 
-         <!-- Área de conteúdo (Lista normal ou Swipe Track) -->
-         <div id="savings-content-area"></div>
+         <!-- Área de conteúdo (Com altura mínima garantida idêntica) -->
+         <div id="savings-content-area" style="min-height: 220px;"></div>
       </div>
     </div>
     
@@ -579,18 +573,58 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        });
     }
 
-    function populateSavingsMonthDropdowns() {
-       const monthSel = document.getElementById("savings-month-sel");
+    function populateSavingsYearDropdown() {
        const yearSel = document.getElementById("savings-year-sel");
-       if(!monthSel || !yearSel) return;
-       
-       let htmlM = "";
-       monthNames.forEach((m, i) => htmlM += `<option value="${String(i+1).padStart(2,'0')}">${m}</option>`);
-       monthSel.innerHTML = htmlM;
-       
+       if(!yearSel) return;
+       const currentYear = new Date().getFullYear();
        let htmlY = "";
-       for(let y=2025; y<=2030; y++) htmlY += `<option value="${y}">${y}</option>`;
+       for(let y = 2025; y <= currentYear; y++) {
+          htmlY += `<option value="${y}">${y}</option>`;
+       }
        yearSel.innerHTML = htmlY;
+    }
+
+    function updateSavingsMonthOptions() {
+       const yearSel = document.getElementById("savings-year-sel");
+       const monthSel = document.getElementById("savings-month-sel");
+       if(!yearSel || !monthSel) return;
+
+       const selectedYear = parseInt(yearSel.value);
+       const currentDate = new Date();
+       const currentYear = currentDate.getFullYear();
+       const currentMonth = currentDate.getMonth() + 1; // 1-12
+
+       let htmlM = "";
+       let startMonth = (selectedYear === 2025) ? 11 : 1;
+       let endMonth = (selectedYear === currentYear) ? currentMonth : 12;
+
+       for(let i = startMonth; i <= endMonth; i++) {
+          htmlM += `<option value="${String(i).padStart(2,'0')}">${monthNames[i-1]}</option>`;
+       }
+       monthSel.innerHTML = htmlM;
+
+       let [currY, currM] = savingsSelectedMonth.split('-');
+       if(parseInt(currY) === selectedYear) {
+          // Garantir que o mês selecionado ainda é válido para o ano escolhido
+          let options = Array.from(monthSel.options).map(o => o.value);
+          if(options.includes(currM)) {
+             monthSel.value = currM;
+          } else {
+             monthSel.value = options[options.length - 1];
+             savingsSelectedMonth = `${selectedYear}-${monthSel.value}`;
+          }
+       } else {
+          monthSel.value = String(startMonth).padStart(2,'0');
+          savingsSelectedMonth = `${selectedYear}-${monthSel.value}`;
+       }
+    }
+
+    window.onSavingsYearChange = function() {
+       const yearSel = document.getElementById("savings-year-sel");
+       const monthSel = document.getElementById("savings-month-sel");
+       savingsSelectedMonth = `${yearSel.value}-${monthSel.value}`;
+       updateSavingsMonthOptions();
+       updateSavings();
     }
 
     window.forceRefresh = async function() {
@@ -774,11 +808,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     function initApp() {
       // Carregar Cache da Poupança
-      document.getElementById('calc-fuel').value = localStorage.getItem('pec_fuel') || 'gasoleo';
       document.getElementById('calc-cons').value = localStorage.getItem('pec_cons') || '5.0';
       document.getElementById('calc-price').value = localStorage.getItem('pec_price') || '2.00';
       
-      populateSavingsMonthDropdowns();
+      populateSavingsYearDropdown();
+      updateSavingsMonthOptions();
       renderHeaderDate();
       renderWeekBar();
       initHistoryFilterDropdown();
@@ -1043,7 +1077,22 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     }
 
     window.changeSavingsMonth = function(delta) {
-       savingsSelectedMonth = getOffsetMonth(savingsSelectedMonth, delta);
+       let nextKey = getOffsetMonth(savingsSelectedMonth, delta);
+       let [ny, nm] = nextKey.split('-');
+       let targetYear = parseInt(ny);
+       let targetMonth = parseInt(nm);
+       
+       let currentYear = new Date().getFullYear();
+       let currentMonth = new Date().getMonth() + 1;
+
+       // Validação de limites (não ultrapassar hoje nem ir antes de Nov 2025)
+       if (targetYear === 2025 && targetMonth < 11) return;
+       if (targetYear > currentYear || (targetYear === currentYear && targetMonth > currentMonth)) return;
+
+       savingsSelectedMonth = nextKey;
+       document.getElementById("savings-year-sel").value = ny;
+       updateSavingsMonthOptions();
+       document.getElementById("savings-month-sel").value = nm;
        updateSavings();
     }
 
@@ -1055,6 +1104,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        document.getElementById('calc-period-container').style.display = viewMode === 'monthly' ? "none" : "block";
        document.getElementById('savings-monthly-nav').style.display = viewMode === 'monthly' ? "flex" : "none";
        
+       if(viewMode === 'monthly') {
+          let [y, m] = savingsSelectedMonth.split('-');
+          document.getElementById("savings-year-sel").value = y;
+          updateSavingsMonthOptions();
+          document.getElementById("savings-month-sel").value = m;
+       }
+
        const track = document.getElementById('savings-list-track');
        if(track) track.style.transform = 'translateX(-33.3333%)';
        
@@ -1063,12 +1119,10 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     window.updateSavings = function() {
         const periodVal = document.getElementById('calc-period') ? document.getElementById('calc-period').value : "ALL";
-        const fuelType = document.getElementById('calc-fuel').value;
         const cons = parseFloat(document.getElementById('calc-cons').value) || 0;
         const price = parseFloat(document.getElementById('calc-price').value) || 0;
         
         // Guardar Cache (User)
-        localStorage.setItem('pec_fuel', fuelType);
         localStorage.setItem('pec_cons', cons);
         localStorage.setItem('pec_price', price);
 
@@ -1120,8 +1174,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
         const totalLiters = (totalKmSaved / 100) * cons;
         const totalEuros = totalLiters * price;
-        const co2Multiplier = fuelType === 'gasoleo' ? 2.64 : 2.31;
-        const totalCO2Tonnes = (totalLiters * co2Multiplier) / 1000;
+        const avgCO2Multiplier = 2.48; // Média padrão combustível
+        const totalCO2Tonnes = (totalLiters * avgCO2Multiplier) / 1000;
         
         const fmtEuros = totalEuros >= 1000 ? (totalEuros / 1000).toFixed(2) + 'k' : totalEuros.toFixed(2);
 
@@ -1159,12 +1213,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                 }
             });
 
-            if (!hasData) listHTML = `<div style="text-align:center; padding: 20px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
+            if (!hasData) listHTML = `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
             container.innerHTML = `<div class="list">${listHTML}</div>`;
         } else {
             let [y, m] = savingsSelectedMonth.split('-');
-            document.getElementById("savings-month-sel").value = m;
             document.getElementById("savings-year-sel").value = y;
+            updateSavingsMonthOptions();
+            document.getElementById("savings-month-sel").value = m;
 
             const buildMonthHTML = (mKey) => {
                  let html = "";
@@ -1195,7 +1250,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             let next = getOffsetMonth(savingsSelectedMonth, 1);
              
             container.innerHTML = `
-                <div id="savings-list-swipe" class="swipe-container" style="min-height: 120px;">
+                <div id="savings-list-swipe" class="swipe-container">
                     <div id="savings-list-track" class="swipe-track" style="transform: translateX(-33.3333%); align-items: flex-start;">
                        <div style="width: 33.3333%; flex-shrink:0;">${buildMonthHTML(prev)}</div>
                        <div style="width: 33.3333%; flex-shrink:0;">${buildMonthHTML(savingsSelectedMonth)}</div>
