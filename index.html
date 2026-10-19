@@ -202,12 +202,12 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
 .summary-panel { background: var(--card2); padding: 14px; border-radius: 6px; border: 1px solid var(--border); border-left: 3px solid var(--accent); font-size: 13px; color: var(--text); margin-bottom: 16px; line-height: 1.5; }
 
-/* Altura mínima rigorosamente idêntica para o bloco de poupança (Global vs Mensal) */
-#savings-content-area { min-height: 310px; }
+/* Altura fixa e idêntica garantida para a área de conteúdo da poupança */
+#savings-content-area { min-height: 380px; }
 
-/* Botnav com espaçamento e largura simétrica rigorosa */
-.botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; justify-content: space-around; }
-.botnav button { flex: 1; max-width: 20%; min-width: 0; background: none; border: none; color: var(--muted); font-size: 9px; font-weight: 500; text-transform: uppercase; padding: 4px 0; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; }
+/* Barra inferior com distribuição simétrica rigorosa baseada nas palavras */
+.botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; justify-content: space-between; }
+.botnav button { flex: 1; min-width: 0; background: none; border: none; color: var(--muted); font-size: 9px; font-weight: 500; text-transform: uppercase; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; text-align: center; }
 .botnav button .ic { font-size: 17px; }
 .botnav button.active { color: var(--accent); }
 
@@ -335,7 +335,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             <button id="btn-view-monthly" class="gh-btn outline" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setSavingsView('monthly')">Análise Mensal</button>
          </div>
 
-         <!-- Drop-down temporal global (Abaixo do selector Resumo Global/Análise Mensal) -->
+         <!-- Drop-down temporal global -->
          <div id="calc-period-container" style="margin-bottom: 12px;">
             <select id="calc-period" class="input-text" onchange="updateSavings()">
                <option value="ALL">Desde Sempre</option>
@@ -346,60 +346,56 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             </select>
          </div>
 
-         <!-- Navegador Mensal de Poupança (Ano à esquerda, Mês à direita) -->
+         <!-- Navegador Mensal de Poupança -->
          <div id="savings-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--card2); padding: 8px; border-radius: 6px; border: 1px solid var(--border);">
             <button onclick="changeSavingsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 4px 8px; font-size: 14px; width:auto; border-color:transparent;">◀</button>
             <div style="display:flex; gap:6px;">
                <select id="savings-year-sel" onchange="onSavingsYearChange()" class="input-text" style="padding: 4px 28px 4px 10px; font-size:11px; min-width: 80px;"></select>
                <select id="savings-month-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 4px 28px 4px 8px; font-size:11px; min-width: 110px;"></select>
             </div>
-            <button onclick="changeSavingsMonth(1)" class="gh-btn outline" style="margin:0; padding: 4px 8px; font-size: 14px; width:auto; border-color:transparent;">▶</button>
+            <button onclick="changeSavingsMonth(1)" class="gh-btn outline" style="margin:0; padding: 4px 8px; font-size: 14px; width:auto; border-color:transparent;" id="btn-next-month">▶</button>
          </div>
 
-         <!-- Área de conteúdo com altura mínima rigorosamente garantida -->
+         <!-- Área de conteúdo com altura consistente -->
          <div id="savings-content-area"></div>
       </div>
     </div>
     
-    <!-- TAB 5: INFO -->
+    <!-- TAB 5: INFO (Reformulado num formato mais limpo e interativo em cartões) -->
     <div id="tab-info" class="page tab-content" style="display: none;">
       <div class="eyebrow">Sobre o Sistema</div>
-      <div class="card">
-        <h3 style="margin-bottom: 12px; color: var(--text);">Manual Operacional e Regras do Grupo</h3>
-        <p style="margin-bottom: 14px; color: var(--muted); line-height: 1.6; text-align: justify;">
-          Esta aplicação foi desenvolvida de raiz para automatizar e descentralizar a gestão de boleias partilhadas do grupo PEC (Ponte de Lima). O objetivo principal é garantir uma distribuição 100% transparente, equitativa e auditável dos custos de transporte, eliminando qualquer necessidade de contabilidade manual ou cálculos complexos em papel.
-        </p>
 
-        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">1. O Sistema de Balanços e Créditos (🪙)</h4>
-        <p style="margin-bottom: 14px; line-height: 1.6; color: var(--text); text-align: justify;">
-          O ecossistema funciona com base numa moeda virtual de compensação:<br>
-          • <strong>Condutores ganham créditos:</strong> Sempre que realizas uma viagem ao volante, o teu saldo acumula créditos proporcionais ao número de passageiros transportados.<br>
-          • <strong>Passageiros gastam créditos:</strong> Sempre que usufrues de uma boleia no carro de outro colega, o teu saldo é descontado proporcionalmente ao custo partilhado da rota.<br>
-          <em>Regra de ouro:</em> A pessoa que apresentar o balanço mais negativo (maior défice de créditos acumulados) é automaticamente sugerida pela app para conduzir na viagem seguinte, garantindo rotação justa.
+      <div class="card" style="margin-bottom: 12px;">
+        <h3 style="color: var(--accent); font-size: 13.5px; margin-bottom: 8px;">🚗 O que é o Boleias PEC?</h3>
+        <p style="text-align: justify; line-height: 1.5; color: var(--text);">
+          Plataforma centralizada do grupo de Ponte de Lima para gerir deslocações diárias, partilha de custos e inventário de créditos de forma 100% automatizada e transparente.
         </p>
-
-        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">2. Critérios de Desempate Inteligente</h4>
-        <p style="margin-bottom: 14px; line-height: 1.6; color: var(--text); text-align: justify;">
-          Se dois ou mais elementos registarem exatamente o mesmo saldo de créditos, a aplicação aplica critérios secundários em cascata:<br>
-          1. <strong>Rácio de Condução:</strong> É selecionado o elemento com menor rácio percentual entre viagens conduzidas e viagens totais efetuadas.<br>
-          2. <strong>Tempo de Inatividade:</strong> Em caso de persistência de igualdade, prioriza-se o membro que conduz há mais tempo (maior espaçamento temporal desde o seu último registo ao volante).
-        </p>
-
-        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">3. Parâmetros de Viagem e Custos</h4>
-        <p style="margin-bottom: 16px; line-height: 1.6; color: var(--text); text-align: justify;">
-          O sistema suporta configurações avançadas, tais como:<br>
-          • Gestão simultânea de um ou dois veículos por dia.<br>
-          • Divisão de custos personalizada ou partilhada entre carros.<br>
-          • Distâncias de referência automáticas com base na origem/destino (ex: Braga ou Vila Verde) e opções de trajetos de sentido único (*só ida*).
-        </p>
-        
-        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center;">
-          <p style="font-size: 11.5px; margin-bottom: 10px; color: var(--muted); white-space: nowrap;">Ainda com dúvidas sobre estes algoritmos complexos?</p>
-          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 13px;">> CLICA AQUI <</a>
-        </div>
       </div>
 
-      <button id="btn-force-backup" class="gh-btn outline" onclick="forceBackup()" style="border-style: dashed; color: var(--muted); margin-top: 20px; font-size: 12px; padding: 10px;">
+      <div class="card" style="margin-bottom: 12px;">
+        <h3 style="color: var(--accent); font-size: 13.5px; margin-bottom: 8px;">🪙 Como funciona o Balanço?</h3>
+        <p style="text-align: justify; line-height: 1.5; color: var(--text); margin-bottom: 8px;">
+          • <strong>Ao conduzir:</strong> Acumulas créditos por cada colega transportado.<br>
+          • <strong>À boleia:</strong> Gastas créditos para pagar a tua viagem.<br>
+          • <strong>Próximo condutor:</strong> A pessoa com o saldo mais negativo é sugerida automaticamente.
+        </p>
+      </div>
+
+      <div class="card" style="margin-bottom: 12px;">
+        <h3 style="color: var(--accent); font-size: 13.5px; margin-bottom: 8px;">⚖️ Critérios de Desempate</h3>
+        <p style="text-align: justify; line-height: 1.5; color: var(--text);">
+          Em caso de igualdade de créditos, a app analisa o <strong>Rácio</strong> (percentagem de condução face a viagens totais) e o <strong>tempo de inatividade</strong> (quem não pega no carro há mais tempo).
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 style="color: var(--accent); font-size: 13.5px; margin-bottom: 8px;">📊 Ferramentas e Impacto</h3>
+        <p style="text-align: justify; line-height: 1.5; color: var(--text);">
+          Permite registar até 2 viaturas por dia, calcular distâncias automáticas (Braga/Vila Verde) e monitorizar a poupança financeira e ecológica acumulada em tempo real.
+        </p>
+      </div>
+
+      <button id="btn-force-backup" class="gh-btn outline" onclick="forceBackup()" style="border-style: dashed; color: var(--muted); margin-top: 16px; font-size: 12px; padding: 10px;">
         Forçar Backup ☁️
       </button>
     </div>
@@ -633,6 +629,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           monthSel.value = String(endMonth).padStart(2,'0');
           savingsSelectedMonth = `${selectedYear}-${monthSel.value}`;
        }
+       
+       // Controlar botão avançar mês no limite atual
+       const btnNextM = document.getElementById("btn-next-month");
+       if(btnNextM) {
+          const isAtCurrentMonth = (selectedYear === currentYear && parseInt(monthSel.value) === currentMonth);
+          btnNextM.disabled = isAtCurrentMonth;
+          btnNextM.style.opacity = isAtCurrentMonth ? "0.3" : "1";
+       }
     }
 
     window.onSavingsYearChange = function() {
@@ -761,21 +765,10 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       }
     }
 
-    function setupSwipeListener(containerId, trackId, onSwipeLeft, onSwipeRight) {
+    function setupSwipeListener(containerId, trackId, onSwipeLeft, onSwipeRight, isMonthlySavingsNav = false) {
        const container = document.getElementById(containerId);
        if(!container) return;
        let startX = 0, startY = 0, isDragging = false, currentX = 0;
-
-       const adjustHeight = (childIndex) => {
-           const track = document.getElementById(trackId);
-           if (track && track.children[childIndex]) {
-               let h = track.children[childIndex].offsetHeight;
-               if(h > 310) container.style.height = h + "px";
-               else container.style.height = "310px";
-           }
-       };
-
-       setTimeout(() => adjustHeight(1), 0);
 
        container.addEventListener('touchstart', e => {
           startX = e.changedTouches[0].screenX;
@@ -793,6 +786,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           const deltaY = y - startY;
 
           if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+             // Bloquear swipe para a frente (deltaX < 0 se for avanço) se for análise mensal no mês atual
+             if(isMonthlySavingsNav && deltaX < 0) {
+                 let [y, m] = savingsSelectedMonth.split('-');
+                 let cur = new Date();
+                 if(parseInt(y) === cur.getFullYear() && parseInt(m) === (cur.getMonth()+1)) {
+                     return; // Não deixa arrastar para o futuro
+                 }
+             }
              currentX = Math.max(-120, Math.min(120, deltaX));
              const track = document.getElementById(trackId);
              if(track) track.style.transform = `translateX(calc(-33.3333% + ${currentX}px))`;
@@ -809,16 +810,22 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           track.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
           
           if (currentX < -60) {
+             if(isMonthlySavingsNav) {
+                 let [y, m] = savingsSelectedMonth.split('-');
+                 let cur = new Date();
+                 if(parseInt(y) === cur.getFullYear() && parseInt(m) === (cur.getMonth()+1)) {
+                     track.style.transform = `translateX(-33.3333%)`;
+                     currentX = 0;
+                     return;
+                 }
+             }
              track.style.transform = `translateX(-66.6666%)`; 
-             adjustHeight(2); 
              setTimeout(() => { onSwipeLeft(); }, 250);
           } else if (currentX > 60) {
              track.style.transform = `translateX(0%)`; 
-             adjustHeight(0); 
              setTimeout(() => { onSwipeRight(); }, 250);
           } else {
              track.style.transform = `translateX(-33.3333%)`; 
-             adjustHeight(1);
           }
           currentX = 0;
        }, {passive: true});
@@ -1192,7 +1199,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         const avgCO2Multiplier = 2.48; 
         const totalCO2Tonnes = (totalLiters * avgCO2Multiplier) / 1000;
         
-        // Precisão à unidade, com suporte a 'k' com espaço caso ultrapasse 1000€
         const fmtEuros = totalEuros >= 1000 ? (totalEuros / 1000).toFixed(2) + ' k' : totalEuros.toFixed(0);
 
         document.getElementById('savings-global-results').innerHTML = `
@@ -1266,7 +1272,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             let next = getOffsetMonth(savingsSelectedMonth, 1);
              
             container.innerHTML = `
-                <div id="savings-list-swipe" class="swipe-container">
+                <div id="savings-list-swipe" class="swipe-container" style="min-height: 380px;">
                     <div id="savings-list-track" class="swipe-track" style="transform: translateX(-33.3333%); align-items: flex-start;">
                        <div style="width: 33.3333%; flex-shrink:0;">${buildMonthHTML(prev)}</div>
                        <div style="width: 33.3333%; flex-shrink:0;">${buildMonthHTML(savingsSelectedMonth)}</div>
@@ -1274,7 +1280,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                     </div>
                 </div>
             `;
-            setupSwipeListener('savings-list-swipe', 'savings-list-track', () => changeSavingsMonth(1), () => changeSavingsMonth(-1));
+            setupSwipeListener('savings-list-swipe', 'savings-list-track', () => changeSavingsMonth(1), () => changeSavingsMonth(-1), true);
         }
     };
 
@@ -1376,6 +1382,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        currDate.setMonth(currDate.getMonth() + delta);
        let newIso = getLocalDateISO(currDate);
        if(newIso < "2025-11-01") return;
+       if(newIso > todayISO) return;
        historySelectedDate = newIso;
        renderHistoryCalendar();
     }
@@ -1386,6 +1393,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        currDate.setFullYear(currDate.getFullYear() + delta);
        let newIso = getLocalDateISO(currDate);
        if(newIso < "2025-11-01") return;
+       if(newIso > todayISO) return;
        historySelectedDate = newIso;
        renderHistoryCalendar();
     }
@@ -1458,6 +1466,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       const targetYear = targetDate.getFullYear();
       const targetMonth = targetDate.getMonth();
       const canGoPrev = !(targetYear === 2025 && targetMonth === 10);
+      const curY = new Date().getFullYear();
+      const curM = new Date().getMonth();
+      const canGoNext = !(targetYear === curY && targetMonth === curM);
 
       let prevYear = targetYear, prevMonth = targetMonth - 1;
       if(prevMonth < 0) { prevMonth = 11; prevYear--; }
@@ -1474,8 +1485,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
              <span>${targetYear}</span>
           </div>
           <div style="display:flex; gap:4px;">
-             <button onclick="changeHistoryMonth(1)" title="Mês Seguinte"><span>▶</span><span>Mês</span></button>
-             <button onclick="changeHistoryYear(1)" title="Ano Seguinte"><span>▶</span><span>Ano</span></button>
+             <button onclick="changeHistoryMonth(1)" ${!canGoNext ? 'disabled' : ''} title="Mês Seguinte"><span>▶</span><span>Mês</span></button>
+             <button onclick="changeHistoryYear(1)" ${!canGoNext ? 'disabled' : ''} title="Ano Seguinte"><span>▶</span><span>Ano</span></button>
              <button onclick="resetHistoryToToday()" style="background:#30363d; color:#ffffff; border-color:#8b949e;" title="Hoje"><span>▼</span><span>Hoje</span></button>
           </div>
        </div>`;
@@ -1490,7 +1501,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     function renderHistoryCalendar() {
        document.getElementById("history-calendar").innerHTML = generateHistoryCalendarHTML(historySelectedDate, 'selectHistoryDate');
-       setupSwipeListener('hist-swipe', 'history-track', () => changeHistoryMonth(1), () => changeHistoryMonth(-1));
+       setupSwipeListener('hist-swipe', 'history-track', () => changeHistoryMonth(1), () => changeHistoryMonth(-1), true);
        renderHistoryDetails();
     }
 
