@@ -94,8 +94,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .input-text { background: #010409; border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 10px 12px; font-size: 14px; width: 100%; outline: none; }
 .input-text:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(214, 107, 43, 0.25); }
 
-.list { list-style: none; padding: 0; margin: 0; }
-.list-item { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); gap: 10px; }
+.list { list-style: none; padding: 0; margin: 0; width: 100%; }
+.list-item { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); gap: 10px; width: 100%; }
 .list-item:last-child { border-bottom: none; }
 .balance-name { font-size: 13.5px; font-weight: 500; flex: 1; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
 .balance-right { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
@@ -356,46 +356,50 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             <button onclick="changeSavingsMonth(1)" class="gh-btn outline" style="margin:0; padding: 4px 8px; font-size: 14px; width:auto; border-color:transparent;" id="btn-next-month">▶</button>
          </div>
 
-         <!-- Área de conteúdo com altura consistente -->
+         <!-- Área de conteúdo com largura e altura padronizadas -->
          <div id="savings-content-area"></div>
       </div>
     </div>
     
-    <!-- TAB 5: INFO (Reformulado num formato mais limpo e interativo em cartões) -->
+    <!-- TAB 5: INFO (Abordagem original detalhada restaurada, com o Rickroll) -->
     <div id="tab-info" class="page tab-content" style="display: none;">
       <div class="eyebrow">Sobre o Sistema</div>
-
-      <div class="card" style="margin-bottom: 12px;">
-        <h3 style="color: var(--accent); font-size: 13.5px; margin-bottom: 8px;">🚗 O que é o Boleias PEC?</h3>
-        <p style="text-align: justify; line-height: 1.5; color: var(--text);">
-          Plataforma centralizada do grupo de Ponte de Lima para gerir deslocações diárias, partilha de custos e inventário de créditos de forma 100% automatizada e transparente.
-        </p>
-      </div>
-
-      <div class="card" style="margin-bottom: 12px;">
-        <h3 style="color: var(--accent); font-size: 13.5px; margin-bottom: 8px;">🪙 Como funciona o Balanço?</h3>
-        <p style="text-align: justify; line-height: 1.5; color: var(--text); margin-bottom: 8px;">
-          • <strong>Ao conduzir:</strong> Acumulas créditos por cada colega transportado.<br>
-          • <strong>À boleia:</strong> Gastas créditos para pagar a tua viagem.<br>
-          • <strong>Próximo condutor:</strong> A pessoa com o saldo mais negativo é sugerida automaticamente.
-        </p>
-      </div>
-
-      <div class="card" style="margin-bottom: 12px;">
-        <h3 style="color: var(--accent); font-size: 13.5px; margin-bottom: 8px;">⚖️ Critérios de Desempate</h3>
-        <p style="text-align: justify; line-height: 1.5; color: var(--text);">
-          Em caso de igualdade de créditos, a app analisa o <strong>Rácio</strong> (percentagem de condução face a viagens totais) e o <strong>tempo de inatividade</strong> (quem não pega no carro há mais tempo).
-        </p>
-      </div>
-
       <div class="card">
-        <h3 style="color: var(--accent); font-size: 13.5px; margin-bottom: 8px;">📊 Ferramentas e Impacto</h3>
-        <p style="text-align: justify; line-height: 1.5; color: var(--text);">
-          Permite registar até 2 viaturas por dia, calcular distâncias automáticas (Braga/Vila Verde) e monitorizar a poupança financeira e ecológica acumulada em tempo real.
+        <h3 style="margin-bottom: 12px; color: var(--text);">Manual Operacional e Regras do Grupo</h3>
+        <p style="margin-bottom: 14px; color: var(--muted); line-height: 1.6; text-align: justify;">
+          Esta aplicação foi desenvolvida de raiz para automatizar e descentralizar a gestão de boleias partilhadas do grupo PEC (Ponte de Lima). O objetivo principal é garantir uma distribuição 100% transparente, equitativa e auditável dos custos de transporte, eliminando qualquer necessidade de contabilidade manual ou cálculos complexos em papel.
         </p>
+
+        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">1. O Sistema de Balanços e Créditos (🪙)</h4>
+        <p style="margin-bottom: 14px; line-height: 1.6; color: var(--text); text-align: justify;">
+          O ecossistema funciona com base numa moeda virtual de compensação:<br>
+          • <strong>Condutores ganham créditos:</strong> Sempre que realizas uma viagem ao volante, o teu saldo acumula créditos proporcionais ao número de passageiros transportados.<br>
+          • <strong>Passageiros gastam créditos:</strong> Sempre que usufrues de uma boleia no carro de outro colega, o teu saldo é descontado proporcionalmente ao custo partilhado da rota.<br>
+          <em>Regra de ouro:</em> A pessoa que apresentar o balanço mais negativo (maior défice de créditos acumulados) é automaticamente sugerida pela app para conduzir na viagem seguinte, garantindo rotação justa.
+        </p>
+
+        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">2. Critérios de Desempate Inteligente</h4>
+        <p style="margin-bottom: 14px; line-height: 1.6; color: var(--text); text-align: justify;">
+          Se dois ou mais elementos registarem exatamente o mesmo saldo de créditos, a aplicação aplica critérios secundários em cascata:<br>
+          1. <strong>Rácio de Condução:</strong> É selecionado o elemento com menor rácio percentual entre viagens conduzidas e viagens totais efetuadas.<br>
+          2. <strong>Tempo de Inatividade:</strong> Em caso de persistência de igualdade, prioriza-se o membro que conduz há mais tempo (maior espaçamento temporal desde o seu último registo ao volante).
+        </p>
+
+        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">3. Parâmetros de Viagem e Custos</h4>
+        <p style="margin-bottom: 16px; line-height: 1.6; color: var(--text); text-align: justify;">
+          O sistema suporta configurações avançadas, tais como:<br>
+          • Gestão simultânea de um ou dois veículos por dia.<br>
+          • Divisão de custos personalizada ou partilhada entre carros.<br>
+          • Distâncias de referência automáticas com base na origem/destino (ex: Braga ou Vila Verde) e opções de trajetos de sentido único (*só ida*).
+        </p>
+        
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center;">
+          <p style="font-size: 11.5px; margin-bottom: 10px; color: var(--muted); white-space: nowrap;">Ainda com dúvidas sobre estes algoritmos complexos?</p>
+          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 13px;">> CLICA AQUI <</a>
+        </div>
       </div>
 
-      <button id="btn-force-backup" class="gh-btn outline" onclick="forceBackup()" style="border-style: dashed; color: var(--muted); margin-top: 16px; font-size: 12px; padding: 10px;">
+      <button id="btn-force-backup" class="gh-btn outline" onclick="forceBackup()" style="border-style: dashed; color: var(--muted); margin-top: 20px; font-size: 12px; padding: 10px;">
         Forçar Backup ☁️
       </button>
     </div>
@@ -630,7 +634,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           savingsSelectedMonth = `${selectedYear}-${monthSel.value}`;
        }
        
-       // Controlar botão avançar mês no limite atual
        const btnNextM = document.getElementById("btn-next-month");
        if(btnNextM) {
           const isAtCurrentMonth = (selectedYear === currentYear && parseInt(monthSel.value) === currentMonth);
@@ -786,12 +789,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           const deltaY = y - startY;
 
           if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
-             // Bloquear swipe para a frente (deltaX < 0 se for avanço) se for análise mensal no mês atual
              if(isMonthlySavingsNav && deltaX < 0) {
                  let [y, m] = savingsSelectedMonth.split('-');
                  let cur = new Date();
                  if(parseInt(y) === cur.getFullYear() && parseInt(m) === (cur.getMonth()+1)) {
-                     return; // Não deixa arrastar para o futuro
+                     return; 
                  }
              }
              currentX = Math.max(-120, Math.min(120, deltaX));
@@ -1225,8 +1227,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                     hasData = true;
                     let pEuros = (pKm / 100) * cons * price;
                     listHTML += `
-                    <div class="list-item" style="padding: 10px 0;">
-                        <div style="font-size: 13.5px; font-weight: 500;">${p}</div>
+                    <div class="list-item">
+                        <div class="balance-name">${p}</div>
                         <div style="text-align: right;">
                             <div style="font-size: 13.5px;"><span style="font-weight: 600; color: var(--text);">${pEuros.toFixed(2)} €</span> <span style="font-size: 10px; color: var(--muted); font-weight: 400;">poupados</span></div>
                             <div style="font-size: 10.5px; color: var(--muted);">${pKm} km à boleia</div>
@@ -1236,7 +1238,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             });
 
             if (!hasData) listHTML = `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
-            container.innerHTML = `<div class="list">${listHTML}</div>`;
+            container.innerHTML = `<ul class="list">${listHTML}</ul>`;
         } else {
             let [y, m] = savingsSelectedMonth.split('-');
             document.getElementById("savings-year-sel").value = y;
@@ -1254,18 +1256,18 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                              mTotalKm += km;
                              let euros = (km / 100) * cons * price;
                              html += `
-                             <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px;">
-                                 <div style="font-weight: 500; color: var(--text);">${p}</div>
+                             <li class="list-item">
+                                 <div class="balance-name">${p}</div>
                                  <div style="text-align: right;">
                                      <div><span style="font-weight: 600; color: var(--text);">${euros.toFixed(2)} €</span> <span style="font-size: 9.5px; color: var(--muted); font-weight: 400;">poupados</span></div>
                                      <div style="color: var(--muted); font-size: 10.5px;">${km} km à boleia</div>
                                  </div>
-                             </div>`;
+                             </li>`;
                          }
                      });
                  }
                  if(mTotalKm === 0) return `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px; width: 100%;">Nenhuma viagem registada neste mês.</div>`;
-                 return `<div class="list" style="width: 100%; padding: 0 4px;">${html}</div>`;
+                 return `<ul class="list">${html}</ul>`;
             };
 
             let prev = getOffsetMonth(savingsSelectedMonth, -1);
