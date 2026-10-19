@@ -335,7 +335,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             <button id="btn-view-monthly" class="gh-btn outline" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setSavingsView('monthly')">Análise Mensal</button>
          </div>
 
-         <!-- Drop-down temporal global (Altura forçada = 44px) -->
+         <!-- Drop-down temporal global -->
          <div id="calc-period-container" style="margin-bottom: 12px;">
             <select id="calc-period" class="input-text" style="height: 44px; padding: 0 12px; line-height: 42px;" onchange="updateSavings()">
                <option value="ALL">Desde Sempre</option>
@@ -346,7 +346,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             </select>
          </div>
 
-         <!-- Navegador Mensal de Poupança (Altura forçada = 44px, sem paddings externos) -->
+         <!-- Navegador Mensal de Poupança -->
          <div id="savings-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: transparent; padding: 0; border: none; height: 44px;">
             <button onclick="changeSavingsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;">◀</button>
             <div style="display:flex; gap:6px; align-items: center; flex: 1; margin: 0 6px; height: 44px;">
@@ -365,38 +365,39 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     <div id="tab-info" class="page tab-content" style="display: none;">
       <div class="eyebrow">Sobre o Sistema</div>
       <div class="card">
-        <h3 style="margin-bottom: 12px; color: var(--text);">Manual Operacional e Regras do Grupo</h3>
-        <p style="margin-bottom: 14px; color: var(--muted); line-height: 1.6; text-align: justify;">
-          Esta aplicação foi desenvolvida de raiz para automatizar e descentralizar a gestão de boleias partilhadas do grupo PEC (Ponte de Lima). O objetivo principal é garantir uma distribuição 100% transparente, equitativa e auditável dos custos de transporte, eliminando qualquer necessidade de contabilidade manual ou cálculos complexos em papel.
-        </p>
-
-        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">1. O Sistema de Balanços e Créditos (🪙)</h4>
-        <p style="margin-bottom: 14px; line-height: 1.6; color: var(--text); text-align: justify;">
-          O ecossistema funciona com base numa moeda virtual de compensação:<br>
-          • <strong>Condutores ganham créditos:</strong> Sempre que realizas uma viagem ao volante, o teu saldo acumula créditos proporcionais ao número de passageiros transportados.<br>
-          • <strong>Passageiros gastam créditos:</strong> Sempre que usufrues de uma boleia no carro de outro colega, o teu saldo é descontado proporcionalmente ao custo partilhado da rota.<br>
-          <em>Regra de ouro:</em> A pessoa que apresentar o balanço mais negativo (maior défice de créditos acumulados) é automaticamente sugerida pela app para conduzir na viagem seguinte, garantindo rotação justa.
-        </p>
-
-        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">2. Critérios de Desempate Inteligente</h4>
-        <p style="margin-bottom: 14px; line-height: 1.6; color: var(--text); text-align: justify;">
-          Se dois ou mais elementos registarem exatamente o mesmo saldo de créditos, a aplicação aplica critérios secundários em cascata:<br>
-          1. <strong>Rácio de Condução:</strong> É selecionado o elemento com menor rácio percentual entre viagens conduzidas e viagens totais efetuadas.<br>
-          2. <strong>Tempo de Inatividade:</strong> Em caso de persistência de igualdade, prioriza-se o membro que conduz há mais tempo (maior espaçamento temporal desde o seu último registo ao volante).
-        </p>
-
-        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">3. Parâmetros de Viagem e Custos</h4>
-        <p style="margin-bottom: 16px; line-height: 1.6; color: var(--text); text-align: justify;">
-          O sistema suporta configurações avançadas, tais como:<br>
-          • Gestão simultânea de um ou dois veículos por dia.<br>
-          • Divisão de custos personalizada ou partilhada entre carros.<br>
-          • Distâncias de referência automáticas com base na origem/destino (ex: Braga ou Vila Verde) e opções de trajetos de sentido único (*só ida*).
-        </p>
-        
-        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center;">
-          <p style="font-size: 11.5px; margin-bottom: 10px; color: var(--muted); white-space: nowrap;">Ainda com dúvidas sobre estes algoritmos complexos?</p>
-          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 13px;">> CLICA AQUI <</a>
+        <!-- Secção do Vídeo no Topo -->
+        <div style="text-align: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border);">
+          <p style="font-size: 13px; margin-bottom: 10px; color: var(--muted);">Para quê ler as instruções quando podes só ver um vídeo?</p>
+          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 14px;">> CLICA AQUI <</a>
         </div>
+
+        <h3 style="margin-bottom: 12px; color: var(--text);">Manual Operacional Técnico</h3>
+        <p style="margin-bottom: 14px; color: var(--muted); line-height: 1.6; text-align: justify;">
+          Esta aplicação automatiza a gestão e auditoria das boleias do grupo PEC (Ponte de Lima). Todos os custos de deslocação são representados no sistema através de "Moedas" (🪙), garantindo uma distribuição e rotação exata entre condutores.
+        </p>
+
+        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">1. Sistema Matemático de Créditos</h4>
+        <p style="margin-bottom: 14px; line-height: 1.6; color: var(--text); text-align: justify;">
+          A matemática base do sistema determina que o custo de uma viagem padrão equivale a <strong>1 + (0.5 × Nº de Passageiros)</strong>. Por exemplo, uma viagem com 1 condutor e 3 passageiros tem o custo total de 2.5 🪙.<br>
+          • <strong>Condutor (Credor):</strong> Recebe +2.5 🪙 no seu saldo global.<br>
+          • <strong>Passageiros (Devedores):</strong> Dividem o custo igualmente. Cada passageiro é descontado em -0.83 🪙.<br>
+          <em>Critério Primário:</em> O membro do grupo com o saldo mais baixo (mais negativo) assume automaticamente o dever de ser o próximo condutor sugerido.
+        </p>
+
+        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">2. Algoritmo de Desempate (Cascata)</h4>
+        <p style="margin-bottom: 14px; line-height: 1.6; color: var(--text); text-align: justify;">
+          Em situações de empate exato no saldo de créditos (🪙), o algoritmo utiliza sucessivos critérios para apurar a prioridade da condução:<br>
+          1. <strong>Rácio de Participação (%):</strong> Compara o volume total de vezes conduzidas sobre o total de viagens feitas (condutor + passageiro). O membro com o valor percentual mais reduzido conduz.<br>
+          2. <strong>Tempo de Latência:</strong> Caso o empate em rácio prevaleça, o sistema processa a data (timestamp) em que cada membro conduziu pela última vez. O que não conduz há mais tempo assume o volante.
+        </p>
+
+        <h4 style="font-size: 13px; margin-bottom: 6px; color: var(--accent);">3. Modos Multi-Carro</h4>
+        <p style="margin-bottom: 16px; line-height: 1.6; color: var(--text); text-align: justify;">
+          Em dias em que se atinge a capacidade máxima de um veículo (4 passageiros + 1 condutor), é ativado o 2º Carro. A gestão financeira do segundo veículo suporta duas vias distintas:<br>
+          • <strong>Custo Partilhado (Por defeito):</strong> Todos os custos de ambos os veículos são fundidos e repartidos igualmente por todos os passageiros de todos os carros.<br>
+          • <strong>Custo Separado:</strong> Cada veículo funciona de forma estanque. Os passageiros pagam exclusivamente as 🪙 relativas à lotação do seu próprio veículo.<br>
+          <em>Nota:</em> O modo "Só ida" corta todos os cálculos do custo inerente pela metade (0.5x).
+        </p>
       </div>
 
       <button id="btn-force-backup" class="gh-btn outline" onclick="forceBackup()" style="border-style: dashed; color: var(--muted); margin-top: 20px; font-size: 12px; padding: 10px;">
@@ -1196,18 +1197,15 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             }
         });
 
-        // CALCULAR VALORES A APRESENTAR NO QUADRO RESUMO GERAL
         let displayKm = 0;
         if (currentSavingsView === 'global') {
             displayKm = totalKmSaved;
         } else {
-            // Em modo mensal, forçar a atualização dos select boxes
             let [y, m] = savingsSelectedMonth.split('-');
             document.getElementById("savings-year-sel").value = y;
             updateSavingsMonthOptions();
             document.getElementById("savings-month-sel").value = m;
 
-            // Extrair KMs apenas do mês focado
             if (monthlySavingsData[savingsSelectedMonth]) {
                 Object.values(monthlySavingsData[savingsSelectedMonth]).forEach(d => {
                     displayKm += d.km;
@@ -1217,9 +1215,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
         const displayLiters = (displayKm / 100) * cons;
         const displayEuros = displayLiters * price;
-        const displayCO2Kg = displayLiters * 2.48; // 2.48 kg CO2 por litro
+        const displayCO2Kg = displayLiters * 2.48; 
         
-        const fmtEuros = displayEuros >= 1000 ? (displayEuros / 1000).toFixed(2) + ' k' : displayEuros.toFixed(0);
+        // Formatação Cêntimos apenas se inferior a 1k
+        const fmtEuros = displayEuros < 1000 ? displayEuros.toFixed(2) : displayEuros.toFixed(0);
+        
         let fmtCO2;
         if (displayCO2Kg >= 1000) {
             fmtCO2 = (displayCO2Kg / 1000).toFixed(2) + ' t';
@@ -1242,51 +1242,91 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
         if (currentSavingsView === 'global') {
             let sortedPeopleAlpha = [...PEOPLE].sort((a, b) => a.localeCompare(b, 'pt'));
-            let listHTML = "";
-            let hasData = false;
-            
+            let pData = [];
+            let maxVal = 0;
+
             sortedPeopleAlpha.forEach(p => {
-                let pKm = globalSavingsData[p].km;
-                if (pKm > 0) {
-                    hasData = true;
-                    let pEuros = (pKm / 100) * cons * price;
-                    listHTML += `
-                    <div class="list-item">
-                        <div class="balance-name">${p}</div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 13.5px;"><span style="font-weight: 600; color: var(--text);">${pEuros.toFixed(2)} €</span> <span style="font-size: 10px; color: var(--muted); font-weight: 400;">poupados</span></div>
-                            <div style="font-size: 10.5px; color: var(--muted);">${pKm} km à boleia</div>
-                        </div>
-                    </div>`;
+                let km = globalSavingsData[p].km;
+                if (km > 0) {
+                    let euros = (km / 100) * cons * price;
+                    if (euros > maxVal) maxVal = euros;
+                    pData.push({ name: p, km, euros });
                 }
             });
 
-            if (!hasData) listHTML = `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
-            container.innerHTML = `<ul class="list">${listHTML}</ul>`;
+            if (pData.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
+                return;
+            }
+
+            let chartHTML = `<div class="stats-chart" style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">`;
+            let listHTML = "";
+
+            pData.forEach(d => {
+                let pct = maxVal > 0 ? Math.round((d.euros / maxVal) * 100) : 0;
+                
+                chartHTML += `
+                <div class="chart-bar-row">
+                   <div class="chart-label" style="width: 60px;">${d.name}</div>
+                   <div class="chart-track"><div class="chart-fill" style="width: ${pct}%; background: var(--green);"></div></div>
+                   <div class="chart-val" style="width: auto; min-width: 50px; text-align: right;">${d.euros.toFixed(0)}€ <span style="font-size:9px; color:var(--muted); font-weight:500;">(${d.km}km)</span></div>
+                </div>`;
+
+                listHTML += `
+                <div class="list-item">
+                    <div class="balance-name">${d.name}</div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 13.5px;"><span style="font-weight: 600; color: var(--text);">${d.euros.toFixed(2)} €</span> <span style="font-size: 10px; color: var(--muted); font-weight: 400;">poupados</span></div>
+                        <div style="font-size: 10.5px; color: var(--muted);">${d.km} km à boleia</div>
+                    </div>
+                </div>`;
+            });
+            chartHTML += `</div>`;
+            container.innerHTML = chartHTML + `<ul class="list">${listHTML}</ul>`;
+
         } else {
             const buildMonthHTML = (mKey) => {
-                 let html = "";
-                 let mTotalKm = 0;
+                 let mData = [];
+                 let maxVal = 0;
+
                  if (monthlySavingsData[mKey]) {
                      let sorted = [...PEOPLE].sort((a,b) => a.localeCompare(b, 'pt'));
                      sorted.forEach(p => {
                          const km = monthlySavingsData[mKey][p].km;
                          if (km > 0) {
-                             mTotalKm += km;
                              let euros = (km / 100) * cons * price;
-                             html += `
-                             <li class="list-item">
-                                 <div class="balance-name">${p}</div>
-                                 <div style="text-align: right;">
-                                     <div style="font-size: 13.5px;"><span style="font-weight: 600; color: var(--text);">${euros.toFixed(2)} €</span> <span style="font-size: 10px; color: var(--muted); font-weight: 400;">poupados</span></div>
-                                     <div style="font-size: 10.5px; color: var(--muted);">${km} km à boleia</div>
-                                 </div>
-                             </li>`;
+                             if (euros > maxVal) maxVal = euros;
+                             mData.push({ name: p, km, euros });
                          }
                      });
                  }
-                 if(mTotalKm === 0) return `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px; width: 100%;">Nenhuma viagem registada neste mês.</div>`;
-                 return `<ul class="list">${html}</ul>`;
+
+                 if(mData.length === 0) return `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px; width: 100%;">Nenhuma viagem registada neste mês.</div>`;
+
+                 let chartStr = `<div class="stats-chart" style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">`;
+                 let listStr = "";
+
+                 mData.forEach(d => {
+                     let pct = maxVal > 0 ? Math.round((d.euros / maxVal) * 100) : 0;
+                     chartStr += `
+                     <div class="chart-bar-row">
+                        <div class="chart-label" style="width: 60px;">${d.name}</div>
+                        <div class="chart-track"><div class="chart-fill" style="width: ${pct}%; background: var(--green);"></div></div>
+                        <div class="chart-val" style="width: auto; min-width: 50px; text-align: right;">${d.euros.toFixed(0)}€ <span style="font-size:9px; color:var(--muted); font-weight:500;">(${d.km}km)</span></div>
+                     </div>`;
+
+                     listStr += `
+                     <li class="list-item">
+                         <div class="balance-name">${d.name}</div>
+                         <div style="text-align: right;">
+                             <div style="font-size: 13.5px;"><span style="font-weight: 600; color: var(--text);">${d.euros.toFixed(2)} €</span> <span style="font-size: 10px; color: var(--muted); font-weight: 400;">poupados</span></div>
+                             <div style="font-size: 10.5px; color: var(--muted);">${d.km} km à boleia</div>
+                         </div>
+                     </li>`;
+                 });
+                 chartStr += `</div>`;
+
+                 return chartStr + `<ul class="list">${listStr}</ul>`;
             };
 
             let prev = getOffsetMonth(savingsSelectedMonth, -1);
