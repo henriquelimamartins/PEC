@@ -346,12 +346,12 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             </select>
          </div>
 
-         <!-- Navegador Mensal de Poupança (Com altura e paddings idênticos ao select único) -->
-         <div id="savings-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: transparent; padding: 0; border: none;">
+         <!-- Navegador Mensal de Poupança (Com altura exata, sem margens ou paddings externos no container) -->
+         <div id="savings-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: transparent; padding: 0; border: none; height: 42px;">
             <button onclick="changeSavingsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 42px; border-color:var(--border); background: #010409;">◀</button>
-            <div style="display:flex; gap:6px; align-items: center; flex: 1; margin: 0 6px;">
-               <select id="savings-year-sel" onchange="onSavingsYearChange()" class="input-text" style="padding: 10px 28px 10px 10px; font-size:14px; height: 42px; flex: 1;"></select>
-               <select id="savings-month-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 10px 28px 10px 10px; font-size:14px; height: 42px; flex: 1.5;"></select>
+            <div style="display:flex; gap:6px; align-items: center; flex: 1; margin: 0 6px; height: 42px;">
+               <select id="savings-year-sel" onchange="onSavingsYearChange()" class="input-text" style="padding: 0 28px 0 10px; font-size:14px; height: 42px; flex: 1; line-height: 40px;"></select>
+               <select id="savings-month-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 0 28px 0 10px; font-size:14px; height: 42px; flex: 1.5; line-height: 40px;"></select>
             </div>
             <button onclick="changeSavingsMonth(1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 42px; border-color:var(--border); background: #010409;" id="btn-next-month">▶</button>
          </div>
