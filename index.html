@@ -202,9 +202,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
 .summary-panel { background: var(--card2); padding: 14px; border-radius: 6px; border: 1px solid var(--border); border-left: 3px solid var(--accent); font-size: 13px; color: var(--text); margin-bottom: 16px; line-height: 1.5; }
 
-/* Botnav com espaçamento perfeitamente uniforme */
-.botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; }
-.botnav button { flex: 1; min-width: 0; background: none; border: none; color: var(--muted); font-size: 9px; font-weight: 500; text-transform: uppercase; padding: 4px 0; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; }
+/* Botnav com espaçamento rigorosamente consistente em proporção aos títulos das tabs */
+.botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; justify-content: space-around; }
+.botnav button { flex: 1; max-width: 20%; min-width: 0; background: none; border: none; color: var(--muted); font-size: 9px; font-weight: 500; text-transform: uppercase; padding: 4px 0; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; }
 .botnav button .ic { font-size: 17px; }
 .botnav button.active { color: var(--accent); }
 
@@ -304,16 +304,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     <div id="tab-savings" class="page tab-content" style="display: none;">
       <div class="eyebrow">Poupança e Impacto</div>
       
-      <div id="calc-period-container" style="margin-bottom: 16px;">
-         <select id="calc-period" class="input-text" onchange="updateSavings()">
-            <option value="ALL">Desde Sempre</option>
-            <option value="30">Últimos 30 dias</option>
-            <option value="90">Últimos 90 dias</option>
-            <option value="180">Últimos 180 dias</option>
-            <option value="365">Últimos 365 dias</option>
-         </select>
-      </div>
-
       <div class="card">
          <div style="background: var(--card2); padding: 12px; border-radius: 6px; margin-bottom: 16px;">
             <div style="display: flex; gap: 8px; margin-bottom: 6px;">
@@ -340,6 +330,17 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
             <button id="btn-view-global" class="gh-btn primary" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setSavingsView('global')">Resumo Global</button>
             <button id="btn-view-monthly" class="gh-btn outline" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setSavingsView('monthly')">Análise Mensal</button>
+         </div>
+
+         <!-- Drop-down temporal global (Abaixo do selector Resumo Global/Análise Mensal) -->
+         <div id="calc-period-container" style="margin-bottom: 12px;">
+            <select id="calc-period" class="input-text" onchange="updateSavings()">
+               <option value="ALL">Desde Sempre</option>
+               <option value="30">Últimos 30 dias</option>
+               <option value="90">Últimos 90 dias</option>
+               <option value="180">Últimos 180 dias</option>
+               <option value="365">Últimos 365 dias</option>
+            </select>
          </div>
 
          <!-- Navegador Mensal de Poupança (Ano à esquerda, Mês à direita) -->
@@ -550,7 +551,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     let currentHistoryFilter = "ALL"; 
     
     let currentSavingsView = "global";
-    let savingsSelectedMonth = todayISO.substring(0, 7); 
+    let savingsSelectedMonth = todayISO.substring(0, 7); // Default ao mês/ano presente
     
     let formDate = todayISO;
     let selectedCars = 1;
@@ -582,6 +583,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           htmlY += `<option value="${y}">${y}</option>`;
        }
        yearSel.innerHTML = htmlY;
+       yearSel.value = new Date().getFullYear();
     }
 
     function updateSavingsMonthOptions() {
@@ -605,7 +607,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
        let [currY, currM] = savingsSelectedMonth.split('-');
        if(parseInt(currY) === selectedYear) {
-          // Garantir que o mês selecionado ainda é válido para o ano escolhido
           let options = Array.from(monthSel.options).map(o => o.value);
           if(options.includes(currM)) {
              monthSel.value = currM;
@@ -614,7 +615,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
              savingsSelectedMonth = `${selectedYear}-${monthSel.value}`;
           }
        } else {
-          monthSel.value = String(startMonth).padStart(2,'0');
+          monthSel.value = String(endMonth).padStart(2,'0');
           savingsSelectedMonth = `${selectedYear}-${monthSel.value}`;
        }
     }
@@ -622,8 +623,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     window.onSavingsYearChange = function() {
        const yearSel = document.getElementById("savings-year-sel");
        const monthSel = document.getElementById("savings-month-sel");
-       savingsSelectedMonth = `${yearSel.value}-${monthSel.value}`;
        updateSavingsMonthOptions();
+       savingsSelectedMonth = `${yearSel.value}-${monthSel.value}`;
        updateSavings();
     }
 
@@ -807,7 +808,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     }
 
     function initApp() {
-      // Carregar Cache da Poupança
       document.getElementById('calc-cons').value = localStorage.getItem('pec_cons') || '5.0';
       document.getElementById('calc-price').value = localStorage.getItem('pec_price') || '2.00';
       
@@ -1085,7 +1085,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        let currentYear = new Date().getFullYear();
        let currentMonth = new Date().getMonth() + 1;
 
-       // Validação de limites (não ultrapassar hoje nem ir antes de Nov 2025)
        if (targetYear === 2025 && targetMonth < 11) return;
        if (targetYear > currentYear || (targetYear === currentYear && targetMonth > currentMonth)) return;
 
@@ -1122,7 +1121,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         const cons = parseFloat(document.getElementById('calc-cons').value) || 0;
         const price = parseFloat(document.getElementById('calc-price').value) || 0;
         
-        // Guardar Cache (User)
         localStorage.setItem('pec_cons', cons);
         localStorage.setItem('pec_price', price);
 
@@ -1174,7 +1172,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
         const totalLiters = (totalKmSaved / 100) * cons;
         const totalEuros = totalLiters * price;
-        const avgCO2Multiplier = 2.48; // Média padrão combustível
+        const avgCO2Multiplier = 2.48; 
         const totalCO2Tonnes = (totalLiters * avgCO2Multiplier) / 1000;
         
         const fmtEuros = totalEuros >= 1000 ? (totalEuros / 1000).toFixed(2) + 'k' : totalEuros.toFixed(2);
@@ -1917,4 +1915,3 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
   </script>
 </body>
 </html>
-
