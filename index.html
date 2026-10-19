@@ -899,13 +899,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       
       let enteredHash = null;
       try {
-         // Se o browser não deixar usar crypto (por ex: HTTP local), isto vai falhar, mas o catch apanha o erro.
          enteredHash = await hashString(pwd);
       } catch(e) {
          console.warn("Crypto bloqueado pelo browser. A validar como texto...");
       }
 
-      // Valida o hash (se disponível) ou testa a password crua
       if (enteredHash === targetHash || pwd === "pec2026") {
         localStorage.setItem("pec_auth", "true");
         document.getElementById("login-screen").style.display = "none";
@@ -1387,7 +1385,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                <div class="chart-track" style="flex: 1;"><div class="chart-fill" style="width: ${pct}%; background: ${color};"></div></div>
                <div class="chart-val" style="width: 125px; flex-shrink: 0; display: flex; justify-content: flex-start; align-items: center; gap: 4px; font-size: 11px; white-space: nowrap;">
                   <span style="width: 58px; text-align: left; font-weight: 600; color: var(--text);">${fmtMoney(d.euros)} €</span>
-                  <span style="width: 58px; text-align: right; font-size: 9.5px; color: var(--muted); font-weight: 500;">(${d.km} km)</span>
+                  <span style="width: 58px; text-align: right; font-size: 9.5px; color: var(--muted); font-weight: 500;">/ ${d.km} km</span>
                </div>
             </div>`;
         });
@@ -1519,16 +1517,16 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
         document.getElementById('savings-global-results').innerHTML = `
             <div style="text-align: center; flex: 1; border-right: 1px solid var(--border); padding: 0 2px;">
-               <span style="font-size: 18px; font-weight: 700; color: var(--green);">${fmtEuros} €</span><br>
-               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Poupança Total</span>
+               <span style="font-size: 18px; font-weight: 700; color: var(--accent);">${fmtLiters}</span><br>
+               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Comb. Poupado</span>
             </div>
             <div style="text-align: center; flex: 1; border-right: 1px solid var(--border); padding: 0 2px;">
-               <span style="font-size: 18px; font-weight: 700; color: var(--text);">${fmtLiters}</span><br>
-               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Litros Poupados</span>
+               <span style="font-size: 18px; font-weight: 700; color: var(--text);">${fmtCO2}</span><br>
+               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">CO2 Evitado</span>
             </div>
             <div style="text-align: center; flex: 1; padding: 0 2px;">
-               <span style="font-size: 18px; font-weight: 700; color: var(--accent);">${fmtCO2}</span><br>
-               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">CO2 Evitado</span>
+               <span style="font-size: 18px; font-weight: 700; color: var(--green);">${fmtEuros} €</span><br>
+               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Poupança Total</span>
             </div>
         `;
 
@@ -1537,9 +1535,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             const numArvores = Math.floor(displayCO2Kg / 22); 
             if (displayCO2Kg >= 1000) {
                 const co2Tons = (displayCO2Kg / 1000).toFixed(1);
-                treeCounterDiv.innerHTML = `🌲 <b>Impressionante!</b> ${co2Tons} t de CO₂ evitadas correspondem a uma plantação de <b>${numArvores} árvores adultas</b>!`;
+                treeCounterDiv.innerHTML = `🌲 <b>Impressionante!</b> ${co2Tons} t de CO₂ correspondem a uma plantação de <b>${numArvores} árvores adultas</b>!`;
             } else if (displayCO2Kg >= 22) {
-                treeCounterDiv.innerHTML = `🌳 <b>Fantástico!</b> ${Math.floor(displayCO2Kg)} kg de CO₂ evitados equivalem ao trabalho de <b>${numArvores} árvores adultas</b> durante 1 ano!`;
+                treeCounterDiv.innerHTML = `🌳 <b>Fantástico!</b> ${Math.floor(displayCO2Kg)} kg de CO₂ equivalem ao trabalho de <b>${numArvores} árvores adultas</b> durante 1 ano!`;
             } else {
                 treeCounterDiv.innerHTML = `🌱 Cada viagem conta! Estão no bom caminho para "plantar" a vossa primeira árvore (aos 22 kg de CO₂)!`;
             }
