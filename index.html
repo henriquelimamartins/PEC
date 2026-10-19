@@ -205,9 +205,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 /* Altura fixa e idêntica garantida para a área de conteúdo da poupança */
 #savings-content-area { min-height: 380px; }
 
-/* Barra inferior otimizada com espaçamento rigoroso e idêntico entre os limites das palavras */
-.botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; justify-content: space-evenly; }
-.botnav button { flex: 1; max-width: 72px; min-width: 0; background: none; border: none; color: var(--muted); font-size: 9px; font-weight: 500; text-transform: uppercase; padding: 4px 0; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; text-align: center; }
+/* Barra inferior com espaçamento dictado pela largura natural das palavras (space-between) */
+.botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; justify-content: space-between; }
+.botnav button { flex: 0 1 auto; min-width: 0; background: none; border: none; color: var(--muted); font-size: 9px; font-weight: 500; text-transform: uppercase; padding: 4px 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; text-align: center; }
 .botnav button .ic { font-size: 17px; }
 .botnav button.active { color: var(--accent); }
 
@@ -395,6 +395,17 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       </div>
 
       <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px;">
+         <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px;"><span>🚗</span> Modos Multi-Carro</h4>
+         <p style="color: var(--muted); font-size: 12px; margin-bottom: 10px; line-height: 1.5;">Quando é preciso ativar o 2º carro, a matemática suporta duas vias:</p>
+         <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5;">
+            <li style="margin-bottom: 6px;"><strong style="color: var(--text);">Custo Partilhado:</strong> Os custos de ambos os veículos são fundidos e repartidos de igual forma por todos os passageiros.</li>
+            <li style="margin-bottom: 6px;"><strong style="color: var(--text);">Custo Separado:</strong> Cada veículo funciona de forma estanque. Pagas apenas a lotação do teu carro.</li>
+            <li><strong style="color: var(--text);">Só Ida:</strong> Corta os custos exatos do respetivo carro pela metade (0.5x).</li>
+         </ul>
+      </div>
+
+      <!-- Bloco de Cálculo da Poupança movido para depois do Multi-Carro -->
+      <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px;">
          <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px;"><span>🌱</span> Cálculo da Poupança</h4>
          <p style="color: var(--muted); font-size: 12px; margin-bottom: 10px; line-height: 1.5;">
             A poupança reflete o dinheiro e combustível que cada passageiro poupa ao viajar à boleia em vez de conduzir sozinho:
@@ -403,16 +414,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             <li style="margin-bottom: 6px;"><strong>Distância Base:</strong> Considera automaticamente 29 km (se todos forem do grupo de Braga) ou 26 km (Vila Verde). O valor é duplicado para viagens de ida e volta.</li>
             <li style="margin-bottom: 6px;"><strong>Conversão Monetária:</strong> Baseia-se nos litros por 100 km e no preço por litro definidos pelo utilizador.</li>
             <li><strong>CO2 Evitado:</strong> Calculado com base num fator de emissão padrão de 2.48 kg de CO2 por litro de combustível queimado.</li>
-         </ul>
-      </div>
-
-      <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
-         <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px;"><span>🚗</span> Modos Multi-Carro</h4>
-         <p style="color: var(--muted); font-size: 12px; margin-bottom: 10px; line-height: 1.5;">Quando é preciso ativar o 2º carro, a matemática suporta duas vias:</p>
-         <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5;">
-            <li style="margin-bottom: 6px;"><strong style="color: var(--text);">Custo Partilhado:</strong> Os custos de ambos os veículos são fundidos e repartidos de igual forma por todos os passageiros.</li>
-            <li style="margin-bottom: 6px;"><strong style="color: var(--text);">Custo Separado:</strong> Cada veículo funciona de forma estanque. Pagas apenas a lotação do teu carro.</li>
-            <li><strong style="color: var(--text);">Só Ida:</strong> Corta os custos exatos do respetivo carro pela metade (0.5x).</li>
          </ul>
       </div>
 
@@ -1194,7 +1195,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                 <div style="text-align: right;">
                     <div style="font-size: 13.5px;"><span style="font-weight: 600; color: var(--text);">${fmtMoney(d.euros)} €</span> <span style="font-size: 10px; color: var(--muted); font-weight: 400;">poupados</span></div>
                     <div style="font-size: 10.5px; color: var(--muted);">${d.km} km à boleia</div>
-                    <div style="font-size: 9.5px; color: var(--accent); margin-top: 1px;">Média mensal: ${fmtMoney(monthlyEur)} € / ${fmtMoney(monthlyKm)} km</div>
+                    <div style="font-size: 9.5px; color: var(--green); margin-top: 1px;">Média mensal: ${fmtMoney(monthlyEur)} € / ${fmtMoney(monthlyKm)} km</div>
                 </div>
             </li>`;
         });
@@ -1276,7 +1277,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         const displayEuros = displayLiters * price;
         const displayCO2Kg = displayLiters * 2.48; 
         
-        // Espaço adicionado e cêntimos inteligentes no 'k'
         const fmtEuros = displayEuros >= 1000 ? parseFloat((displayEuros / 1000).toFixed(2)) + ' k' : fmtMoney(displayEuros);
         
         let fmtCO2;
