@@ -327,7 +327,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          </div>
 
          <!-- Resultados Globais da Calculadora -->
-         <div id="savings-global-results" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: #010409; padding: 16px; border-radius: 6px; border: 1px solid var(--border);">
+         <div id="savings-global-results" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: #010409; padding: 16px 8px; border-radius: 6px; border: 1px solid var(--border);">
          </div>
 
          <!-- Modos de Visualização: Resumo Global vs Mensal -->
@@ -366,14 +366,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       
       <div style="text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
         <p style="font-size: 13px; margin-bottom: 6px; color: var(--muted); text-align: center;">Para quê ler isto tudo?</p>
-        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 14px;">> CLICA AQUI <</a>
+        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 14px;">> VÊ O VÍDEO <</a>
       </div>
 
       <div class="eyebrow" style="margin-bottom: 12px;">Manual Operacional Técnico</div>
 
       <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px;">
          <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px;"><span>🧮</span> Sistema de Créditos</h4>
-         <p style="color: var(--text); font-size: 12.5px; margin-bottom: 8px;">O custo de uma viagem padrão equivale sempre a:<br><strong>1 + (0.5 × Nº de Passageiros)</strong></p>
+         <p style="color: var(--text); font-size: 12.5px; margin-bottom: 8px;">O custo de uma viagem padrão equivale sempre a<br><strong>1 + (0.5 × Nº de Passageiros)</strong></p>
          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0 0 12px 0; line-height: 1.5; text-align: justify;">
             <li><strong style="color: var(--green);">Condutor:</strong> Recebe a totalidade (+2.5 🪙).</li>
             <li><strong style="color: var(--danger);">Passageiros:</strong> Dividem o custo (-0.83 🪙 cada).</li>
@@ -1217,7 +1217,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           const pTra = Math.round((d.passCount / maxVal) * 100);
 
           barsHtml += `<div style="margin-bottom: 12px; background: var(--card2); padding: 8px; border-radius: 6px; border: 1px solid var(--border);">
-             <div style="font-size: 12px; font-weight:600; color:var(--text); margin-bottom:6px; text-align: left;">${d.name}</div>
+             <div style="font-size: 12px; font-weight:600; color:var(--text); margin-bottom:6px; width: 65px; text-align: right;">${d.name}</div>
              
              <div class="chart-bar-row" style="margin-bottom:3px;">
                 <div class="chart-label" style="font-size:9px;">Total Viagens</div>
@@ -1491,6 +1491,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         
         const fmtEuros = displayEuros >= 1000 ? parseFloat((displayEuros / 1000).toFixed(2)) + ' k' : fmtMoney(displayEuros);
         
+        let fmtLiters;
+        if (displayLiters >= 1000) {
+            fmtLiters = parseFloat((displayLiters / 1000).toFixed(2)) + ' kL';
+        } else {
+            fmtLiters = fmtMoney(displayLiters) + ' L';
+        }
+
         let fmtCO2;
         if (displayCO2Kg >= 1000) {
             fmtCO2 = parseFloat((displayCO2Kg / 1000).toFixed(2)) + ' t';
@@ -1499,13 +1506,17 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         }
 
         document.getElementById('savings-global-results').innerHTML = `
-            <div style="text-align: center; flex: 1; border-right: 1px solid var(--border);">
-               <span style="font-size: 22px; color: var(--green);">${fmtEuros} €</span><br>
-               <span style="font-size: 10px; color: var(--muted); text-transform: uppercase;">Poupança Total</span>
+            <div style="text-align: center; flex: 1; border-right: 1px solid var(--border); padding: 0 2px;">
+               <span style="font-size: 18px; font-weight: 700; color: var(--green);">${fmtEuros} €</span><br>
+               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Poupança Total</span>
             </div>
-            <div style="text-align: center; flex: 1;">
-               <span style="font-size: 22px; color: var(--accent);">${fmtCO2}</span><br>
-               <span style="font-size: 10px; color: var(--muted); text-transform: uppercase;">CO2 Evitado</span>
+            <div style="text-align: center; flex: 1; border-right: 1px solid var(--border); padding: 0 2px;">
+               <span style="font-size: 18px; font-weight: 700; color: var(--text);">${fmtLiters}</span><br>
+               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Litros Poupados</span>
+            </div>
+            <div style="text-align: center; flex: 1; padding: 0 2px;">
+               <span style="font-size: 18px; font-weight: 700; color: var(--accent);">${fmtCO2}</span><br>
+               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">CO2 Evitado</span>
             </div>
         `;
 
