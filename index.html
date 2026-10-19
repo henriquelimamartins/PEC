@@ -324,7 +324,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             </p>
          </div>
 
-         <!-- Resultados Globais da Calculadora -->
+         <!-- Resultados Globais da Calculadora (Atualizado Dinamicamente) -->
          <div id="savings-global-results" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: #010409; padding: 16px; border-radius: 6px; border: 1px solid var(--border);">
             <!-- Renderizado via JS -->
          </div>
@@ -335,9 +335,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             <button id="btn-view-monthly" class="gh-btn outline" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setSavingsView('monthly')">Análise Mensal</button>
          </div>
 
-         <!-- Drop-down temporal global -->
+         <!-- Drop-down temporal global (Altura forçada = 44px) -->
          <div id="calc-period-container" style="margin-bottom: 12px;">
-            <select id="calc-period" class="input-text" onchange="updateSavings()">
+            <select id="calc-period" class="input-text" style="height: 44px; padding: 0 12px; line-height: 42px;" onchange="updateSavings()">
                <option value="ALL">Desde Sempre</option>
                <option value="30">Últimos 30 dias</option>
                <option value="90">Últimos 90 dias</option>
@@ -346,14 +346,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             </select>
          </div>
 
-         <!-- Navegador Mensal de Poupança (Com altura exata, sem margens ou paddings externos no container) -->
-         <div id="savings-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: transparent; padding: 0; border: none; height: 42px;">
-            <button onclick="changeSavingsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 42px; border-color:var(--border); background: #010409;">◀</button>
-            <div style="display:flex; gap:6px; align-items: center; flex: 1; margin: 0 6px; height: 42px;">
-               <select id="savings-year-sel" onchange="onSavingsYearChange()" class="input-text" style="padding: 0 28px 0 10px; font-size:14px; height: 42px; flex: 1; line-height: 40px;"></select>
-               <select id="savings-month-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 0 28px 0 10px; font-size:14px; height: 42px; flex: 1.5; line-height: 40px;"></select>
+         <!-- Navegador Mensal de Poupança (Altura forçada = 44px, sem paddings externos) -->
+         <div id="savings-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: transparent; padding: 0; border: none; height: 44px;">
+            <button onclick="changeSavingsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;">◀</button>
+            <div style="display:flex; gap:6px; align-items: center; flex: 1; margin: 0 6px; height: 44px;">
+               <select id="savings-year-sel" onchange="onSavingsYearChange()" class="input-text" style="padding: 0 28px 0 10px; font-size:14px; height: 44px; flex: 1; line-height: 42px;"></select>
+               <select id="savings-month-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 0 28px 0 10px; font-size:14px; height: 44px; flex: 1.5; line-height: 42px;"></select>
             </div>
-            <button onclick="changeSavingsMonth(1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 42px; border-color:var(--border); background: #010409;" id="btn-next-month">▶</button>
+            <button onclick="changeSavingsMonth(1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;" id="btn-next-month">▶</button>
          </div>
 
          <!-- Área de conteúdo com largura e altura padronizadas -->
@@ -1196,12 +1196,36 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             }
         });
 
-        const totalLiters = (totalKmSaved / 100) * cons;
-        const totalEuros = totalLiters * price;
-        const avgCO2Multiplier = 2.48; 
-        const totalCO2Tonnes = (totalLiters * avgCO2Multiplier) / 1000;
+        // CALCULAR VALORES A APRESENTAR NO QUADRO RESUMO GERAL
+        let displayKm = 0;
+        if (currentSavingsView === 'global') {
+            displayKm = totalKmSaved;
+        } else {
+            // Em modo mensal, forçar a atualização dos select boxes
+            let [y, m] = savingsSelectedMonth.split('-');
+            document.getElementById("savings-year-sel").value = y;
+            updateSavingsMonthOptions();
+            document.getElementById("savings-month-sel").value = m;
+
+            // Extrair KMs apenas do mês focado
+            if (monthlySavingsData[savingsSelectedMonth]) {
+                Object.values(monthlySavingsData[savingsSelectedMonth]).forEach(d => {
+                    displayKm += d.km;
+                });
+            }
+        }
+
+        const displayLiters = (displayKm / 100) * cons;
+        const displayEuros = displayLiters * price;
+        const displayCO2Kg = displayLiters * 2.48; // 2.48 kg CO2 por litro
         
-        const fmtEuros = totalEuros >= 1000 ? (totalEuros / 1000).toFixed(2) + ' k' : totalEuros.toFixed(0);
+        const fmtEuros = displayEuros >= 1000 ? (displayEuros / 1000).toFixed(2) + ' k' : displayEuros.toFixed(0);
+        let fmtCO2;
+        if (displayCO2Kg >= 1000) {
+            fmtCO2 = (displayCO2Kg / 1000).toFixed(2) + ' t';
+        } else {
+            fmtCO2 = displayCO2Kg.toFixed(1) + ' kg';
+        }
 
         document.getElementById('savings-global-results').innerHTML = `
             <div style="text-align: center; flex: 1; border-right: 1px solid var(--border);">
@@ -1209,7 +1233,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                <span style="font-size: 10px; color: var(--muted); text-transform: uppercase;">Poupança Total</span>
             </div>
             <div style="text-align: center; flex: 1;">
-               <span style="font-size: 22px; color: var(--accent);">${totalCO2Tonnes.toFixed(2)} t</span><br>
+               <span style="font-size: 22px; color: var(--accent);">${fmtCO2}</span><br>
                <span style="font-size: 10px; color: var(--muted); text-transform: uppercase;">CO2 Evitado</span>
             </div>
         `;
@@ -1240,11 +1264,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             if (!hasData) listHTML = `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
             container.innerHTML = `<ul class="list">${listHTML}</ul>`;
         } else {
-            let [y, m] = savingsSelectedMonth.split('-');
-            document.getElementById("savings-year-sel").value = y;
-            updateSavingsMonthOptions();
-            document.getElementById("savings-month-sel").value = m;
-
             const buildMonthHTML = (mKey) => {
                  let html = "";
                  let mTotalKm = 0;
