@@ -298,6 +298,44 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         <div class="stats-section-title">Métricas de Participação (Nº de Vezes)</div>
         <div id="stats-bars-chart" class="stats-chart" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;"></div>
       </div>
+
+      <!-- SECÇÃO: CALCULADORA DE POUPANÇA -->
+      <div class="card" style="margin-top: 16px;">
+         <h3 style="margin-bottom: 12px;">Poupança e Impacto 🌍</h3>
+         
+         <div style="background: var(--card2); padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+               <div style="flex: 1;">
+                  <label style="font-size: 10px; color: var(--muted); display: block; margin-bottom: 4px;">Combustível</label>
+                  <select id="calc-fuel" class="input-text" style="padding: 8px; font-size: 12px; background-position: right 8px center;" onchange="updateSavings()">
+                     <option value="gasoleo">Gasóleo</option>
+                     <option value="gasolina">Gasolina</option>
+                  </select>
+               </div>
+               <div style="flex: 1;">
+                  <label style="font-size: 10px; color: var(--muted); display: block; margin-bottom: 4px;">L/100km</label>
+                  <input type="number" id="calc-cons" class="input-text" value="6.0" step="0.1" style="padding: 8px; font-size: 12px;" oninput="updateSavings()">
+               </div>
+               <div style="flex: 1;">
+                  <label style="font-size: 10px; color: var(--muted); display: block; margin-bottom: 4px;">Preço (€/L)</label>
+                  <input type="number" id="calc-price" class="input-text" value="1.65" step="0.01" style="padding: 8px; font-size: 12px;" oninput="updateSavings()">
+               </div>
+            </div>
+            <p style="font-size: 10.5px; text-align: center; color: var(--muted); margin-top: 6px; line-height: 1.4;">
+               Cálculo automático: 29km (Braga) ou 26km (Vila Verde). O dobro caso não seja "só ida".
+            </p>
+         </div>
+
+         <!-- Resultados Globais da Calculadora -->
+         <div id="savings-global-results" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: #010409; padding: 16px; border-radius: 6px; border: 1px solid var(--border);">
+            <!-- Renderizado via JS -->
+         </div>
+
+         <!-- Lista de poupança por pessoa -->
+         <div id="savings-per-person-list" class="list">
+            <!-- Renderizado via JS -->
+         </div>
+      </div>
     </div>
     
     <!-- TAB 4: INFO -->
@@ -473,6 +511,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     const PEOPLE = ["Ana", "André", "Henrique", "Joana", "João", "Luciano", "Luís", "Mariana"];
     const FEMALES = ["Ana", "Joana", "Mariana"];
+    const BRAGA_GROUP = ["Ana", "Henrique", "João", "Joana", "Mariana"];
     const INITIALS = { "Ana": "AC", "Luciano": "LF", "Luís": "LA", "André": "AS", "Henrique": "HL", "Joana": "JF", "João": "JC", "Mariana": "MB" };
     const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
     const shortMonths = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
@@ -837,6 +876,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           });
        }
        
+       window.currentFilteredTrips = filteredTrips;
+       
        document.getElementById('stats-total-trips').innerText = filteredTrips.length;
        
        let statsData = [];
@@ -932,7 +973,94 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           </div>`;
        });
        barsContainer.innerHTML = barsHtml;
+       
+       updateSavings();
     }
+
+    window.updateSavings = function() {
+        const fuelType = document.getElementById('calc-fuel').value;
+        const cons = parseFloat(document.getElementById('calc-cons').value) || 0;
+        const price = parseFloat(document.getElementById('calc-price').value) || 0;
+        
+        const co2Multiplier = fuelType === 'gasoleo' ? 2.64 : 2.31;
+        let tripsData = window.currentFilteredTrips || trips;
+
+        let savingsData = {};
+        PEOPLE.forEach(p => savingsData[p] = { km: 0, tripsAsPass: 0 });
+        let totalKmSaved = 0;
+
+        tripsData.forEach(trip => {
+            const processCar = (car) => {
+                if (!car || !car.driver || !car.passengers || car.passengers.length === 0) return;
+                
+                const allOccupants = [car.driver, ...car.passengers];
+                const onlyBraga = allOccupants.every(p => BRAGA_GROUP.includes(p));
+                
+                const baseDist = onlyBraga ? 29 : 26;
+                const finalDist = car.isOneWay ? baseDist : (baseDist * 2);
+
+                car.passengers.forEach(p => {
+                    if(savingsData[p]) {
+                       savingsData[p].km += finalDist;
+                       savingsData[p].tripsAsPass += 1;
+                       totalKmSaved += finalDist;
+                    }
+                });
+            };
+
+            if (trip.cars === 2 && trip.car1 && trip.car2) {
+                processCar(trip.car1);
+                processCar(trip.car2);
+            } else {
+                let carInfo = trip.car1 ? trip.car1 : { 
+                    driver: trip.drivers ? trip.drivers[0] : null, 
+                    passengers: trip.passengers || [], 
+                    isOneWay: trip.isOneWay || false 
+                };
+                processCar(carInfo);
+            }
+        });
+
+        const totalLiters = (totalKmSaved / 100) * cons;
+        const totalEuros = totalLiters * price;
+        const totalCO2 = totalLiters * co2Multiplier;
+
+        document.getElementById('savings-global-results').innerHTML = `
+            <div style="text-align: center; flex: 1; border-right: 1px solid var(--border);">
+               <span style="font-size: 22px; color: var(--green);">${totalEuros.toFixed(2)} €</span><br>
+               <span style="font-size: 10px; color: var(--muted); text-transform: uppercase;">Poupados pelo Grupo</span>
+            </div>
+            <div style="text-align: center; flex: 1;">
+               <span style="font-size: 22px; color: var(--accent);">${totalCO2.toFixed(1)} kg</span><br>
+               <span style="font-size: 10px; color: var(--muted); text-transform: uppercase;">CO2 Evitado</span>
+            </div>
+        `;
+
+        let sortedSavings = PEOPLE.map(p => {
+            let pKm = savingsData[p].km;
+            let pLiters = (pKm / 100) * cons;
+            let pEuros = pLiters * price;
+            return { name: p, euros: pEuros, km: pKm };
+        }).filter(s => s.km > 0).sort((a, b) => b.euros - a.euros);
+
+        let listHTML = "";
+        sortedSavings.forEach(s => {
+            listHTML += `
+            <div class="list-item" style="padding: 10px 0;">
+                <div style="font-size: 13.5px; font-weight: 500;">${s.name}</div>
+                <div style="text-align: right;">
+                    <div style="font-size: 13.5px; font-weight: 600; color: var(--text);">${s.euros.toFixed(2)} €</div>
+                    <div style="font-size: 10.5px; color: var(--muted);">${s.km} km não conduzidos</div>
+                </div>
+            </div>`;
+        });
+        
+        if (sortedSavings.length === 0) {
+            listHTML = `<div style="text-align:center; padding: 20px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
+        }
+        
+        document.getElementById('savings-per-person-list').innerHTML = listHTML;
+    };
 
     window.applyHistoryFilter = function() {
        currentHistoryFilter = document.getElementById("history-filter").value;
@@ -1201,7 +1329,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           const passAlfab = [...trip.passengers].sort((a,b) => a.localeCompare(b)).join(", ");
           const typeLabel = (trip.cars === 2 ? 'Viagem 2 Carros' : 'Viagem Normal') + (trip.splitCostMode ? ' (Separados)' : '');
           
-          // Lógica para mostrar o custo por passageiro (com suporte a custos variáveis caso haja separação de carros)
           let costPassStr = "0 🪙";
           if (trip.passengerCosts && trip.passengers.length > 0) {
               let pCosts = trip.passengers.map(p => trip.passengerCosts[p]).filter(c => c !== undefined);
