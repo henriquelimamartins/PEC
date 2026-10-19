@@ -143,7 +143,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .chart-label { width: 65px; color: var(--muted); font-weight: 500; text-align: right; flex-shrink: 0; }
 .chart-track { flex: 1; background: var(--card2); height: 10px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); position: relative; }
 .chart-fill { height: 100%; background: var(--accent); border-radius: 4px; }
-.chart-val { width: 40px; font-weight: 600; color: var(--text); text-align: left; flex-shrink: 0; }
+.chart-val { width: 125px; font-weight: 600; color: var(--text); flex-shrink: 0; display: flex; justify-content: flex-start; align-items: center; gap: 4px; font-size: 11px; white-space: nowrap; }
 
 .avg-line { position: absolute; top: 8px; bottom: 8px; border-left: 1px solid rgba(255,255,255,0.4); z-index: 1; pointer-events: none; }
 .avg-label { position: absolute; top: 0; font-size: 8.5px; color: var(--muted); white-space: nowrap; font-weight: 500; transform: translateX(-50%); pointer-events: none; z-index: 3; }
@@ -202,10 +202,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
 .summary-panel { background: var(--card2); padding: 14px; border-radius: 6px; border: 1px solid var(--border); border-left: 3px solid var(--accent); font-size: 13px; color: var(--text); margin-bottom: 16px; line-height: 1.5; text-align: justify; }
 
-/* Altura fixa e idêntica garantida para a área de conteúdo da poupança e estatísticas */
 #savings-content-area, #stats-content-area { min-height: 380px; }
 
-/* Barra inferior com espaçamento ditado pela largura natural das palavras (space-between) */
 .botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; justify-content: space-between; }
 .botnav button { flex: 0 1 auto; min-width: 0; background: none; border: none; color: var(--muted); font-size: 9px; font-weight: 500; text-transform: uppercase; padding: 4px 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; text-align: center; }
 .botnav button .ic { font-size: 17px; }
@@ -296,7 +294,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
       <!-- Navegador Mensal de Estatísticas -->
       <div id="stats-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: transparent; padding: 0; border: none; height: 44px;">
-         <button onclick="changeStatsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;">◀</button>
+         <button onclick="changeStatsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;" id="btn-prev-stats-month">◀</button>
          <div style="display:flex; gap:6px; align-items: center; flex: 1; margin: 0 6px; height: 44px;">
             <select id="stats-year-sel" onchange="onStatsYearChange()" class="input-text" style="padding: 0 28px 0 10px; font-size:14px; height: 44px; flex: 1; line-height: 42px;"></select>
             <select id="stats-month-sel" onchange="jumpStatsMonth()" class="input-text" style="padding: 0 28px 0 10px; font-size:14px; height: 44px; flex: 1.5; line-height: 42px;"></select>
@@ -328,9 +326,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             </p>
          </div>
 
-         <!-- Resultados Globais da Calculadora (Atualizado Dinamicamente) -->
+         <!-- Resultados Globais da Calculadora -->
          <div id="savings-global-results" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: #010409; padding: 16px; border-radius: 6px; border: 1px solid var(--border);">
-            <!-- Renderizado via JS -->
          </div>
 
          <!-- Modos de Visualização: Resumo Global vs Mensal -->
@@ -352,7 +349,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
          <!-- Navegador Mensal de Poupança -->
          <div id="savings-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: transparent; padding: 0; border: none; height: 44px;">
-            <button onclick="changeSavingsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;">◀</button>
+            <button onclick="changeSavingsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;" id="btn-prev-month">◀</button>
             <div style="display:flex; gap:6px; align-items: center; flex: 1; margin: 0 6px; height: 44px;">
                <select id="savings-year-sel" onchange="onSavingsYearChange()" class="input-text" style="padding: 0 28px 0 10px; font-size:14px; height: 44px; flex: 1; line-height: 42px;"></select>
                <select id="savings-month-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 0 28px 0 10px; font-size:14px; height: 44px; flex: 1.5; line-height: 42px;"></select>
@@ -360,7 +357,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             <button onclick="changeSavingsMonth(1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;" id="btn-next-month">▶</button>
          </div>
 
-         <!-- Área de conteúdo com largura e altura padronizadas -->
          <div id="savings-content-area"></div>
       </div>
     </div>
@@ -368,18 +364,16 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     <!-- TAB 5: INFO -->
     <div id="tab-info" class="page tab-content" style="display: none;">
       
-      <!-- Link Discreto do Rickroll no Topo -->
       <div style="text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
         <p style="font-size: 13px; margin-bottom: 6px; color: var(--muted); text-align: center;">Para quê ler isto tudo?</p>
-        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 14px;">> VÊ O VÍDEO <</a>
+        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 14px;">> CLICA AQUI <</a>
       </div>
 
       <div class="eyebrow" style="margin-bottom: 12px;">Manual Operacional Técnico</div>
 
-      <!-- Blocos de Texto Organizados com texto justificado -->
       <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px;">
          <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px;"><span>🧮</span> Sistema de Créditos</h4>
-         <p style="color: var(--text); font-size: 12.5px; margin-bottom: 8px;">O custo de uma viagem padrão equivale sempre a<br><strong>1 + (0.5 × Nº de Passageiros)</strong></p>
+         <p style="color: var(--text); font-size: 12.5px; margin-bottom: 8px;">O custo de uma viagem padrão equivale sempre a:<br><strong>1 + (0.5 × Nº de Passageiros)</strong></p>
          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0 0 12px 0; line-height: 1.5; text-align: justify;">
             <li><strong style="color: var(--green);">Condutor:</strong> Recebe a totalidade (+2.5 🪙).</li>
             <li><strong style="color: var(--danger);">Passageiros:</strong> Dividem o custo (-0.83 🪙 cada).</li>
@@ -393,8 +387,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px;"><span>⚖️</span> Algoritmo de Desempate</h4>
          <p style="color: var(--text); font-size: 12.5px; margin-bottom: 8px;">Em caso de saldo exato, a app aplica 2 critérios:</p>
          <ol style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5; text-align: justify;">
-            <li style="margin-bottom: 6px;"><strong>Rácio de Participação (%):</strong> Compara total de conduções sobre o total de viagens. Quem tiver o menor rácio é o próximo condutor.</li>
-            <li><strong>Tempo de Latência:</strong> O membro que não conduz há mais tempo (pela data do último registo) assume o volante.</li>
+            <li style="margin-bottom: 6px;"><strong>Rácio de Participação (%):</strong> Compara total de conduções sobre o total de viagens. Quem tiver o menor rácio é o próximo condutor sugerido.</li>
+            <li><strong>Tempo de Latência:</strong> O membro que não conduz há mais tempo (pela data do último registo) deverá assumir o volante.</li>
          </ol>
       </div>
 
@@ -408,7 +402,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          </ul>
       </div>
 
-      <!-- Bloco de Cálculo da Poupança após o Multi-Carro -->
       <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px;">
          <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px;"><span>🌱</span> Cálculo da Poupança</h4>
          <p style="color: var(--muted); font-size: 12px; margin-bottom: 10px; line-height: 1.5;">
@@ -616,16 +609,21 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        });
     }
 
+    /* === DATA LIMITE ABSOLUTA: NOVEMBRO DE 2025 === */
+    const MIN_ALLOWED_YEAR = 2025;
+    const MIN_ALLOWED_MONTH = 11;
+    const MIN_ALLOWED_ISO = "2025-11-01";
+
     function populateSavingsYearDropdown() {
        const yearSel = document.getElementById("savings-year-sel");
        if(!yearSel) return;
        const currentYear = new Date().getFullYear();
        let htmlY = "";
-       for(let y = 2024; y <= currentYear; y++) {
+       for(let y = MIN_ALLOWED_YEAR; y <= currentYear; y++) {
           htmlY += `<option value="${y}">${y}</option>`;
        }
        yearSel.innerHTML = htmlY;
-       yearSel.value = new Date().getFullYear();
+       yearSel.value = Math.max(MIN_ALLOWED_YEAR, currentYear);
     }
 
     function updateSavingsMonthOptions() {
@@ -639,7 +637,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        const currentMonth = currentDate.getMonth() + 1; 
 
        let htmlM = "";
-       let startMonth = (selectedYear === 2024) ? 11 : 1;
+       let startMonth = (selectedYear === MIN_ALLOWED_YEAR) ? MIN_ALLOWED_MONTH : 1;
        let endMonth = (selectedYear === currentYear) ? currentMonth : 12;
 
        for(let i = startMonth; i <= endMonth; i++) {
@@ -667,6 +665,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           btnNextM.disabled = isAtCurrentMonth;
           btnNextM.style.opacity = isAtCurrentMonth ? "0.3" : "1";
        }
+
+       const btnPrevM = document.getElementById("btn-prev-month");
+       if(btnPrevM) {
+          const isAtMinMonth = (selectedYear === MIN_ALLOWED_YEAR && parseInt(monthSel.value) === MIN_ALLOWED_MONTH);
+          btnPrevM.disabled = isAtMinMonth;
+          btnPrevM.style.opacity = isAtMinMonth ? "0.3" : "1";
+       }
     }
 
     window.onSavingsYearChange = function() {
@@ -677,17 +682,16 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        updateSavings();
     }
 
-    // Dropdowns de Análise Mensal para Estatísticas
     function populateStatsYearDropdown() {
        const yearSel = document.getElementById("stats-year-sel");
        if(!yearSel) return;
        const currentYear = new Date().getFullYear();
        let htmlY = "";
-       for(let y = 2024; y <= currentYear; y++) {
+       for(let y = MIN_ALLOWED_YEAR; y <= currentYear; y++) {
           htmlY += `<option value="${y}">${y}</option>`;
        }
        yearSel.innerHTML = htmlY;
-       yearSel.value = new Date().getFullYear();
+       yearSel.value = Math.max(MIN_ALLOWED_YEAR, currentYear);
     }
 
     function updateStatsMonthOptions() {
@@ -701,7 +705,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        const currentMonth = currentDate.getMonth() + 1; 
 
        let htmlM = "";
-       let startMonth = (selectedYear === 2024) ? 11 : 1;
+       let startMonth = (selectedYear === MIN_ALLOWED_YEAR) ? MIN_ALLOWED_MONTH : 1;
        let endMonth = (selectedYear === currentYear) ? currentMonth : 12;
 
        for(let i = startMonth; i <= endMonth; i++) {
@@ -729,6 +733,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           btnNextM.disabled = isAtCurrentMonth;
           btnNextM.style.opacity = isAtCurrentMonth ? "0.3" : "1";
        }
+
+       const btnPrevM = document.getElementById("btn-prev-stats-month");
+       if(btnPrevM) {
+          const isAtMinMonth = (selectedYear === MIN_ALLOWED_YEAR && parseInt(monthSel.value) === MIN_ALLOWED_MONTH);
+          btnPrevM.disabled = isAtMinMonth;
+          btnPrevM.style.opacity = isAtMinMonth ? "0.3" : "1";
+       }
     }
 
     window.onStatsYearChange = function() {
@@ -755,7 +766,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        let currentYear = new Date().getFullYear();
        let currentMonth = new Date().getMonth() + 1;
 
-       if (targetYear < 2024 || (targetYear === 2024 && targetMonth < 11)) return;
+       if (targetYear < MIN_ALLOWED_YEAR || (targetYear === MIN_ALLOWED_YEAR && targetMonth < MIN_ALLOWED_MONTH)) return;
        if (targetYear > currentYear || (targetYear === currentYear && targetMonth > currentMonth)) return;
 
        statsSelectedMonth = nextKey;
@@ -923,13 +934,18 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
           if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
              if(isMonthlyNav) {
-                 let targetSelectedMonth = containerId.includes('stats') ? statsSelectedMonth : savingsSelectedMonth;
+                 let targetSelectedMonth = "";
+                 if(containerId.includes('stats')) targetSelectedMonth = statsSelectedMonth;
+                 else if(containerId.includes('savings')) targetSelectedMonth = savingsSelectedMonth;
+                 else if(containerId.includes('hist')) targetSelectedMonth = historySelectedDate.substring(0, 7);
+
                  let [y, m] = targetSelectedMonth.split('-');
                  let cur = new Date();
+                 
                  if(deltaX < 0 && parseInt(y) === cur.getFullYear() && parseInt(m) === (cur.getMonth()+1)) {
                      return; 
                  }
-                 if(deltaX > 0 && parseInt(y) === 2024 && parseInt(m) === 11) {
+                 if(deltaX > 0 && parseInt(y) === MIN_ALLOWED_YEAR && parseInt(m) === MIN_ALLOWED_MONTH) {
                      return;
                  }
              }
@@ -950,7 +966,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           
           if (currentX < -60) {
              if(isMonthlyNav) {
-                 let targetSelectedMonth = containerId.includes('stats') ? statsSelectedMonth : savingsSelectedMonth;
+                 let targetSelectedMonth = "";
+                 if(containerId.includes('stats')) targetSelectedMonth = statsSelectedMonth;
+                 else if(containerId.includes('savings')) targetSelectedMonth = savingsSelectedMonth;
+                 else if(containerId.includes('hist')) targetSelectedMonth = historySelectedDate.substring(0, 7);
+
                  let [y, m] = targetSelectedMonth.split('-');
                  let cur = new Date();
                  if(parseInt(y) === cur.getFullYear() && parseInt(m) === (cur.getMonth()+1)) {
@@ -963,9 +983,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
              setTimeout(() => { onSwipeLeft(); }, 250);
           } else if (currentX > 60) {
              if(isMonthlyNav) {
-                 let targetSelectedMonth = containerId.includes('stats') ? statsSelectedMonth : savingsSelectedMonth;
+                 let targetSelectedMonth = "";
+                 if(containerId.includes('stats')) targetSelectedMonth = statsSelectedMonth;
+                 else if(containerId.includes('savings')) targetSelectedMonth = savingsSelectedMonth;
+                 else if(containerId.includes('hist')) targetSelectedMonth = historySelectedDate.substring(0, 7);
+
                  let [y, m] = targetSelectedMonth.split('-');
-                 if(parseInt(y) === 2024 && parseInt(m) === 11) {
+                 if(parseInt(y) === MIN_ALLOWED_YEAR && parseInt(m) === MIN_ALLOWED_MONTH) {
                      track.style.transform = `translateX(-33.3333%)`;
                      currentX = 0;
                      return;
@@ -1169,7 +1193,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
              <div class="chart-track">
                 <div class="chart-fill" style="width: ${pct}%; background: ${barColor};"></div>
              </div>
-             <div class="chart-val">${pct}%</div>
+             <div class="chart-val" style="width:40px;">${pct}%</div>
           </div>`;
        });
        
@@ -1193,27 +1217,27 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           const pTra = Math.round((d.passCount / maxVal) * 100);
 
           barsHtml += `<div style="margin-bottom: 12px; background: var(--card2); padding: 8px; border-radius: 6px; border: 1px solid var(--border);">
-             <div style="font-size: 12px; font-weight:600; color:var(--text); margin-bottom:6px; text-align: center;">${d.name}</div>
+             <div style="font-size: 12px; font-weight:600; color:var(--text); margin-bottom:6px; text-align: left;">${d.name}</div>
              
              <div class="chart-bar-row" style="margin-bottom:3px;">
                 <div class="chart-label" style="font-size:9px;">Total Viagens</div>
                 <div class="chart-track"><div class="chart-fill" style="width: ${pTot}%; background:var(--accent)"></div></div>
-                <div class="chart-val">${d.totalViagens}</div>
+                <div class="chart-val" style="width:40px;">${d.totalViagens}</div>
              </div>
              <div class="chart-bar-row" style="margin-bottom:3px;">
                 <div class="chart-label" style="font-size:9px;">Condutor</div>
                 <div class="chart-track"><div class="chart-fill" style="width: ${pDrv}%; background:var(--green)"></div></div>
-                <div class="chart-val">${d.asDriver}</div>
+                <div class="chart-val" style="width:40px;">${d.asDriver}</div>
              </div>
              <div class="chart-bar-row" style="margin-bottom:3px;">
                 <div class="chart-label" style="font-size:9px;">Passageiro</div>
                 <div class="chart-track"><div class="chart-fill" style="width: ${pPas}%; background:var(--muted)"></div></div>
-                <div class="chart-val">${d.asPassenger}</div>
+                <div class="chart-val" style="width:40px;">${d.asPassenger}</div>
              </div>
              <div class="chart-bar-row" style="margin-bottom:0;">
                 <div class="chart-label" style="font-size:9px;">Transportados</div>
                 <div class="chart-track"><div class="chart-fill" style="width: ${pTra}%; background:#f59e0b"></div></div>
-                <div class="chart-val">${d.passCount}</div>
+                <div class="chart-val" style="width:40px;">${d.passCount}</div>
              </div>
           </div>`;
        });
@@ -1305,7 +1329,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        let currentYear = new Date().getFullYear();
        let currentMonth = new Date().getMonth() + 1;
 
-       if (targetYear < 2024 || (targetYear === 2024 && targetMonth < 11)) return;
+       if (targetYear < MIN_ALLOWED_YEAR || (targetYear === MIN_ALLOWED_YEAR && targetMonth < MIN_ALLOWED_MONTH)) return;
        if (targetYear > currentYear || (targetYear === currentYear && targetMonth > currentMonth)) return;
 
        savingsSelectedMonth = nextKey;
@@ -1349,9 +1373,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             <div class="chart-bar-row">
                <div class="chart-label" style="width: 65px; flex-shrink: 0; text-align: right;">${d.name}</div>
                <div class="chart-track" style="flex: 1;"><div class="chart-fill" style="width: ${pct}%; background: ${color};"></div></div>
-               <div class="chart-val" style="width: 125px; flex-shrink: 0; display: flex; justify-content: flex-end; align-items: center; gap: 4px; font-size: 11px; white-space: nowrap;">
-                  <span style="width: 58px; text-align: right; font-weight: 600; color: var(--text);">${fmtMoney(d.euros)} €</span>
-                  <span style="width: 58px; text-align: left; font-size: 9.5px; color: var(--muted); font-weight: 500;">(${d.km} km)</span>
+               <div class="chart-val" style="width: 125px; flex-shrink: 0; display: flex; justify-content: flex-start; align-items: center; gap: 4px; font-size: 11px; white-space: nowrap;">
+                  <span style="width: 58px; text-align: left; font-weight: 600; color: var(--text);">${fmtMoney(d.euros)} €</span>
+                  <span style="width: 58px; text-align: right; font-size: 9.5px; color: var(--muted); font-weight: 500;">(${d.km} km)</span>
                </div>
             </div>`;
         });
@@ -1540,7 +1564,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         }
     };
 
-    /* === RESTANTES FUNÇÕES (Cálculo, Histórico, Formulário) === */
+    /* === HISTÓRICO E FORMULÁRIO === */
 
     window.applyHistoryFilter = function() {
        currentHistoryFilter = document.getElementById("history-filter").value;
@@ -1637,7 +1661,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        let currDate = new Date(parts[0], parts[1]-1, parts[2]);
        currDate.setMonth(currDate.getMonth() + delta);
        let newIso = getLocalDateISO(currDate);
-       if(newIso < "2024-11-01") return;
+       if(newIso < MIN_ALLOWED_ISO) return;
        if(newIso > todayISO) return;
        historySelectedDate = newIso;
        renderHistoryCalendar();
@@ -1648,11 +1672,12 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        let currDate = new Date(parts[0], parts[1]-1, parts[2]);
        currDate.setFullYear(currDate.getFullYear() + delta);
        let newIso = getLocalDateISO(currDate);
-       if(newIso < "2024-11-01") return;
-       if(newIso > todayISO) return;
+       if(newIso < MIN_ALLOWED_ISO) newIso = MIN_ALLOWED_ISO;
+       if(newIso > todayISO) newIso = todayISO;
        historySelectedDate = newIso;
        renderHistoryCalendar();
     }
+    
     window.resetHistoryToToday = function() {
        historySelectedDate = todayISO;
        renderHistoryCalendar();
@@ -1721,7 +1746,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       const targetDate = new Date(parts[0], parts[1]-1, parts[2]);
       const targetYear = targetDate.getFullYear();
       const targetMonth = targetDate.getMonth();
-      const canGoPrev = !(targetYear === 2024 && targetMonth === 10);
+      const canGoPrev = !(targetYear === MIN_ALLOWED_YEAR && targetMonth === (MIN_ALLOWED_MONTH - 1));
       const curY = new Date().getFullYear();
       const curM = new Date().getMonth();
       const canGoNext = !(targetYear === curY && targetMonth === curM);
