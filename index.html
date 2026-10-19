@@ -301,24 +301,21 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     <!-- TAB 4: POUPANÇA E IMPACTO -->
     <div id="tab-savings" class="page tab-content" style="display: none;">
-      <div class="eyebrow">Calculadora de Impacto</div>
+      <div class="eyebrow">Poupança e Impacto</div>
       
-      <div class="card">
-         <h3 style="margin-bottom: 12px;">Poupança e Impacto 🌍</h3>
-         
-         <div style="background: var(--card2); padding: 12px; border-radius: 6px; margin-bottom: 16px;">
-            <div style="margin-bottom: 10px;">
-               <label style="font-size: 10px; color: var(--muted); display: block; margin-bottom: 4px;">Período de Análise</label>
-               <select id="calc-period" class="input-text" style="padding: 8px; font-size: 12px;" onchange="updateSavings()">
-                  <option value="ALL">Desde Sempre</option>
-                  <option value="30">Últimos 30 dias</option>
-                  <option value="90">Últimos 90 dias</option>
-                  <option value="180">Últimos 180 dias</option>
-                  <option value="365">Últimos 365 dias</option>
-               </select>
-            </div>
+      <div id="calc-period-container" style="margin-bottom: 16px;">
+         <select id="calc-period" class="input-text" onchange="updateSavings()">
+            <option value="ALL">Desde Sempre</option>
+            <option value="30">Últimos 30 dias</option>
+            <option value="90">Últimos 90 dias</option>
+            <option value="180">Últimos 180 dias</option>
+            <option value="365">Últimos 365 dias</option>
+         </select>
+      </div>
 
-            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+      <div class="card">
+         <div style="background: var(--card2); padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+            <div style="display: flex; gap: 8px; margin-bottom: 6px;">
                <div style="flex: 1;">
                   <label style="font-size: 10px; color: var(--muted); display: block; margin-bottom: 4px;">Combustível</label>
                   <select id="calc-fuel" class="input-text" style="padding: 8px; font-size: 12px; background-position: right 8px center;" onchange="updateSavings()">
@@ -355,8 +352,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          <div id="savings-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--card2); padding: 8px; border-radius: 6px; border: 1px solid var(--border);">
             <button onclick="changeSavingsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 4px 8px; font-size: 14px; width:auto; border-color:transparent;">◀</button>
             <div style="display:flex; gap:6px;">
-               <select id="savings-month-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 4px 20px 4px 8px; font-size:11px;"></select>
-               <select id="savings-year-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 4px 20px 4px 8px; font-size:11px;"></select>
+               <select id="savings-month-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 4px 28px 4px 8px; font-size:11px; min-width: 100px;"></select>
+               <select id="savings-year-sel" onchange="jumpSavingsMonth()" class="input-text" style="padding: 4px 24px 4px 8px; font-size:11px;"></select>
             </div>
             <button onclick="changeSavingsMonth(1)" class="gh-btn outline" style="margin:0; padding: 4px 8px; font-size: 14px; width:auto; border-color:transparent;">▶</button>
          </div>
@@ -1055,7 +1052,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        document.getElementById('btn-view-global').className = viewMode === 'global' ? "gh-btn primary" : "gh-btn outline";
        document.getElementById('btn-view-monthly').className = viewMode === 'monthly' ? "gh-btn primary" : "gh-btn outline";
        
+       document.getElementById('calc-period-container').style.display = viewMode === 'monthly' ? "none" : "block";
        document.getElementById('savings-monthly-nav').style.display = viewMode === 'monthly' ? "flex" : "none";
+       
        const track = document.getElementById('savings-list-track');
        if(track) track.style.transform = 'translateX(-33.3333%)';
        
@@ -1074,7 +1073,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         localStorage.setItem('pec_price', price);
 
         let filteredTrips = trips;
-        if (periodVal !== "ALL") {
+        if (currentSavingsView !== 'monthly' && periodVal !== "ALL") {
            const daysNum = parseInt(periodVal);
            const now = new Date();
            const cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysNum);
@@ -1124,7 +1123,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         const co2Multiplier = fuelType === 'gasoleo' ? 2.64 : 2.31;
         const totalCO2Tonnes = (totalLiters * co2Multiplier) / 1000;
         
-        const fmtEuros = totalEuros >= 1000 ? (totalEuros / 1000).toFixed(1) + 'k' : totalEuros.toFixed(2);
+        const fmtEuros = totalEuros >= 1000 ? (totalEuros / 1000).toFixed(2) + 'k' : totalEuros.toFixed(2);
 
         document.getElementById('savings-global-results').innerHTML = `
             <div style="text-align: center; flex: 1; border-right: 1px solid var(--border);">
@@ -1153,7 +1152,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                     <div class="list-item" style="padding: 10px 0;">
                         <div style="font-size: 13.5px; font-weight: 500;">${p}</div>
                         <div style="text-align: right;">
-                            <div style="font-size: 13.5px; font-weight: 600; color: var(--text);">${pEuros.toFixed(2)} €</div>
+                            <div style="font-size: 13.5px;"><span style="font-weight: 600; color: var(--text);">${pEuros.toFixed(2)} €</span> <span style="font-size: 10px; color: var(--muted); font-weight: 400;">poupados</span></div>
                             <div style="font-size: 10.5px; color: var(--muted);">${pKm} km à boleia</div>
                         </div>
                     </div>`;
@@ -1163,7 +1162,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             if (!hasData) listHTML = `<div style="text-align:center; padding: 20px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
             container.innerHTML = `<div class="list">${listHTML}</div>`;
         } else {
-            // Detalhamento Mensal (Swipe View)
             let [y, m] = savingsSelectedMonth.split('-');
             document.getElementById("savings-month-sel").value = m;
             document.getElementById("savings-year-sel").value = y;
@@ -1182,14 +1180,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                              <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px;">
                                  <div style="font-weight: 500; color: var(--text);">${p}</div>
                                  <div style="text-align: right;">
-                                     <div style="font-weight: 600; color: var(--text);">${euros.toFixed(2)} €</div>
+                                     <div><span style="font-weight: 600; color: var(--text);">${euros.toFixed(2)} €</span> <span style="font-size: 9.5px; color: var(--muted); font-weight: 400;">poupados</span></div>
                                      <div style="color: var(--muted); font-size: 10.5px;">${km} km à boleia</div>
                                  </div>
                              </div>`;
                          }
                      });
                  }
-                 if(mTotalKm === 0) return `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px; width: 100%;">Nenhuma viagem registada neste mês para o filtro escolhido.</div>`;
+                 if(mTotalKm === 0) return `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px; width: 100%;">Nenhuma viagem registada neste mês.</div>`;
                  return `<div class="list" style="width: 100%; padding: 0 4px;">${html}</div>`;
             };
 
