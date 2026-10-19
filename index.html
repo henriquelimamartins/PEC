@@ -299,11 +299,22 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         <div id="stats-bars-chart" class="stats-chart" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;"></div>
       </div>
 
-      <!-- SECÇÃO: CALCULADORA DE POUPANÇA -->
+      <!-- SECÇÃO: CALCULADORA DE POUPANÇA E IMPACTO -->
       <div class="card" style="margin-top: 16px;">
          <h3 style="margin-bottom: 12px;">Poupança e Impacto 🌍</h3>
          
          <div style="background: var(--card2); padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+            <div style="margin-bottom: 10px;">
+               <label style="font-size: 10px; color: var(--muted); display: block; margin-bottom: 4px;">Período de Análise</label>
+               <select id="calc-period" class="input-text" style="padding: 8px; font-size: 12px;" onchange="updateSavings()">
+                  <option value="ALL">Desde Sempre</option>
+                  <option value="30">Últimos 30 dias</option>
+                  <option value="90">Últimos 90 dias</option>
+                  <option value="180">Últimos 180 dias</option>
+                  <option value="365">Últimos 365 dias</option>
+               </select>
+            </div>
+
             <div style="display: flex; gap: 8px; margin-bottom: 10px;">
                <div style="flex: 1;">
                   <label style="font-size: 10px; color: var(--muted); display: block; margin-bottom: 4px;">Combustível</label>
@@ -331,7 +342,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             <!-- Renderizado via JS -->
          </div>
 
-         <!-- Lista de poupança por pessoa -->
+         <!-- Modos de Visualização: Resumo Global vs Mensal -->
+         <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <button id="btn-view-global" class="gh-btn primary" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setSavingsView('global')">Resumo Global</button>
+            <button id="btn-view-monthly" class="gh-btn outline" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setSavingsView('monthly')">Detalhamento Mensal</button>
+         </div>
+
+         <!-- Lista de poupança por pessoa (Alfabética) -->
          <div id="savings-per-person-list" class="list">
             <!-- Renderizado via JS -->
          </div>
@@ -526,6 +543,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     let todayISO = getLocalDateISO();
     let historySelectedDate = todayISO;
     let currentHistoryFilter = "ALL"; 
+    let currentSavingsView = "global";
     
     let formDate = todayISO;
     let selectedCars = 1;
@@ -820,7 +838,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         if (a.val !== b.val) return a.val - b.val;
         if (a.ratio !== b.ratio) return a.ratio - b.ratio;
         if (a.lastTime !== b.lastTime) return a.lastTime - b.lastTime;
-        return a.name.localeCompare(b.name); 
+        return a.name.localeCompare(b.name, 'pt'); 
       });
       
       const list = document.getElementById("balance-list");
@@ -876,8 +894,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           });
        }
        
-       window.currentFilteredTrips = filteredTrips;
-       
        document.getElementById('stats-total-trips').innerText = filteredTrips.length;
        
        let statsData = [];
@@ -906,7 +922,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        statsData.forEach(d => { sumDrvs += d.asDriver; sumTotal += d.totalViagens; });
        const globalRatioPct = sumTotal > 0 ? Math.round((sumDrvs / sumTotal) * 100) : 0;
 
-       let statsDataAlpha = [...statsData].sort((a, b) => a.name.localeCompare(b.name));
+       let statsDataAlpha = [...statsData].sort((a, b) => a.name.localeCompare(b.name, 'pt'));
        
        let ratioHtml = `<div style="position: relative;">`; 
        
@@ -973,23 +989,58 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           </div>`;
        });
        barsContainer.innerHTML = barsHtml;
-       
+
+       updateSavings();
+    }
+
+    window.setSavingsView = function(viewMode) {
+       currentSavingsView = viewMode;
+       const btnGlobal = document.getElementById('btn-view-global');
+       const btnMonthly = document.getElementById('btn-view-monthly');
+       if(viewMode === 'global') {
+          btnGlobal.className = "gh-btn primary";
+          btnMonthly.className = "gh-btn outline";
+       } else {
+          btnGlobal.className = "gh-btn outline";
+          btnMonthly.className = "gh-btn primary";
+       }
        updateSavings();
     }
 
     window.updateSavings = function() {
+        const periodVal = document.getElementById('calc-period') ? document.getElementById('calc-period').value : "ALL";
         const fuelType = document.getElementById('calc-fuel').value;
         const cons = parseFloat(document.getElementById('calc-cons').value) || 0;
         const price = parseFloat(document.getElementById('calc-price').value) || 0;
         
         const co2Multiplier = fuelType === 'gasoleo' ? 2.64 : 2.31;
-        let tripsData = window.currentFilteredTrips || trips;
+        
+        // Filtragem temporal específica da calculadora
+        let filteredSavingsTrips = trips;
+        if (periodVal !== "ALL") {
+           const daysNum = parseInt(periodVal);
+           const now = new Date();
+           const cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysNum);
+           filteredSavingsTrips = trips.filter(t => {
+              const parts = t.date.split('-');
+              const tDate = new Date(parts[0], parts[1]-1, parts[2]);
+              return tDate >= cutoff;
+           });
+        }
 
-        let savingsData = {};
-        PEOPLE.forEach(p => savingsData[p] = { km: 0, tripsAsPass: 0 });
+        let globalSavingsData = {};
+        let monthlySavingsData = {}; 
+        
+        PEOPLE.forEach(p => { globalSavingsData[p] = { km: 0, tripsAsPass: 0 }; });
         let totalKmSaved = 0;
 
-        tripsData.forEach(trip => {
+        filteredSavingsTrips.forEach(trip => {
+            const monthKey = trip.date.substring(0, 7); // ex: "2026-10"
+            if (!monthlySavingsData[monthKey]) {
+                monthlySavingsData[monthKey] = {};
+                PEOPLE.forEach(p => { monthlySavingsData[monthKey][p] = { km: 0, tripsAsPass: 0 }; });
+            }
+
             const processCar = (car) => {
                 if (!car || !car.driver || !car.passengers || car.passengers.length === 0) return;
                 
@@ -1000,10 +1051,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                 const finalDist = car.isOneWay ? baseDist : (baseDist * 2);
 
                 car.passengers.forEach(p => {
-                    if(savingsData[p]) {
-                       savingsData[p].km += finalDist;
-                       savingsData[p].tripsAsPass += 1;
+                    if (globalSavingsData[p]) {
+                       globalSavingsData[p].km += finalDist;
+                       globalSavingsData[p].tripsAsPass += 1;
                        totalKmSaved += finalDist;
+                    }
+                    if (monthlySavingsData[monthKey] && monthlySavingsData[monthKey][p]) {
+                       monthlySavingsData[monthKey][p].km += finalDist;
+                       monthlySavingsData[monthKey][p].tripsAsPass += 1;
                     }
                 });
             };
@@ -1021,6 +1076,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             }
         });
 
+        // Totais Globais
         const totalLiters = (totalKmSaved / 100) * cons;
         const totalEuros = totalLiters * price;
         const totalCO2 = totalLiters * co2Multiplier;
@@ -1036,29 +1092,85 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             </div>
         `;
 
-        let sortedSavings = PEOPLE.map(p => {
-            let pKm = savingsData[p].km;
-            let pLiters = (pKm / 100) * cons;
-            let pEuros = pLiters * price;
-            return { name: p, euros: pEuros, km: pKm };
-        }).filter(s => s.km > 0).sort((a, b) => b.euros - a.euros);
-
         let listHTML = "";
-        sortedSavings.forEach(s => {
-            listHTML += `
-            <div class="list-item" style="padding: 10px 0;">
-                <div style="font-size: 13.5px; font-weight: 500;">${s.name}</div>
-                <div style="text-align: right;">
-                    <div style="font-size: 13.5px; font-weight: 600; color: var(--text);">${s.euros.toFixed(2)} €</div>
-                    <div style="font-size: 10.5px; color: var(--muted);">${s.km} km não conduzidos</div>
-                </div>
-            </div>`;
-        });
-        
-        if (sortedSavings.length === 0) {
-            listHTML = `<div style="text-align:center; padding: 20px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
+
+        if (currentSavingsView === 'global') {
+            // Nomes ordenados estritamente ALFABETICAMENTE
+            let sortedPeopleAlpha = [...PEOPLE].sort((a, b) => a.localeCompare(b, 'pt'));
+            
+            let hasData = false;
+            sortedPeopleAlpha.forEach(p => {
+                let pKm = globalSavingsData[p].km;
+                if (pKm > 0) {
+                    hasData = true;
+                    let pLiters = (pKm / 100) * cons;
+                    let pEuros = pLiters * price;
+                    listHTML += `
+                    <div class="list-item" style="padding: 10px 0;">
+                        <div style="font-size: 13.5px; font-weight: 500;">${p}</div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 13.5px; font-weight: 600; color: var(--text);">${pEuros.toFixed(2)} €</div>
+                            <div style="font-size: 10.5px; color: var(--muted);">${pKm} km não conduzidos</div>
+                        </div>
+                    </div>`;
+                }
+            });
+
+            if (!hasData) {
+                listHTML = `<div style="text-align:center; padding: 20px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
+            }
+        } else {
+            // Modo Mensal: Ordenar os meses do mais recente para o mais antigo
+            const sortedMonths = Object.keys(monthlySavingsData).sort((a, b) => b.localeCompare(a));
+            
+            if (sortedMonths.length === 0) {
+                listHTML = `<div style="text-align:center; padding: 20px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
+            } else {
+                sortedMonths.forEach(mKey => {
+                    const [year, month] = mKey.split('-');
+                    const monthName = monthNames[parseInt(month) - 1];
+                    
+                    // Nomes dentro de cada mês organizados ALFABETICAMENTE
+                    let sortedPeopleAlpha = [...PEOPLE].sort((a, b) => a.localeCompare(b, 'pt'));
+                    let monthRowsHTML = "";
+                    let monthTotalKm = 0;
+
+                    sortedPeopleAlpha.forEach(p => {
+                        const pData = monthlySavingsData[mKey][p];
+                        if (pData && pData.km > 0) {
+                            monthTotalKm += pData.km;
+                            let pLiters = (pData.km / 100) * cons;
+                            let pEuros = pLiters * price;
+                            monthRowsHTML += `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px;">
+                                <div style="font-weight: 500; color: var(--text);">${p}</div>
+                                <div style="text-align: right;">
+                                    <span style="font-weight: 600; color: var(--green);">${pEuros.toFixed(2)} €</span>
+                                    <span style="color: var(--muted); font-size: 10px; margin-left: 6px;">(${pData.km} km)</span>
+                                </div>
+                            </div>`;
+                        }
+                    });
+
+                    if (monthTotalKm > 0) {
+                        let monthTotalEuros = ((monthTotalKm / 100) * cons) * price;
+                        listHTML += `
+                        <div style="margin-bottom: 16px; background: var(--card2); border: 1px solid var(--border); border-radius: 6px; padding: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border);">
+                                <span style="font-size: 13px; font-weight: 700; color: var(--accent); text-transform: uppercase;">${monthName} ${year}</span>
+                                <span style="font-size: 12px; font-weight: 700; color: var(--green);">${monthTotalEuros.toFixed(2)} € total</span>
+                            </div>
+                            ${monthRowsHTML}
+                        </div>`;
+                    }
+                });
+
+                if (listHTML === "") {
+                    listHTML = `<div style="text-align:center; padding: 20px; color: var(--muted); font-size: 12px;">Sem dados de poupança no período selecionado.</div>`;
+                }
+            }
         }
-        
+
         document.getElementById('savings-per-person-list').innerHTML = listHTML;
     };
 
@@ -1326,7 +1438,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
              passLabel = "Passageiras";
           }
 
-          const passAlfab = [...trip.passengers].sort((a,b) => a.localeCompare(b)).join(", ");
+          const passAlfab = [...trip.passengers].sort((a,b) => a.localeCompare(b, 'pt')).join(", ");
           const typeLabel = (trip.cars === 2 ? 'Viagem 2 Carros' : 'Viagem Normal') + (trip.splitCostMode ? ' (Separados)' : '');
           
           let costPassStr = "0 🪙";
