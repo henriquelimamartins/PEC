@@ -205,9 +205,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 /* Altura fixa e idêntica garantida para a área de conteúdo da poupança */
 #savings-content-area { min-height: 380px; }
 
-/* Barra inferior com distribuição simétrica rigorosa baseada nas palavras */
-.botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; justify-content: space-between; }
-.botnav button { flex: 1; min-width: 0; background: none; border: none; color: var(--muted); font-size: 9px; font-weight: 500; text-transform: uppercase; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; text-align: center; }
+/* Barra inferior otimizada com espaçamento rigoroso e idêntico entre os limites das palavras */
+.botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; justify-content: space-evenly; }
+.botnav button { flex: 1; max-width: 72px; min-width: 0; background: none; border: none; color: var(--muted); font-size: 9px; font-weight: 500; text-transform: uppercase; padding: 4px 0; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 6px; text-align: center; }
 .botnav button .ic { font-size: 17px; }
 .botnav button.active { color: var(--accent); }
 
@@ -392,6 +392,18 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             <li style="margin-bottom: 6px;"><strong>Rácio de Participação (%):</strong> Compara total de conduções sobre o total de viagens feitas. O menor rácio conduz.</li>
             <li><strong>Tempo de Latência:</strong> O membro que não conduz há mais tempo (pela data do último registo) assume o volante.</li>
          </ol>
+      </div>
+
+      <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px;">
+         <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px;"><span>🌱</span> Cálculo da Poupança</h4>
+         <p style="color: var(--muted); font-size: 12px; margin-bottom: 10px; line-height: 1.5;">
+            A poupança reflete o dinheiro e combustível que cada passageiro poupa ao viajar à boleia em vez de conduzir sozinho:
+         </p>
+         <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5;">
+            <li style="margin-bottom: 6px;"><strong>Distância Base:</strong> Considera automaticamente 29 km (se todos forem do grupo de Braga) ou 26 km (Vila Verde). O valor é duplicado para viagens de ida e volta.</li>
+            <li style="margin-bottom: 6px;"><strong>Conversão Monetária:</strong> Baseia-se nos litros por 100 km e no preço por litro definidos pelo utilizador.</li>
+            <li><strong>CO2 Evitado:</strong> Calculado com base num fator de emissão padrão de 2.48 kg de CO2 por litro de combustível queimado.</li>
+         </ul>
       </div>
 
       <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
@@ -1036,7 +1048,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
        statsDataAlpha.forEach(d => {
           const pct = Math.round(d.ratio * 100);
-          // Shading de laranja: o valor mais alto mantém o acento brilhante, os restantes ficam com um tom mais escuro
           const barColor = (d.ratio === maxRatioVal && maxRatioVal > 0) ? "var(--accent)" : "rgba(214, 107, 43, 0.45)";
           
           ratioHtml += `<div class="chart-bar-row">
@@ -1153,7 +1164,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        updateSavings();
     }
 
-    function buildSavingsChartHTML(dataArr, maxEuros) {
+    function buildSavingsChartHTML(dataArr, maxEuros, monthsCount = 1) {
         if (dataArr.length === 0) return `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px; width: 100%;">Nenhuma viagem registada.</div>`;
         
         let chartStr = `<div class="stats-chart" style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">`;
@@ -1174,12 +1185,16 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         
         let listStr = "";
         dataArr.forEach(d => {
+            let monthlyEur = monthsCount > 0 ? d.euros / monthsCount : d.euros;
+            let monthlyKm = monthsCount > 0 ? d.km / monthsCount : d.km;
+            
             listStr += `
             <li class="list-item">
                 <div class="balance-name">${d.name}</div>
                 <div style="text-align: right;">
                     <div style="font-size: 13.5px;"><span style="font-weight: 600; color: var(--text);">${fmtMoney(d.euros)} €</span> <span style="font-size: 10px; color: var(--muted); font-weight: 400;">poupados</span></div>
                     <div style="font-size: 10.5px; color: var(--muted);">${d.km} km à boleia</div>
+                    <div style="font-size: 9.5px; color: var(--accent); margin-top: 1px;">Média mensal: ${fmtMoney(monthlyEur)} € / ${fmtMoney(monthlyKm)} km</div>
                 </div>
             </li>`;
         });
@@ -1261,11 +1276,12 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         const displayEuros = displayLiters * price;
         const displayCO2Kg = displayLiters * 2.48; 
         
-        const fmtEuros = displayEuros >= 1000 ? (displayEuros / 1000).toFixed(2) + 'k' : fmtMoney(displayEuros);
+        // Espaço adicionado e cêntimos inteligentes no 'k'
+        const fmtEuros = displayEuros >= 1000 ? parseFloat((displayEuros / 1000).toFixed(2)) + ' k' : fmtMoney(displayEuros);
         
         let fmtCO2;
         if (displayCO2Kg >= 1000) {
-            fmtCO2 = (displayCO2Kg / 1000).toFixed(2) + ' t';
+            fmtCO2 = parseFloat((displayCO2Kg / 1000).toFixed(2)) + ' t';
         } else {
             fmtCO2 = fmtMoney(displayCO2Kg) + ' kg';
         }
@@ -1297,7 +1313,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                 }
             });
 
-            container.innerHTML = buildSavingsChartHTML(pData, maxVal);
+            let uniqueMonths = Object.keys(monthlySavingsData).length || 1;
+            container.innerHTML = buildSavingsChartHTML(pData, maxVal, uniqueMonths);
 
         } else {
             const buildMonthHTML = (mKey) => {
@@ -1315,7 +1332,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                          }
                      });
                  }
-                 return buildSavingsChartHTML(mData, maxVal);
+                 return buildSavingsChartHTML(mData, maxVal, 1);
             };
 
             let prev = getOffsetMonth(savingsSelectedMonth, -1);
