@@ -537,11 +537,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
   <!-- Script Não-Módulo: Service Worker + Login (independente da Firebase) -->
   <script>
-    // ---------- Helpers seguros para localStorage (pode estar bloqueado, ex.: modo privado) ----------
     function safeGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
     function safeSet(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
 
-    // ---------- Service Worker + auto-update ----------
     if ('serviceWorker' in navigator) {
       const hadController = !!navigator.serviceWorker.controller;
       let reloading = false;
@@ -560,7 +558,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       }).catch(err => console.log('Erro SW:', err));
     }
 
-    // ---------- Login ----------
     async function hashString(string) {
       const msgUint8 = new TextEncoder().encode(string);
       const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
@@ -600,7 +597,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         window.initApp();
       } catch (e) {
         console.error('Erro ao iniciar a app:', e);
-        // Não apagamos o login do utilizador! Em vez disso, deixamos a UI carregar mas em modo offline/restrito.
         if (typeof window.initApp !== 'function') {
             window.initApp = function() {
                 const list = document.getElementById('balance-list');
@@ -621,7 +617,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     window.checkLogin = async function () {
       const btn = document.getElementById('login-btn');
       const pwd = document.getElementById('password-input').value.trim().toLowerCase();
-      // Hash correta para pec2026
       const targetHash = '2496e57975c7cb484c2049d5bf599e0339cb1d43a14434241cd64d4b1a1ea0f9';
       showLoginError('');
       if (btn) { btn.disabled = true; btn.textContent = 'A entrar...'; }
@@ -629,7 +624,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       try {
         let ok = false;
         try {
-          // Validação dupla para garantir que não ficas trancado se a encriptação falhar
           ok = ((await hashString(pwd)) === targetHash) || (pwd === 'pec2026');
         } catch (e) {
           ok = (pwd === 'pec2026');
@@ -669,14 +663,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     };
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, getDocs, disableNetwork, enableNetwork } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, getDocs, disableNetwork, enableNetwork } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     let db;
     if (USE_FIREBASE) {
       const app = initializeApp(firebaseConfig);
-      db = initializeFirestore(app, {
-        localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
-      });
+      // Inicialização limpa e universal compatível com todos os browsers móveis (Android/iOS)
+      db = getFirestore(app);
     }
 
     const PEOPLE = ["Ana", "André", "Henrique", "Joana", "João", "Luciano", "Luís", "Mariana"];
@@ -726,7 +719,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        });
     }
 
-    /* === DATA LIMITE ABSOLUTA: NOVEMBRO DE 2025 === */
     const MIN_ALLOWED_YEAR = 2025;
     const MIN_ALLOWED_MONTH = 11;
     const MIN_ALLOWED_ISO = "2025-11-01";
@@ -1111,6 +1103,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           trips = [];
           snapshot.forEach((doc) => { trips.push({ id: doc.id, ...doc.data() }); });
           recalculateAndRender();
+        }, (error) => {
+          console.error("Erro no listener do Firestore:", error);
+          showToast("Aviso: ligação à BD instável.");
         });
       } else {
         const localTrips = localStorage.getItem("pec_trips_v20");
@@ -1390,8 +1385,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           setupSwipeListener('stats-list-swipe', 'stats-list-track', () => changeStatsMonth(1), () => changeStatsMonth(-1), true);
        }
     }
-
-    /* === SECÇÃO POUPANÇA E IMPACTO === */
 
     window.jumpSavingsMonth = function() {
        const m = document.getElementById("savings-month-sel").value;
@@ -1674,8 +1667,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             setupSwipeListener('savings-list-swipe', 'savings-list-track', () => changeSavingsMonth(1), () => changeSavingsMonth(-1), true);
         }
     };
-
-    /* === HISTÓRICO E FORMULÁRIO === */
 
     window.applyHistoryFilter = function() {
        currentHistoryFilter = document.getElementById("history-filter").value;
@@ -1961,13 +1952,20 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
               costPassStr = fmt(trip.costPerPassenger) + " 🪙";
           }
             
+          let passRowHtml = "";
+          if (trip.passengers.length >= 4) {
+              passRowHtml = `<span style="display:block; margin-top:4px;"><strong style="color:var(--muted)">${passLabel}:</strong><br><span style="color:var(--text);">${passAlfab || "Nenhum"}</span></span>`;
+          } else {
+              passRowHtml = `<span><strong style="color:var(--muted)">${passLabel}:</strong> ${passAlfab || "Nenhum"}</span>`;
+          }
+
           html += `<div class="hist-details" style="margin-top: ${index > 0 ? '10px' : '0'};">
              <div class="hist-info">
                <span class="hist-type">
                   ${typeLabel}
                </span>
                <span class="hist-driver-row"><strong style="color:var(--accent)">${driverLabel}:</strong> ${trip.drivers.join(" e ")}</span>
-               <span><strong style="color:var(--muted)">${passLabel}:</strong> ${passAlfab || "Nenhum"}</span>
+               ${passRowHtml}
                <div style="margin-top:8px; display:flex; justify-content:space-between; font-size:12px; color:var(--text); margin-bottom: 2px;">
                   <span>Custo Total: <strong>${fmt(trip.totalCost)} 🪙</strong></span>
                </div>
