@@ -1,7 +1,7 @@
 // Boleias PEC - Service Worker
 // Estratégia: NETWORK-FIRST. Vai sempre à rede buscar a versão mais recente
 // (ignorando a cache HTTP do browser/GitHub Pages) e só usa a cache se estiveres offline.
-const CACHE_NAME = 'pec-boleias-runtime-v2';
+const CACHE_NAME = 'pec-boleias-runtime-v3';
 
 const CORE_FILES = [
   './',
