@@ -34,14 +34,14 @@
 }
 
 ::-webkit-scrollbar { display: none; }
-html, body { -ms-overflow-style: none; scrollbar-width: none; overflow-x: hidden; overscroll-behavior-y: contain; }
+html, body { -ms-overflow-style: none; scrollbar-width: none; overflow-x: hidden; }
 
 * { box-sizing: border-box; }
-html, body { min-height: 100vh; margin: 0; background: var(--bg); touch-action: pan-x pan-y; }
+html, body { min-height: 100vh; margin: 0; background: var(--bg); touch-action: manipulation; }
 button, a, img, select { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif; color: var(--text); -webkit-tap-highlight-color: transparent; padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px)); }
 
-body.locked-scroll { overflow: hidden; height: 100vh; height: 100dvh; }
+body.locked-scroll { overflow: hidden; height: 100vh; }
 
 h1, h2, h3, h4 { font-weight: 600; margin: 0; }
 p { margin: 0; line-height: 1.5; color: var(--muted); font-size: 13.5px; text-align: justify; }
@@ -79,6 +79,7 @@ input, select { font-family: inherit; }
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
 .card.no-pad-top { padding-top: 4px; padding-bottom: 4px; }
 .card h3 { font-size: 14px; margin-bottom: 12px; color: var(--text); display: flex; justify-content: space-between; align-items: center; }
+.tag { color: var(--muted); font-size: 11px; font-weight: 500; background: var(--card2); border: 1px solid var(--border); padding: 2px 8px; border-radius: 12px; }
 
 .gh-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--card2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; width: 100%; text-align: center; color: var(--text); font-weight: 500; font-size: 14px; }
 .gh-btn:hover { background: #30363d; }
@@ -89,7 +90,7 @@ input, select { font-family: inherit; }
 .gh-btn.outline { background: transparent; border: 1px solid var(--border); }
 .gh-btn:disabled { opacity: 0.4; pointer-events: none; }
 
-select.input-text { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 32px; background-color: #010409; color: var(--text); }
+select.input-text { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 32px; }
 .input-text { background: #010409; border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 10px 12px; font-size: 14px; width: 100%; outline: none; }
 .input-text:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(214, 107, 43, 0.25); }
 
@@ -109,8 +110,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .center-date { text-align: center; line-height: 1.2; font-size: 11px; }
 .center-date span { display: block; }
 
-.swipe-container { overflow: hidden; width: 100%; position: relative; touch-action: pan-y; will-change: transform; }
-.streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 46px; gap: 6px; padding-bottom: 16px; width: 100%; }
+.swipe-container { overflow: hidden; width: 100%; position: relative; transition: height 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
+.swipe-track { display: flex; align-items: flex-start; width: 300%; will-change: transform; transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
+.streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 46px; gap: 6px; padding-bottom: 16px; width: 33.3333%; flex-shrink: 0; }
 
 .s-day { background: var(--card2); border-radius: 6px; height: 46px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--border); cursor: pointer; position: relative; }
 .s-month-badge { position: absolute; top: 1px; left: 0; right: 0; text-align: center; font-size: 6.5px; font-weight: 600; color: var(--muted); opacity: 0.8; }
@@ -129,9 +131,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .s-day.has-trip-passenger { border-bottom: 3px solid var(--yellow); }
 
 .hist-details { background: var(--card2); border-radius: 6px; padding: 14px; margin-top: 10px; border: 1px solid var(--border); }
-.hist-info { font-size: 13px; color: var(--muted); line-height: 1.5; text-align: left; }
+.hist-info { font-size: 13px; color: var(--muted); line-height: 1.5; text-align: justify; }
 .hist-type { font-weight: 600; color: var(--text); display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.hist-driver-row { display: block; margin-bottom: 4px; color: var(--text); }
+.hist-driver-row { display: block; margin-bottom: 4px; }
 .hist-actions { display: flex; gap: 8px; margin-top: 12px; }
 
 .stats-section-title { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
@@ -217,10 +219,10 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
   <div id="login-screen">
     <div style="text-align: center; margin-bottom: 24px;">
       <h1 class="brand" style="font-size: 20px; margin-bottom: 6px; justify-content: center;">GESTÃO DE <span>BOLEIAS</span> PEC</h1>
+      <p style="color: var(--muted); font-size: 12px;">Ponte de Lima</p>
     </div>
-    <input type="password" id="password-input" class="input-text" placeholder="Palavra-passe" style="text-align: center; margin-bottom: 12px; max-width: 280px;" onkeypress="if(event.key === 'Enter') checkLogin()">
-    <div id="login-error" style="display:none; color: var(--danger); font-size: 12px; margin-bottom: 12px; max-width: 280px; text-align: center;"></div>
-    <button id="login-btn" class="gh-btn primary" onclick="checkLogin()" style="width: 100%; max-width: 280px; justify-content: center;">Entrar na App</button>
+    <input type="password" id="password-input" class="input-text" placeholder="Palavra-passe" style="text-align: center; margin-bottom: 12px; max-width: 280px;">
+    <button class="gh-btn primary" onclick="checkLogin()" style="width: 100%; max-width: 280px; justify-content: center;">Entrar na App</button>
   </div>
 
   <!-- App Principal -->
@@ -264,7 +266,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       </div>
 
       <div class="card" id="history-card-container">
-        <div id="history-calendar" class="swipe-container"></div>
+        <div id="history-calendar"></div>
         <div id="history-details-container"></div>
       </div>
     </div>
@@ -273,11 +275,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     <div id="tab-stats" class="page tab-content" style="display: none;">
       <div class="eyebrow">MÉTRICAS E RESUMO</div>
       
+      <!-- Modos de Visualização: Resumo Global vs Mensal nas Estatísticas -->
       <div style="display: flex; gap: 8px; margin-bottom: 12px;">
          <button id="btn-stats-view-global" class="gh-btn primary" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setStatsView('global')">Resumo Global</button>
          <button id="btn-stats-view-monthly" class="gh-btn outline" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setStatsView('monthly')">Análise Mensal</button>
       </div>
 
+      <!-- Drop-down temporal global para estatísticas -->
       <div id="stats-period-container" style="margin-bottom: 12px;">
          <select id="stats-month-filter" class="input-text" style="height: 44px; padding: 0 12px; line-height: 42px;" onchange="renderStats()">
             <option value="ALL">Desde Sempre</option>
@@ -288,6 +292,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          </select>
       </div>
 
+      <!-- Navegador Mensal de Estatísticas -->
       <div id="stats-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: transparent; padding: 0; border: none; height: 44px;">
          <button onclick="changeStatsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;" id="btn-prev-stats-month">◀</button>
          <div style="display:flex; gap:6px; align-items: center; flex: 1; margin: 0 6px; height: 44px;">
@@ -297,12 +302,12 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          <button onclick="changeStatsMonth(1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;" id="btn-next-stats-month">▶</button>
       </div>
 
-      <div id="stats-content-area" class="swipe-container"></div>
+      <div id="stats-content-area"></div>
     </div>
 
     <!-- TAB 4: POUPANÇA E IMPACTO -->
     <div id="tab-savings" class="page tab-content" style="display: none;">
-      <div class="eyebrow">POUPANÇA E IMPACTO AMBIENTAL</div>
+      <div class="eyebrow">Poupança e Impacto Ambiental</div>
       
       <div class="card">
          <div style="background: var(--card2); padding: 12px; border-radius: 6px; margin-bottom: 16px;">
@@ -321,17 +326,21 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             </p>
          </div>
 
+         <!-- Resultados Globais da Calculadora -->
          <div id="savings-global-results" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: #010409; padding: 16px 8px; border-radius: 6px; border: 1px solid var(--border);">
          </div>
 
+         <!-- NOVO: Contador Dinâmico de Árvores -->
          <div id="savings-tree-counter" style="text-align: center; margin-bottom: 16px; background: rgba(35, 134, 54, 0.1); border: 1px dashed var(--green); padding: 12px; border-radius: 6px; font-size: 12px; color: var(--text); line-height: 1.4;">
          </div>
 
+         <!-- Modos de Visualização: Resumo Global vs Mensal -->
          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
             <button id="btn-view-global" class="gh-btn primary" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setSavingsView('global')">Resumo Global</button>
             <button id="btn-view-monthly" class="gh-btn outline" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setSavingsView('monthly')">Análise Mensal</button>
          </div>
 
+         <!-- Drop-down temporal global -->
          <div id="calc-period-container" style="margin-bottom: 12px;">
             <select id="calc-period" class="input-text" style="height: 44px; padding: 0 12px; line-height: 42px;" onchange="updateSavings()">
                <option value="ALL">Desde Sempre</option>
@@ -342,6 +351,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             </select>
          </div>
 
+         <!-- Navegador Mensal de Poupança -->
          <div id="savings-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: transparent; padding: 0; border: none; height: 44px;">
             <button onclick="changeSavingsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;" id="btn-prev-month">◀</button>
             <div style="display:flex; gap:6px; align-items: center; flex: 1; margin: 0 6px; height: 44px;">
@@ -351,12 +361,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             <button onclick="changeSavingsMonth(1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;" id="btn-next-month">▶</button>
          </div>
 
-         <div id="savings-content-area" class="swipe-container"></div>
+         <div id="savings-content-area"></div>
       </div>
     </div>
     
     <!-- TAB 5: INFO -->
     <div id="tab-info" class="page tab-content" style="display: none;">
+      
       <div style="text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
         <p style="font-size: 13px; margin-bottom: 6px; color: var(--muted); text-align: center;">Para quê ler isto tudo?</p>
         <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 14px;">> VÊ O VÍDEO <</a>
@@ -435,6 +446,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
   <!-- Modal Nova Viagem -->
   <div id="modal-trip" class="modal-overlay">
     <div class="page form-container" id="modal-form-content" style="position: relative;">
+      
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
         <h2 style="font-size: 16px; margin: 0; color: var(--text);">Registo de Viagem</h2>
         <button onclick="closeModal()" style="background:var(--card2); border:1px solid var(--border); color:var(--text); width:32px; height:32px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer;" title="Fechar">✕</button>
@@ -442,7 +454,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
       <div class="fg">
         <label>Data da Viagem</label>
-        <div id="form-calendar-wrapper" class="swipe-container">
+        <div id="form-calendar-wrapper">
           <div id="new-trip-calendar"></div>
         </div>
       </div>
@@ -505,6 +517,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         <button class="gh-btn outline" style="flex:1; padding: 14px; font-size: 15px; margin: 0;" onclick="closeModal()">Cancelar</button>
         <button class="gh-btn primary" style="flex:1; padding: 14px; font-size: 15px; margin: 0;" id="btn-save-trip" onclick="saveTrip()" disabled>Guardar</button>
       </div>
+
     </div>
   </div>
 
@@ -522,103 +535,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
   <div id="toast" class="toast"></div>
 
-  <!-- Script Não-Módulo: Service Worker + Login -->
   <script>
-    function safeGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
-    function safeSet(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
-
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
-        reg.update();
-        document.addEventListener('visibilitychange', () => {
-          if (document.visibilityState === 'visible') reg.update();
-        });
-      }).catch(err => console.log('Erro SW:', err));
+      navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log("Service Worker registado com sucesso!"))
+        .catch((err) => console.log("Erro ao registar Service Worker:", err));
     }
-
-    async function hashString(string) {
-      const msgUint8 = new TextEncoder().encode(string);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    function showLoginError(msg) {
-      const el = document.getElementById('login-error');
-      if (el) { el.textContent = msg; el.style.display = msg ? 'block' : 'none'; }
-    }
-
-    function enterApp() {
-      const lScreen = document.getElementById('login-screen');
-      const aScreen = document.getElementById('app-screen');
-      if(lScreen) lScreen.style.display = 'none';
-      if(aScreen) aScreen.style.display = 'block';
-    }
-
-    function waitForInitApp(timeoutMs = 10000) {
-      return new Promise((resolve, reject) => {
-        if (typeof window.initApp === 'function') return resolve();
-        const start = Date.now();
-        const timer = setInterval(() => {
-          if (typeof window.initApp === 'function') { clearInterval(timer); resolve(); }
-          else if (Date.now() - start > timeoutMs) { clearInterval(timer); reject(new Error('timeout')); }
-        }, 50);
-      });
-    }
-
-    async function startApp() {
-      enterApp();
-      try {
-        await waitForInitApp();
-        window.initApp();
-      } catch (e) {
-        console.error('Erro ao iniciar a app:', e);
-        const aScreen = document.getElementById('app-screen');
-        const lScreen = document.getElementById('login-screen');
-        if (aScreen) aScreen.style.display = 'none';
-        if (lScreen) lScreen.style.display = 'flex';
-        showLoginError('Não foi possível carregar a app. Verifica a ligação e toca em "Entrar na App" para tentar de novo.');
-      }
-    }
-
-    window.checkLogin = async function () {
-      const btn = document.getElementById('login-btn');
-      const pwdInput = document.getElementById('password-input');
-      if(!pwdInput) return;
-      const pwd = pwdInput.value.trim().toLowerCase();
-      const targetHash = '2496e57975c7cb484c2049d5bf599e0339cb1d43a14434241cd64d4b1a1ea0f9';
-      showLoginError('');
-      if (btn) { btn.disabled = true; btn.textContent = 'A entrar...'; }
-
-      try {
-        let ok = false;
-        try {
-          ok = ((await hashString(pwd)) === targetHash) || (pwd === 'pec2026');
-        } catch (e) {
-          ok = (pwd === 'pec2026');
-        }
-
-        if (!ok) {
-          showLoginError('Palavra-passe incorreta.');
-          return;
-        }
-
-        safeSet('pec_auth', 'true');
-        await startApp();
-      } catch (e) {
-        showLoginError('Erro inesperado.');
-      } finally {
-        if (btn) { btn.disabled = false; btn.textContent = 'Entrar na App'; }
-      }
-    };
-
-    window.addEventListener('load', function () {
-      if (safeGet('pec_auth') === 'true') {
-        startApp();
-      }
-    });
   </script>
 
-  <!-- Script App Principal (Módulo) -->
   <script type="module">
     const USE_FIREBASE = true;
 
@@ -631,28 +555,15 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       appId: "1:920930610974:web:600d31aeaaebc9aef0230f"
     };
 
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getFirestore, initializeFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, getDocs, disableNetwork, enableNetwork } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, getDocs, disableNetwork, enableNetwork } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
     let db;
     if (USE_FIREBASE) {
-      try {
-        const app = initializeApp(firebaseConfig);
-        try {
-          db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
-        } catch (e) {
-          db = getFirestore(app);
-        }
-      } catch (err) {
-        console.error("Erro ao iniciar Firebase:", err);
-      }
-    }
-
-    function normalizeTrip(id, data) {
-      const t = { ...data, id };
-      t.drivers = Array.isArray(t.drivers) ? t.drivers : [];
-      t.passengers = Array.isArray(t.passengers) ? t.passengers : [];
-      return t;
+      const app = initializeApp(firebaseConfig);
+      db = initializeFirestore(app, {
+        localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
+      });
     }
 
     const PEOPLE = ["Ana", "André", "Henrique", "Joana", "João", "Luciano", "Luís", "Mariana"];
@@ -692,7 +603,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     function initHistoryFilterDropdown() {
        const select = document.getElementById("history-filter");
-       if(!select) return;
        select.innerHTML = '<option value="ALL">Visualização Global</option>';
        PEOPLE.forEach(person => {
           let opt = document.createElement('option');
@@ -703,6 +613,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        });
     }
 
+    /* === DATA LIMITE ABSOLUTA: NOVEMBRO DE 2025 === */
     const MIN_ALLOWED_YEAR = 2025;
     const MIN_ALLOWED_MONTH = 11;
     const MIN_ALLOWED_ISO = "2025-11-01";
@@ -751,12 +662,25 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           monthSel.value = String(endMonth).padStart(2,'0');
           savingsSelectedMonth = `${selectedYear}-${monthSel.value}`;
        }
+       
+       const btnNextM = document.getElementById("btn-next-month");
+       if(btnNextM) {
+          const isAtCurrentMonth = (selectedYear === currentYear && parseInt(monthSel.value) === currentMonth);
+          btnNextM.disabled = isAtCurrentMonth;
+          btnNextM.style.opacity = isAtCurrentMonth ? "0.3" : "1";
+       }
+
+       const btnPrevM = document.getElementById("btn-prev-month");
+       if(btnPrevM) {
+          const isAtMinMonth = (selectedYear === MIN_ALLOWED_YEAR && parseInt(monthSel.value) === MIN_ALLOWED_MONTH);
+          btnPrevM.disabled = isAtMinMonth;
+          btnPrevM.style.opacity = isAtMinMonth ? "0.3" : "1";
+       }
     }
 
     window.onSavingsYearChange = function() {
        const yearSel = document.getElementById("savings-year-sel");
        const monthSel = document.getElementById("savings-month-sel");
-       if(!yearSel || !monthSel) return;
        updateSavingsMonthOptions();
        savingsSelectedMonth = `${yearSel.value}-${monthSel.value}`;
        updateSavings();
@@ -797,27 +721,43 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        if(parseInt(currY) === selectedYear) {
           let options = Array.from(monthSel.options).map(o => o.value);
           if(options.includes(currM)) {
-             statsSelectedMonth = `${selectedYear}-${currM}`;
+             monthSel.value = currM;
           } else {
-             statsSelectedMonth = `${selectedYear}-${options[options.length - 1]}`;
+             monthSel.value = options[options.length - 1];
+             statsSelectedMonth = `${selectedYear}-${monthSel.value}`;
           }
+       } else {
+          monthSel.value = String(endMonth).padStart(2,'0');
+          statsSelectedMonth = `${selectedYear}-${monthSel.value}`;
+       }
+       
+       const btnNextM = document.getElementById("btn-next-stats-month");
+       if(btnNextM) {
+          const isAtCurrentMonth = (selectedYear === currentYear && parseInt(monthSel.value) === currentMonth);
+          btnNextM.disabled = isAtCurrentMonth;
+          btnNextM.style.opacity = isAtCurrentMonth ? "0.3" : "1";
+       }
+
+       const btnPrevM = document.getElementById("btn-prev-stats-month");
+       if(btnPrevM) {
+          const isAtMinMonth = (selectedYear === MIN_ALLOWED_YEAR && parseInt(monthSel.value) === MIN_ALLOWED_MONTH);
+          btnPrevM.disabled = isAtMinMonth;
+          btnPrevM.style.opacity = isAtMinMonth ? "0.3" : "1";
        }
     }
 
     window.onStatsYearChange = function() {
        const yearSel = document.getElementById("stats-year-sel");
        const monthSel = document.getElementById("stats-month-sel");
-       if(!yearSel || !monthSel) return;
        updateStatsMonthOptions();
        statsSelectedMonth = `${yearSel.value}-${monthSel.value}`;
        renderStats();
     }
 
     window.jumpStatsMonth = function() {
-       const m = document.getElementById("stats-month-sel");
-       const y = document.getElementById("stats-year-sel");
-       if(!m || !y) return;
-       statsSelectedMonth = `${y.value}-${m.value}`;
+       const m = document.getElementById("stats-month-sel").value;
+       const y = document.getElementById("stats-year-sel").value;
+       statsSelectedMonth = `${y}-${m}`;
        renderStats();
     }
 
@@ -834,63 +774,55 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        if (targetYear > currentYear || (targetYear === currentYear && targetMonth > currentMonth)) return;
 
        statsSelectedMonth = nextKey;
-       const statsYearSel = document.getElementById("stats-year-sel");
-       const statsMonthSel = document.getElementById("stats-month-sel");
-       if(statsYearSel) statsYearSel.value = ny;
+       document.getElementById("stats-year-sel").value = ny;
        updateStatsMonthOptions();
-       if(statsMonthSel) statsMonthSel.value = nm;
+       document.getElementById("stats-month-sel").value = nm;
        renderStats();
     }
 
     window.setStatsView = function(viewMode) {
        currentStatsView = viewMode;
-       const btnG = document.getElementById('btn-stats-view-global');
-       const btnM = document.getElementById('btn-stats-view-monthly');
-       if(btnG) btnG.className = viewMode === 'global' ? "gh-btn primary" : "gh-btn outline";
-       if(btnM) btnM.className = viewMode === 'monthly' ? "gh-btn primary" : "gh-btn outline";
+       document.getElementById('btn-stats-view-global').className = viewMode === 'global' ? "gh-btn primary" : "gh-btn outline";
+       document.getElementById('btn-stats-view-monthly').className = viewMode === 'monthly' ? "gh-btn primary" : "gh-btn outline";
        
-       const spContainer = document.getElementById('stats-period-container');
-       const smNav = document.getElementById('stats-monthly-nav');
-       if(spContainer) spContainer.style.display = viewMode === 'monthly' ? "none" : "block";
-       if(smNav) smNav.style.display = viewMode === 'monthly' ? "flex" : "none";
+       document.getElementById('stats-period-container').style.display = viewMode === 'monthly' ? "none" : "block";
+       document.getElementById('stats-monthly-nav').style.display = viewMode === 'monthly' ? "flex" : "none";
        
        if(viewMode === 'monthly') {
           let [y, m] = statsSelectedMonth.split('-');
-          const statsYearSel = document.getElementById("stats-year-sel");
-          const statsMonthSel = document.getElementById("stats-month-sel");
-          if(statsYearSel) statsYearSel.value = y;
+          document.getElementById("stats-year-sel").value = y;
           updateStatsMonthOptions();
-          if(statsMonthSel) statsMonthSel.value = m;
+          document.getElementById("stats-month-sel").value = m;
        }
 
        renderStats();
     }
 
     window.forceRefresh = async function() {
-       if(!USE_FIREBASE || !db) { showToast("Firebase indisponível."); return; }
+       if(!USE_FIREBASE) return;
        const btn = document.getElementById("btn-refresh");
-       if(btn) { btn.innerText = "A atualizar..."; btn.disabled = true; }
+       btn.innerText = "A atualizar...";
+       btn.disabled = true;
        try {
           const q = query(collection(db, "trips"), orderBy("date", "desc"));
           const snapshot = await getDocs(q);
-          if (snapshot.metadata.fromCache && snapshot.empty) throw new Error("sem ligação ao servidor");
-          trips = snapshot.docs.map(d => normalizeTrip(d.id, d.data()));
-          safeSet("pec_trips_v20", JSON.stringify(trips));
+          trips = [];
+          snapshot.forEach((doc) => { trips.push({ id: doc.id, ...doc.data() }); });
           recalculateAndRender();
           showToast("Dados atualizados!");
        } catch (err) {
-          console.error("forceRefresh:", err);
-          showToast("Sem ligação ao servidor. A mostrar os últimos dados guardados.");
+          showToast("Erro ao sincronizar dados!");
        } finally {
-          if(btn) { btn.innerHTML = "Atualizar Dados ☁️"; btn.disabled = false; }
+          btn.innerHTML = "Atualizar Dados ☁️";
+          btn.disabled = false;
        }
     }
 
     window.forceBackup = async function() {
-       if(!USE_FIREBASE || !db) return;
+       if(!USE_FIREBASE) return;
        const btn = document.getElementById("btn-force-backup");
-       const origText = btn ? btn.innerText : "";
-       if(btn) btn.innerText = "A Sincronizar...";
+       const origText = btn.innerText;
+       btn.innerText = "A Sincronizar...";
        try {
           await disableNetwork(db);
           await enableNetwork(db);
@@ -898,12 +830,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        } catch(e) {
           showToast("Erro de ligação.");
        }
-       if(btn) btn.innerText = origText;
+       btn.innerText = origText;
     }
 
     window.showToast = function(msg) {
       const t = document.getElementById("toast");
-      if(!t) return;
       t.textContent = msg;
       t.classList.add("show");
       setTimeout(() => t.classList.remove("show"), 2500);
@@ -913,35 +844,26 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     let confirmCallback = null;
     window.showConfirm = function(title, msg, callback) {
-       const cTitle = document.getElementById("confirm-title");
-       const cMsg = document.getElementById("confirm-msg");
-       const cConfirm = document.getElementById("custom-confirm");
-       if(cTitle) cTitle.innerText = title;
-       if(cMsg) cMsg.innerText = msg;
+       document.getElementById("confirm-title").innerText = title;
+       document.getElementById("confirm-msg").innerText = msg;
        confirmCallback = callback;
-       if(cConfirm) cConfirm.classList.add("active");
+       document.getElementById("custom-confirm").classList.add("active");
     }
     window.closeConfirm = function() {
-       const cConfirm = document.getElementById("custom-confirm");
-       if(cConfirm) cConfirm.classList.remove("active");
+       document.getElementById("custom-confirm").classList.remove("active");
        confirmCallback = null;
     }
-    const confirmBtn = document.getElementById("confirm-btn");
-    if(confirmBtn) {
-        confirmBtn.onclick = function() {
-           if(confirmCallback) confirmCallback();
-           closeConfirm();
-        }
+    document.getElementById("confirm-btn").onclick = function() {
+       if(confirmCallback) confirmCallback();
+       closeConfirm();
     }
 
     window.switchTab = function(tabName) {
        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
        document.querySelectorAll('.botnav button').forEach(el => el.classList.remove('active'));
        
-       const targetTab = document.getElementById('tab-' + tabName);
-       const targetNav = document.getElementById('nav-' + tabName);
-       if(targetTab) targetTab.style.display = 'block';
-       if(targetNav) targetNav.classList.add('active');
+       document.getElementById('tab-' + tabName).style.display = 'block';
+       document.getElementById('nav-' + tabName).classList.add('active');
        
        if(tabName === 'home') {
           document.body.classList.add('locked-scroll');
@@ -951,8 +873,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        
        if(tabName === 'history') {
           historySelectedDate = getLocalDateISO();
-          const histFilter = document.getElementById('history-filter');
-          if(histFilter) histFilter.value = "ALL"; 
+          document.getElementById('history-filter').value = "ALL"; 
           currentHistoryFilter = "ALL";
           renderHistoryCalendar();
        }
@@ -965,14 +886,137 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        window.scrollTo(0,0);
     }
 
-    window.initApp = function() {
-      if (window.__appStarted) return;
-      window.__appStarted = true;
+    async function hashString(string) {
+      const msgUint8 = new TextEncoder().encode(string);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
 
-      const consInput = document.getElementById('calc-cons');
-      const priceInput = document.getElementById('calc-price');
-      if(consInput) consInput.value = safeGet('pec_cons') || '5.0';
-      if(priceInput) priceInput.value = safeGet('pec_price') || '2.00';
+    window.checkLogin = async function() {
+      const pwd = document.getElementById("password-input").value;
+      const targetHash = "2496e57975c7cb484c2049d5bf599e0339cb1d43a14434241cd64d4b1a1ea0f9"; 
+      
+      let enteredHash = null;
+      try {
+         enteredHash = await hashString(pwd);
+      } catch(e) {
+         console.warn("Crypto bloqueado pelo browser. A validar como texto...");
+      }
+
+      if (enteredHash === targetHash || pwd === "pec2026") {
+         localStorage.setItem("pec_auth", "true");
+         document.getElementById("login-screen").style.display = "none";
+         document.getElementById("app-screen").style.display = "block";
+         initApp();
+      } else {
+         alert("Password incorreta.");
+      }
+    }
+
+    window.onload = function() {
+      if (localStorage.getItem("pec_auth") === "true") {
+         document.getElementById("login-screen").style.display = "none";
+         document.getElementById("app-screen").style.display = "block";
+         initApp();
+      }
+    }
+
+    function setupSwipeListener(containerId, trackId, onSwipeLeft, onSwipeRight, isMonthlyNav = false) {
+       const container = document.getElementById(containerId);
+       if(!container) return;
+       let startX = 0, startY = 0, isDragging = false, currentX = 0;
+
+       container.addEventListener('touchstart', e => {
+          startX = e.changedTouches[0].screenX;
+          startY = e.changedTouches[0].screenY;
+          isDragging = true;
+          const track = document.getElementById(trackId);
+          if(track) track.style.transition = 'none';
+       }, {passive: true});
+
+       container.addEventListener('touchmove', e => {
+          if(!isDragging) return;
+          const x = e.changedTouches[0].screenX;
+          const y = e.changedTouches[0].screenY;
+          const deltaX = x - startX;
+          const deltaY = y - startY;
+
+          if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+             if(isMonthlyNav) {
+                let targetSelectedMonth = "";
+                if(containerId.includes('stats')) targetSelectedMonth = statsSelectedMonth;
+                else if(containerId.includes('savings')) targetSelectedMonth = savingsSelectedMonth;
+                else if(containerId.includes('hist')) targetSelectedMonth = historySelectedDate.substring(0, 7);
+
+                let [y, m] = targetSelectedMonth.split('-');
+                let cur = new Date();
+                
+                if(deltaX < 0 && parseInt(y) === cur.getFullYear() && parseInt(m) === (cur.getMonth()+1)) {
+                    return; 
+                }
+                if(deltaX > 0 && parseInt(y) === MIN_ALLOWED_YEAR && parseInt(m) === MIN_ALLOWED_MONTH) {
+                    return;
+                }
+             }
+             currentX = Math.max(-window.innerWidth, Math.min(window.innerWidth, deltaX));
+             const track = document.getElementById(trackId);
+             if(track) track.style.transform = `translateX(calc(-33.3333% + ${currentX}px))`;
+             if(e.cancelable) e.preventDefault();
+          }
+       }, {passive: false});
+
+       container.addEventListener('touchend', e => {
+          if(!isDragging) return;
+          isDragging = false;
+          const track = document.getElementById(trackId);
+          if(!track) return;
+          
+          track.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
+          
+          if (currentX < -60) {
+             if(isMonthlyNav) {
+                let targetSelectedMonth = "";
+                if(containerId.includes('stats')) targetSelectedMonth = statsSelectedMonth;
+                else if(containerId.includes('savings')) targetSelectedMonth = savingsSelectedMonth;
+                else if(containerId.includes('hist')) targetSelectedMonth = historySelectedDate.substring(0, 7);
+
+                let [y, m] = targetSelectedMonth.split('-');
+                let cur = new Date();
+                if(parseInt(y) === cur.getFullYear() && parseInt(m) === (cur.getMonth()+1)) {
+                    track.style.transform = `translateX(-33.3333%)`;
+                    currentX = 0;
+                    return;
+                }
+             }
+             track.style.transform = `translateX(-66.6666%)`; 
+             setTimeout(() => { onSwipeLeft(); }, 250);
+          } else if (currentX > 60) {
+             if(isMonthlyNav) {
+                let targetSelectedMonth = "";
+                if(containerId.includes('stats')) targetSelectedMonth = statsSelectedMonth;
+                else if(containerId.includes('savings')) targetSelectedMonth = savingsSelectedMonth;
+                else if(containerId.includes('hist')) targetSelectedMonth = historySelectedDate.substring(0, 7);
+
+                let [y, m] = targetSelectedMonth.split('-');
+                if(parseInt(y) === MIN_ALLOWED_YEAR && parseInt(m) === MIN_ALLOWED_MONTH) {
+                    track.style.transform = `translateX(-33.3333%)`;
+                    currentX = 0;
+                    return;
+                }
+             }
+             track.style.transform = `translateX(0%)`; 
+             setTimeout(() => { onSwipeRight(); }, 250);
+          } else {
+             track.style.transform = `translateX(-33.3333%)`; 
+          }
+          currentX = 0;
+       }, {passive: true});
+    }
+
+    function initApp() {
+      document.getElementById('calc-cons').value = localStorage.getItem('pec_cons') || '5.0';
+      document.getElementById('calc-price').value = localStorage.getItem('pec_price') || '2.00';
       
       populateSavingsYearDropdown();
       updateSavingsMonthOptions();
@@ -984,47 +1028,23 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       
       switchTab('home');
 
-      const localTrips = safeGet("pec_trips_v20");
-      if(localTrips) {
-         try {
-            trips = JSON.parse(localTrips).map(t => normalizeTrip(t.id, t));
-            recalculateAndRender();
-         } catch(e) {}
-      }
-
-      if (USE_FIREBASE && db) {
+      if (USE_FIREBASE) {
         const q = query(collection(db, "trips"), orderBy("date", "desc"));
         onSnapshot(q, (snapshot) => {
-          try {
-            if (snapshot.metadata.fromCache && snapshot.empty) return;
-            trips = snapshot.docs.map(d => normalizeTrip(d.id, d.data()));
-            safeSet("pec_trips_v20", JSON.stringify(trips));
-            recalculateAndRender();
-          } catch (e) {
-            console.error("Erro a processar dados:", e);
-            showToast("Erro a processar os dados.");
-          }
-        }, (error) => {
-          console.error("Erro no listener do Firestore:", error);
-          showToast("Sem ligação em tempo real.");
+          trips = [];
+          snapshot.forEach((doc) => { trips.push({ id: doc.id, ...doc.data() }); });
+          recalculateAndRender();
         });
-
-        const reconnect = async () => {
-          try { await disableNetwork(db); await enableNetwork(db); } catch (e) {}
-        };
-        let hiddenAt = 0;
-        document.addEventListener('visibilitychange', () => {
-          if (document.visibilityState === 'hidden') hiddenAt = Date.now();
-          else if (hiddenAt && Date.now() - hiddenAt > 30000) { hiddenAt = 0; reconnect(); }
-        });
-        window.addEventListener('online', reconnect);
+      } else {
+        const localTrips = localStorage.getItem("pec_trips_v20");
+        if(localTrips) trips = JSON.parse(localTrips);
+        recalculateAndRender();
       }
     }
 
     function renderHeaderDate() {
        const now = new Date();
-       const hDate = document.getElementById("header-date");
-       if(hDate) hDate.innerText = `${String(now.getDate()).padStart(2, '0')} ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+       document.getElementById("header-date").innerText = `${String(now.getDate()).padStart(2, '0')} ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
     }
 
     function renderWeekBar() {
@@ -1032,7 +1052,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        const shortDays = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
        const segsContainer = document.getElementById("wb-segments");
        const labelsContainer = document.getElementById("wb-labels");
-       if(!segsContainer || !labelsContainer) return;
        
        let segsHtml = "";
        let labelsHtml = "";
@@ -1102,7 +1121,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       });
       
       const list = document.getElementById("balance-list");
-      if(!list) return;
       list.innerHTML = "";
       
       sortedPeople.forEach((p, index) => {
@@ -1133,15 +1151,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
       renderHistoryCalendar();
       renderWeekBar();
-      renderHeaderDate();
-      const statsTab = document.getElementById('tab-stats');
-      const savingsTab = document.getElementById('tab-savings');
-      if(statsTab && statsTab.style.display === 'block') renderStats();
-      if(savingsTab && savingsTab.style.display === 'block') updateSavings();
+      if(document.getElementById('tab-stats').style.display === 'block') renderStats();
+      if(document.getElementById('tab-savings').style.display === 'block') updateSavings();
     }
 
     function generateStatsCardContent(filteredTrips) {
        let totalTripsCount = filteredTrips.reduce((acc, t) => acc + (t.cars === 2 ? 2 : 1), 0);
+       
        let statsData = [];
        PEOPLE.forEach(person => {
           let asDriver = 0;
@@ -1172,6 +1188,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        const maxRatioVal = Math.max(...statsData.map(d => d.ratio), 0);
        
        let ratioHtml = `<div style="position: relative;">`; 
+       
        if(sumTotal > 0) {
            const linePos = `calc(65px + (100% - 105px) * ${globalRatioPct / 100})`;
            ratioHtml += `<div class="avg-line" style="left: ${linePos};"></div>`;
@@ -1180,17 +1197,25 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        statsDataAlpha.forEach(d => {
           const pct = Math.round(d.ratio * 100);
           const barColor = (d.ratio === maxRatioVal && maxRatioVal > 0) ? "var(--accent)" : "rgba(214, 107, 43, 0.45)";
+          
           ratioHtml += `<div class="chart-bar-row">
              <div class="chart-label">${d.name}</div>
-             <div class="chart-track"><div class="chart-fill" style="width: ${pct}%; background: ${barColor};"></div></div>
+             <div class="chart-track">
+                <div class="chart-fill" style="width: ${pct}%; background: ${barColor};"></div>
+             </div>
              <div class="chart-val" style="width:40px;">${pct}%</div>
           </div>`;
        });
+       
        ratioHtml += `</div>`; 
 
        if(sumTotal > 0) {
            const linePos = `calc(65px + (100% - 105px) * ${globalRatioPct / 100})`;
-           ratioHtml += `<div style="position: relative; height: 16px; margin-top: 4px;"><div class="avg-label" style="left: ${linePos};">média de ${globalRatioPct}%</div></div>`;
+           ratioHtml += `
+              <div style="position: relative; height: 16px; margin-top: 4px;">
+                 <div class="avg-label" style="left: ${linePos};">média de ${globalRatioPct}%</div>
+              </div>
+           `;
        }
 
        const maxVal = Math.max(...statsData.map(d => Math.max(d.totalViagens, d.asDriver, d.asPassenger, d.passCount)), 1);
@@ -1203,22 +1228,42 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
           barsHtml += `<div style="margin-bottom: 12px; background: var(--card2); padding: 8px; border-radius: 6px; border: 1px solid var(--border);">
              <div style="font-size: 12px; font-weight:600; color:var(--text); margin-bottom:6px; width: 65px; text-align: right;">${d.name}</div>
-             <div class="chart-bar-row" style="margin-bottom:3px;"><div class="chart-label" style="font-size:9px;">Total Viagens</div><div class="chart-track"><div class="chart-fill" style="width: ${pTot}%; background:var(--accent)"></div></div><div class="chart-val" style="width:40px;">${d.totalViagens}</div></div>
-             <div class="chart-bar-row" style="margin-bottom:3px;"><div class="chart-label" style="font-size:9px;">Condutor</div><div class="chart-track"><div class="chart-fill" style="width: ${pDrv}%; background:var(--green)"></div></div><div class="chart-val" style="width:40px;">${d.asDriver}</div></div>
-             <div class="chart-bar-row" style="margin-bottom:3px;"><div class="chart-label" style="font-size:9px;">Passageiro</div><div class="chart-track"><div class="chart-fill" style="width: ${pPas}%; background:var(--muted)"></div></div><div class="chart-val" style="width:40px;">${d.asPassenger}</div></div>
-             <div class="chart-bar-row" style="margin-bottom:0;"><div class="chart-label" style="font-size:9px;">Transportados</div><div class="chart-track"><div class="chart-fill" style="width: ${pTra}%; background:#f59e0b"></div></div><div class="chart-val" style="width:40px;">${d.passCount}</div></div>
+             
+             <div class="chart-bar-row" style="margin-bottom:3px;">
+                <div class="chart-label" style="font-size:9px;">Total Viagens</div>
+                <div class="chart-track"><div class="chart-fill" style="width: ${pTot}%; background:var(--accent)"></div></div>
+                <div class="chart-val" style="width:40px;">${d.totalViagens}</div>
+             </div>
+             <div class="chart-bar-row" style="margin-bottom:3px;">
+                <div class="chart-label" style="font-size:9px;">Condutor</div>
+                <div class="chart-track"><div class="chart-fill" style="width: ${pDrv}%; background:var(--green)"></div></div>
+                <div class="chart-val" style="width:40px;">${d.asDriver}</div>
+             </div>
+             <div class="chart-bar-row" style="margin-bottom:3px;">
+                <div class="chart-label" style="font-size:9px;">Passageiro</div>
+                <div class="chart-track"><div class="chart-fill" style="width: ${pPas}%; background:var(--muted)"></div></div>
+                <div class="chart-val" style="width:40px;">${d.asPassenger}</div>
+             </div>
+             <div class="chart-bar-row" style="margin-bottom:0;">
+                <div class="chart-label" style="font-size:9px;">Transportados</div>
+                <div class="chart-track"><div class="chart-fill" style="width: ${pTra}%; background:#f59e0b"></div></div>
+                <div class="chart-val" style="width:40px;">${d.passCount}</div>
+             </div>
           </div>`;
        });
 
        return `
-          <div class="card" style="margin-bottom:0;">
+          <div class="card">
             <h3 style="margin-bottom: 8px;">Estatísticas Gerais</h3>
+            
             <div style="font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 20px; display: flex; align-items: baseline; gap: 8px;">
               <span>${totalTripsCount}</span>
               <span style="font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase;">Viagens Registadas</span>
             </div>
+            
             <div class="stats-section-title">RÁCIO (CONDUÇÃO/VIAGENS)</div>
             ${ratioHtml}
+
             <div class="stats-section-title" style="margin-top: 20px;">Métricas de Participação (Nº de Vezes)</div>
             ${barsHtml}
           </div>
@@ -1227,11 +1272,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     window.renderStats = function() {
        const container = document.getElementById('stats-content-area');
-       if(!container) return;
        
        if (currentStatsView === 'global') {
-          const statsMonthFilter = document.getElementById('stats-month-filter');
-          const filterDays = statsMonthFilter ? statsMonthFilter.value : "ALL";
+          const filterDays = document.getElementById('stats-month-filter').value;
           let filteredTrips = trips;
           if(filterDays !== "ALL") {
              const daysNum = parseInt(filterDays);
@@ -1246,26 +1289,37 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           container.innerHTML = generateStatsCardContent(filteredTrips);
        } else {
           let [y, m] = statsSelectedMonth.split('-');
-          const statsYearSel = document.getElementById("stats-year-sel");
-          const statsMonthSel = document.getElementById("stats-month-sel");
-          if(statsYearSel) statsYearSel.value = y;
+          document.getElementById("stats-year-sel").value = y;
           updateStatsMonthOptions();
-          if(statsMonthSel) statsMonthSel.value = m;
+          document.getElementById("stats-month-sel").value = m;
 
-          let monthlyTrips = trips.filter(t => t.date.startsWith(statsSelectedMonth));
-          container.innerHTML = generateStatsCardContent(monthlyTrips);
-          
-          if(currentStatsView === 'monthly') {
-             attachSmoothSwipeHandler('stats-content-area', () => changeStatsMonth(1), () => changeStatsMonth(-1));
-          }
+          const buildMonthStatsHTML = (mKey) => {
+             let monthlyTrips = trips.filter(t => t.date.startsWith(mKey));
+             return generateStatsCardContent(monthlyTrips);
+          };
+
+          let prev = getOffsetMonth(statsSelectedMonth, -1);
+          let next = getOffsetMonth(statsSelectedMonth, 1);
+
+          container.innerHTML = `
+             <div id="stats-list-swipe" class="swipe-container" style="min-height: 380px;">
+                <div id="stats-list-track" class="swipe-track" style="transform: translateX(-33.3333%); align-items: flex-start;">
+                   <div style="width: 33.3333%; flex-shrink:0;">${buildMonthStatsHTML(prev)}</div>
+                   <div style="width: 33.3333%; flex-shrink:0;">${buildMonthStatsHTML(statsSelectedMonth)}</div>
+                   <div style="width: 33.3333%; flex-shrink:0;">${buildMonthStatsHTML(next)}</div>
+                </div>
+             </div>
+          `;
+          setupSwipeListener('stats-list-swipe', 'stats-list-track', () => changeStatsMonth(1), () => changeStatsMonth(-1), true);
        }
     }
 
+    /* === SECÇÃO POUPANÇA E IMPACTO AMBIENTAL === */
+
     window.jumpSavingsMonth = function() {
-       const mElem = document.getElementById("savings-month-sel");
-       const yElem = document.getElementById("savings-year-sel");
-       if(!mElem || !yElem) return;
-       savingsSelectedMonth = `${yElem.value}-${mElem.value}`;
+       const m = document.getElementById("savings-month-sel").value;
+       const y = document.getElementById("savings-year-sel").value;
+       savingsSelectedMonth = `${y}-${m}`;
        updateSavings();
     }
 
@@ -1289,34 +1343,29 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        if (targetYear > currentYear || (targetYear === currentYear && targetMonth > currentMonth)) return;
 
        savingsSelectedMonth = nextKey;
-       const savingsYearSel = document.getElementById("savings-year-sel");
-       const savingsMonthSel = document.getElementById("savings-month-sel");
-       if(savingsYearSel) savingsYearSel.value = ny;
+       document.getElementById("savings-year-sel").value = ny;
        updateSavingsMonthOptions();
-       if(savingsMonthSel) savingsMonthSel.value = nm;
+       document.getElementById("savings-month-sel").value = nm;
        updateSavings();
     }
 
     window.setSavingsView = function(viewMode) {
        currentSavingsView = viewMode;
-       const btnG = document.getElementById('btn-view-global');
-       const btnM = document.getElementById('btn-view-monthly');
-       if(btnG) btnG.className = viewMode === 'global' ? "gh-btn primary" : "gh-btn outline";
-       if(btnM) btnM.className = viewMode === 'monthly' ? "gh-btn primary" : "gh-btn outline";
+       document.getElementById('btn-view-global').className = viewMode === 'global' ? "gh-btn primary" : "gh-btn outline";
+       document.getElementById('btn-view-monthly').className = viewMode === 'monthly' ? "gh-btn primary" : "gh-btn outline";
        
-       const cpContainer = document.getElementById('calc-period-container');
-       const sNav = document.getElementById('savings-monthly-nav');
-       if(cpContainer) cpContainer.style.display = viewMode === 'monthly' ? "none" : "block";
-       if(sNav) sNav.style.display = viewMode === 'monthly' ? "flex" : "none";
+       document.getElementById('calc-period-container').style.display = viewMode === 'monthly' ? "none" : "block";
+       document.getElementById('savings-monthly-nav').style.display = viewMode === 'monthly' ? "flex" : "none";
        
        if(viewMode === 'monthly') {
           let [y, m] = savingsSelectedMonth.split('-');
-          const savingsYearSel = document.getElementById("savings-year-sel");
-          const savingsMonthSel = document.getElementById("savings-month-sel");
-          if(savingsYearSel) savingsYearSel.value = y;
+          document.getElementById("savings-year-sel").value = y;
           updateSavingsMonthOptions();
-          if(savingsMonthSel) savingsMonthSel.value = m;
+          document.getElementById("savings-month-sel").value = m;
        }
+
+       const track = document.getElementById('savings-list-track');
+       if(track) track.style.transform = 'translateX(-33.3333%)';
        
        updateSavings();
     }
@@ -1325,9 +1374,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         if (dataArr.length === 0) return `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px; width: 100%;">Nenhuma viagem registada.</div>`;
         
         let chartStr = `<div class="stats-chart" style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">`;
+        
         dataArr.forEach(d => {
             let pct = maxEuros > 0 ? (d.euros / maxEuros) * 100 : 0;
             let color = (d.euros === maxEuros && maxEuros > 0) ? "var(--green)" : "rgba(35, 134, 54, 0.45)"; 
+            
             chartStr += `
             <div class="chart-bar-row">
                <div class="chart-label" style="width: 65px; flex-shrink: 0; text-align: right;">${d.name}</div>
@@ -1338,12 +1389,19 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                </div>
             </div>`;
         });
+        
         chartStr += `</div>`;
         
         let listStr = "";
         dataArr.forEach(d => {
             if (d.hasData === false) {
-                listStr += `<li class="list-item"><div class="balance-name">${d.name}</div><div style="text-align: right; color: var(--muted); font-size: 11.5px; font-style: italic;">Sem dados para este período</div></li>`;
+                listStr += `
+                <li class="list-item">
+                    <div class="balance-name">${d.name}</div>
+                    <div style="text-align: right; color: var(--muted); font-size: 11.5px; font-style: italic;">
+                        Sem dados para este mês
+                    </div>
+                </li>`;
             } else {
                 let monthlyInfoHtml = "";
                 if (showMonthlyAvg) {
@@ -1351,23 +1409,29 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                     let monthlyKm = monthsCount > 0 ? d.km / monthsCount : d.km;
                     monthlyInfoHtml = `<div style="font-size: 9.5px; color: var(--text); margin-top: 1px;">Média mensal: <span style="color: var(--green); font-weight: 600;">${fmtMoney(monthlyEur)} € / ${fmtMoney(monthlyKm)} km</span></div>`;
                 }
-                listStr += `<li class="list-item"><div class="balance-name">${d.name}</div><div style="text-align: right;"><div style="font-size: 13.5px;"><span style="font-weight: 600; color: var(--text);">${fmtMoney(d.euros)} €</span> <span style="font-size: 10px; color: var(--muted); font-weight: 400;">poupados</span></div><div style="font-size: 10.5px; color: var(--muted);">${d.km} km à boleia</div>${monthlyInfoHtml}</div></li>`;
+                
+                listStr += `
+                <li class="list-item">
+                    <div class="balance-name">${d.name}</div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 13.5px;"><span style="font-weight: 600; color: var(--text);">${fmtMoney(d.euros)} €</span> <span style="font-size: 10px; color: var(--muted); font-weight: 400;">poupados</span></div>
+                        <div style="font-size: 10.5px; color: var(--muted);">${d.km} km à boleia</div>
+                        ${monthlyInfoHtml}
+                    </div>
+                </li>`;
             }
         });
+        
         return chartStr + `<ul class="list">${listStr}</ul>`;
     }
 
     window.updateSavings = function() {
-        const periodElem = document.getElementById('calc-period');
-        const periodVal = periodElem ? periodElem.value : "ALL";
-        const consElem = document.getElementById('calc-cons');
-        const priceElem = document.getElementById('calc-price');
+        const periodVal = document.getElementById('calc-period') ? document.getElementById('calc-period').value : "ALL";
+        const cons = parseFloat(document.getElementById('calc-cons').value) || 0;
+        const price = parseFloat(document.getElementById('calc-price').value) || 0;
         
-        const cons = consElem ? (parseFloat(consElem.value) || 0) : 5.0;
-        const price = priceElem ? (parseFloat(priceElem.value) || 0) : 2.0;
-        
-        safeSet('pec_cons', cons);
-        safeSet('pec_price', price);
+        localStorage.setItem('pec_cons', cons);
+        localStorage.setItem('pec_price', price);
 
         let filteredTrips = trips;
         if (currentSavingsView !== 'monthly' && periodVal !== "ALL") {
@@ -1395,6 +1459,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
             const processCar = (car) => {
                 if (!car || !car.driver || !car.passengers || car.passengers.length === 0) return;
+                
                 const onlyBraga = [car.driver, ...car.passengers].every(p => BRAGA_GROUP.includes(p));
                 const baseDist = onlyBraga ? 29 : 26;
                 const finalDist = car.isOneWay ? baseDist : (baseDist * 2);
@@ -1419,11 +1484,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             displayKm = totalKmSaved;
         } else {
             let [y, m] = savingsSelectedMonth.split('-');
-            const savingsYearSel = document.getElementById("savings-year-sel");
-            const savingsMonthSel = document.getElementById("savings-month-sel");
-            if(savingsYearSel) savingsYearSel.value = y;
+            document.getElementById("savings-year-sel").value = y;
             updateSavingsMonthOptions();
-            if(savingsMonthSel) savingsMonthSel.value = m;
+            document.getElementById("savings-month-sel").value = m;
 
             if (monthlySavingsData[savingsSelectedMonth]) {
                 Object.values(monthlySavingsData[savingsSelectedMonth]).forEach(d => {
@@ -1437,42 +1500,50 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         const displayCO2Kg = displayLiters * 2.48; 
         
         const fmtEuros = displayEuros >= 1000 ? parseFloat((displayEuros / 1000).toFixed(2)) + ' k' : fmtMoney(displayEuros);
-        let fmtLiters = displayLiters >= 1000 ? parseFloat((displayLiters / 1000).toFixed(2)) + ' kL' : (fmtMoney(displayLiters) + ' L');
-        let fmtCO2 = displayCO2Kg >= 1000 ? parseFloat((displayCO2Kg / 1000).toFixed(2)) + ' t' : (fmtMoney(displayCO2Kg) + ' kg');
-
-        const savingsGlobalResults = document.getElementById('savings-global-results');
-        if(savingsGlobalResults) {
-            savingsGlobalResults.innerHTML = `
-                <div style="text-align: center; flex: 1; border-right: 1px solid var(--border); padding: 0 2px;">
-                   <span style="font-size: 18px; font-weight: 700; color: var(--accent);">${fmtLiters}</span><br>
-                   <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Comb. Poupado</span>
-                </div>
-                <div style="text-align: center; flex: 1; border-right: 1px solid var(--border); padding: 0 2px;">
-                   <span style="font-size: 18px; font-weight: 700; color: var(--text);">${fmtCO2}</span><br>
-                   <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">CO2 Evitado</span>
-                </div>
-                <div style="text-align: center; flex: 1; padding: 0 2px;">
-                   <span style="font-size: 18px; font-weight: 700; color: var(--green);">${fmtEuros} €</span><br>
-                   <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Poupança Total</span>
-                </div>
-            `;
+        
+        let fmtLiters;
+        if (displayLiters >= 1000) {
+            fmtLiters = parseFloat((displayLiters / 1000).toFixed(2)) + ' kL';
+        } else {
+            fmtLiters = fmtMoney(displayLiters) + ' L';
         }
+
+        let fmtCO2;
+        if (displayCO2Kg >= 1000) {
+            fmtCO2 = parseFloat((displayCO2Kg / 1000).toFixed(2)) + ' t';
+        } else {
+            fmtCO2 = fmtMoney(displayCO2Kg) + ' kg';
+        }
+
+        document.getElementById('savings-global-results').innerHTML = `
+            <div style="text-align: center; flex: 1; border-right: 1px solid var(--border); padding: 0 2px;">
+               <span style="font-size: 18px; font-weight: 700; color: var(--accent);">${fmtLiters}</span><br>
+               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Comb. Poupado</span>
+            </div>
+            <div style="text-align: center; flex: 1; border-right: 1px solid var(--border); padding: 0 2px;">
+               <span style="font-size: 18px; font-weight: 700; color: var(--text);">${fmtCO2}</span><br>
+               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">CO2 Evitado</span>
+            </div>
+            <div style="text-align: center; flex: 1; padding: 0 2px;">
+               <span style="font-size: 18px; font-weight: 700; color: var(--green);">${fmtEuros} €</span><br>
+               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Poupança Total</span>
+            </div>
+        `;
 
         const treeCounterDiv = document.getElementById('savings-tree-counter');
         if (treeCounterDiv) {
             const numArvores = Math.floor(displayCO2Kg / 22); 
             if (displayCO2Kg >= 1000) {
                 const co2Tons = (displayCO2Kg / 1000).toFixed(1);
-                treeCounterDiv.innerHTML = `🌲 <b>Impressionante!</b> ${co2Tons} t de CO₂ evitadas correspondem a uma plantação de <b>${numArvores} árvores adultas</b>!`;
+                treeCounterDiv.innerHTML = `🌲 <b>Impressionante!</b> ${co2Tons} t de CO₂ correspondem a uma plantação de <b>${numArvores} árvores adultas</b>!`;
             } else if (displayCO2Kg >= 22) {
-                treeCounterDiv.innerHTML = `🌳 <b>Fantástico!</b> ${Math.floor(displayCO2Kg)} kg de CO₂ evitados equivalem ao trabalho de <b>${numArvores} árvores adultas</b> durante 1 ano!`;
+                treeCounterDiv.innerHTML = `🌳 <b>Fantástico!</b> ${Math.floor(displayCO2Kg)} kg de CO₂ equivalem ao trabalho de <b>${numArvores} árvores adultas</b> durante 1 ano!`;
             } else {
                 treeCounterDiv.innerHTML = `🌱 Cada viagem conta! Estão no bom caminho para "plantar" a vossa primeira árvore (aos 22 kg de CO₂)!`;
             }
         }
 
         const container = document.getElementById('savings-content-area');
-        if(!container) return;
 
         if (currentSavingsView === 'global') {
             let sortedPeopleAlpha = [...PEOPLE].sort((a, b) => a.localeCompare(b, 'pt'));
@@ -1490,30 +1561,47 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
             let uniqueMonths = Object.keys(monthlySavingsData).length || 1;
             container.innerHTML = buildSavingsChartHTML(pData, maxEuros, true, uniqueMonths);
+
         } else {
-            let mData = [];
-            let maxEuros = 0;
-            let sorted = [...PEOPLE].sort((a,b) => a.localeCompare(b, 'pt'));
+            const buildMonthHTML = (mKey) => {
+                 let mData = [];
+                 let maxEuros = 0;
+                 let sorted = [...PEOPLE].sort((a,b) => a.localeCompare(b, 'pt'));
 
-            sorted.forEach(p => {
-                const km = (monthlySavingsData[savingsSelectedMonth] && monthlySavingsData[savingsSelectedMonth][p]) ? monthlySavingsData[savingsSelectedMonth][p].km : 0;
-                if (km > 0) {
-                    let euros = (km / 100) * cons * price;
-                    if (euros > maxEuros) maxEuros = euros;
-                    mData.push({ name: p, km, euros, hasData: true });
-                } else {
-                    mData.push({ name: p, km: 0, euros: 0, hasData: false });
-                }
-            });
+                 sorted.forEach(p => {
+                     const km = (monthlySavingsData[mKey] && monthlySavingsData[mKey][p]) ? monthlySavingsData[mKey][p].km : 0;
+                     if (km > 0) {
+                         let euros = (km / 100) * cons * price;
+                         if (euros > maxEuros) maxEuros = euros;
+                         mData.push({ name: p, km, euros, hasData: true });
+                     } else {
+                         mData.push({ name: p, km: 0, euros: 0, hasData: false });
+                     }
+                 });
 
-            container.innerHTML = buildSavingsChartHTML(mData, maxEuros, false, 1);
-            attachSmoothSwipeHandler('savings-content-area', () => changeSavingsMonth(1), () => changeSavingsMonth(-1));
+                 return buildSavingsChartHTML(mData, maxEuros, false, 1);
+            };
+
+            let prev = getOffsetMonth(savingsSelectedMonth, -1);
+            let next = getOffsetMonth(savingsSelectedMonth, 1);
+             
+            container.innerHTML = `
+                <div id="savings-list-swipe" class="swipe-container" style="min-height: 380px;">
+                    <div id="savings-list-track" class="swipe-track" style="transform: translateX(-33.3333%); align-items: flex-start;">
+                       <div style="width: 33.3333%; flex-shrink:0;">${buildMonthHTML(prev)}</div>
+                       <div style="width: 33.3333%; flex-shrink:0;">${buildMonthHTML(savingsSelectedMonth)}</div>
+                       <div style="width: 33.3333%; flex-shrink:0;">${buildMonthHTML(next)}</div>
+                    </div>
+                </div>
+            `;
+            setupSwipeListener('savings-list-swipe', 'savings-list-track', () => changeSavingsMonth(1), () => changeSavingsMonth(-1), true);
         }
     };
 
+    /* === HISTÓRICO E FORMULÁRIO === */
+
     window.applyHistoryFilter = function() {
-       const hFilter = document.getElementById("history-filter");
-       currentHistoryFilter = hFilter ? hFilter.value : "ALL";
+       currentHistoryFilter = document.getElementById("history-filter").value;
        renderHistoryCalendar();
     }
 
@@ -1562,7 +1650,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           const isFirst = dateNum === 1;
           const isLast = dateNum === new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
           
-          let badgeHtml = isFirst || isLast ? `<div class="s-month-badge">${shortMonths[d.getMonth()]}</div>` : "";
+          let badgeHtml = "";
+          if(isFirst || isLast) {
+             badgeHtml = `<div class="s-month-badge">${shortMonths[d.getMonth()]}</div>`;
+          }
+
           let clickAttr = isFuture ? '' : `onclick="${onClickAction}('${iso}')"`;
           html += `<div class="${c}" ${clickAttr}>${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
        }
@@ -1572,6 +1664,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     function generateFormCalendarHTML(selectedDateISO, onClickAction) {
        const parts = selectedDateISO.split('-');
        const targetDate = new Date(parts[0], parts[1]-1, parts[2]);
+       
+       let prevDate = new Date(targetDate); prevDate.setDate(prevDate.getDate() - 7);
+       let nextDate = new Date(targetDate); nextDate.setDate(nextDate.getDate() + 7);
 
        let html = `<div class="calendar-header-nav">
           <div style="display:flex; gap:4px;">
@@ -1585,9 +1680,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
              <button onclick="changeFormDay(7)" title="Semana Seguinte"><span>▶</span><span>Sem</span></button>
              <button onclick="resetFormWeekToToday()" style="background:#30363d; color:#ffffff; border-color:#8b949e;" title="Hoje"><span>▼</span><span>Hoje</span></button>
           </div>
-       `;
+       </div>`;
 
-       return html + getFormWeekGrid(targetDate, selectedDateISO, onClickAction);
+       html += `<div id="form-swipe" class="swipe-container"><div id="form-track" class="swipe-track" style="transform: translateX(-33.3333%);">`;
+       html += getFormWeekGrid(prevDate, selectedDateISO, onClickAction);
+       html += getFormWeekGrid(targetDate, selectedDateISO, onClickAction);
+       html += getFormWeekGrid(nextDate, selectedDateISO, onClickAction);
+       html += `</div></div>`;
+       return html;
     }
 
     window.changeHistoryMonth = function(delta) {
@@ -1595,7 +1695,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        let currDate = new Date(parts[0], parts[1]-1, parts[2]);
        currDate.setMonth(currDate.getMonth() + delta);
        let newIso = getLocalDateISO(currDate);
-       if(newIso < MIN_ALLOWED_ISO || newIso > todayISO) return;
+       if(newIso < MIN_ALLOWED_ISO) return;
+       if(newIso > todayISO) return;
        historySelectedDate = newIso;
        renderHistoryCalendar();
     }
@@ -1616,45 +1717,20 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        renderHistoryCalendar();
     }
 
-    function generateHistoryCalendarHTML(selectedDateISO, onClickAction) {
-      const parts = selectedDateISO.split('-');
-      const targetDate = new Date(parts[0], parts[1]-1, parts[2]);
-      const targetYear = targetDate.getFullYear();
-      const targetMonth = targetDate.getMonth();
-      const canGoPrev = !(targetYear === MIN_ALLOWED_YEAR && targetMonth === (MIN_ALLOWED_MONTH - 1));
-      const curY = new Date().getFullYear();
-      const curM = new Date().getMonth();
-      const canGoNext = !(targetYear === curY && targetMonth === curM);
+    function getHistoryMonthGrid(targetYear, targetMonth, selectedDateISO, onClickAction) {
+       let html = `<div class="streak-grid">`;
+       const firstDayOfMonth = new Date(targetYear, targetMonth, 1);
+       const jsDayFirst = firstDayOfMonth.getDay();
+       const monBasedFirst = (jsDayFirst + 6) % 7; 
+       const startDate = new Date(targetYear, targetMonth, 1 - monBasedFirst);
 
-      let html = `<div class="calendar-header-nav">
-          <div style="display:flex; gap:4px;">
-             <button onclick="changeHistoryYear(-1)" ${!canGoPrev ? 'disabled' : ''} title="Ano Anterior"><span>◀</span><span>Ano</span></button>
-             <button onclick="changeHistoryMonth(-1)" ${!canGoPrev ? 'disabled' : ''} title="Mês Anterior"><span>◀</span><span>Mês</span></button>
-          </div>
-          <div class="center-date">
-             <span style="font-weight:700; color:var(--text); text-transform:uppercase; font-size:12px;">${monthNames[targetMonth]}</span>
-             <span>${targetYear}</span>
-          </div>
-          <div style="display:flex; gap:4px;">
-             <button onclick="changeHistoryMonth(1)" ${!canGoNext ? 'disabled' : ''} title="Mês Seguinte"><span>▶</span><span>Mês</span></button>
-             <button onclick="changeHistoryYear(1)" ${!canGoNext ? 'disabled' : ''} title="Ano Seguinte"><span>▶</span><span>Ano</span></button>
-             <button onclick="resetHistoryToToday()" style="background:#30363d; color:#ffffff; border-color:#8b949e;" title="Hoje"><span>▼</span><span>Hoje</span></button>
-          </div>
-       </div>`;
+       const lastDayOfMonth = new Date(targetYear, targetMonth + 1, 0);
+       const jsDayLast = lastDayOfMonth.getDay();
+       const monBasedLast = (jsDayLast + 6) % 7;
+       const endDate = new Date(targetYear, targetMonth + 1, 0 + (6 - monBasedLast));
+       const shortDays = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
 
-      let gridHtml = `<div class="streak-grid">`;
-      const firstDayOfMonth = new Date(targetYear, targetMonth, 1);
-      const jsDayFirst = firstDayOfMonth.getDay();
-      const monBasedFirst = (jsDayFirst + 6) % 7; 
-      const startDate = new Date(targetYear, targetMonth, 1 - monBasedFirst);
-
-      const lastDayOfMonth = new Date(targetYear, targetMonth + 1, 0);
-      const jsDayLast = lastDayOfMonth.getDay();
-      const monBasedLast = (jsDayLast + 6) % 7;
-      const endDate = new Date(targetYear, targetMonth + 1, 0 + (6 - monBasedLast));
-      const shortDays = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
-
-      for(let d = new Date(startDate.getTime()); d <= endDate; d.setDate(d.getDate() + 1)){
+       for(let d = new Date(startDate.getTime()); d <= endDate; d.setDate(d.getDate() + 1)){
           const iso = getLocalDateISO(d);
           const isPast = iso < todayISO;
           const isFuture = iso > todayISO;
@@ -1685,70 +1761,62 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           
           const dayName = shortDays[(realJsDay + 6) % 7];
           const dateNum = d.getDate();
-          let badgeHtml = (dateNum === 1 || dateNum === new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()) ? `<div class="s-month-badge">${shortMonths[d.getMonth()]}</div>` : "";
+          const isFirst = dateNum === 1;
+          const isLast = dateNum === new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+            
+          let badgeHtml = "";
+          if(isFirst || isLast) {
+              badgeHtml = `<div class="s-month-badge">${shortMonths[d.getMonth()]}</div>`;
+          }
+
           let clickAttr = isFuture ? '' : `onclick="${onClickAction}('${iso}')"`;
-          gridHtml += `<div class="${c}" ${clickAttr}>${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
-      }
-      gridHtml += `</div>`;
-      return html + gridHtml;
-    }
-
-    // GESTÃO DE SWIPE SUAVE COM O MOVIMENTO DO DEDO
-    function attachSmoothSwipeHandler(containerId, onSwipeLeft, onSwipeRight) {
-       const el = document.getElementById(containerId);
-       if(!el) return;
-       let startX = 0;
-       let startY = 0;
-       let currentX = 0;
-       let isTracking = false;
-
-       el.addEventListener('touchstart', e => {
-          if (!e.touches || e.touches.length === 0) return;
-          startX = e.touches[0].clientX;
-          startY = e.touches[0].clientY;
-          currentX = startX;
-          isTracking = true;
-          el.style.transition = 'none';
-       }, { passive: true });
-
-       el.addEventListener('touchmove', e => {
-          if (!isTracking || !e.touches || e.touches.length === 0) return;
-          currentX = e.touches[0].clientX;
-          let currentY = e.touches[0].clientY;
-          let diffX = currentX - startX;
-          let diffY = currentY - startY;
-
-          if (Math.abs(diffX) > Math.abs(diffY)) {
-             el.style.transform = `translateX(${diffX}px)`;
-          }
-       }, { passive: true });
-
-       el.addEventListener('touchend', e => {
-          if (!isTracking) return;
-          isTracking = false;
-          let diffX = currentX - startX;
-          
-          el.style.transition = 'transform 0.25s ease';
-          if (Math.abs(diffX) > 60) {
-             if (diffX > 0) {
-                el.style.transform = `translateX(100%)`;
-                setTimeout(() => { el.style.transform = 'none'; if(onSwipeRight) onSwipeRight(); }, 200);
-             } else {
-                el.style.transform = `translateX(-100%)`;
-                setTimeout(() => { el.style.transform = 'none'; if(onSwipeLeft) onSwipeLeft(); }, 200);
-             }
-          } else {
-             el.style.transform = 'translateX(0px)';
-          }
-       }, { passive: true });
-    }
-
-    window.renderHistoryCalendar = function() {
-       const hCalendar = document.getElementById("history-calendar");
-       if(hCalendar) {
-          hCalendar.innerHTML = generateHistoryCalendarHTML(historySelectedDate, 'selectHistoryDate');
-          attachSmoothSwipeHandler('history-calendar', () => changeHistoryMonth(1), () => changeHistoryMonth(-1));
+          html += `<div class="${c}" ${clickAttr}>${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
        }
+       return html + `</div>`;
+    }
+
+    function generateHistoryCalendarHTML(selectedDateISO, onClickAction) {
+      const parts = selectedDateISO.split('-');
+      const targetDate = new Date(parts[0], parts[1]-1, parts[2]);
+      const targetYear = targetDate.getFullYear();
+      const targetMonth = targetDate.getMonth();
+      const canGoPrev = !(targetYear === MIN_ALLOWED_YEAR && targetMonth === (MIN_ALLOWED_MONTH - 1));
+      const curY = new Date().getFullYear();
+      const curM = new Date().getMonth();
+      const canGoNext = !(targetYear === curY && targetMonth === curM);
+
+      let prevYear = targetYear, prevMonth = targetMonth - 1;
+      if(prevMonth < 0) { prevMonth = 11; prevYear--; }
+      let nextYear = targetYear, nextMonth = targetMonth + 1;
+      if(nextMonth > 11) { nextMonth = 0; nextYear++; }
+
+      let html = `<div class="calendar-header-nav">
+          <div style="display:flex; gap:4px;">
+             <button onclick="changeHistoryYear(-1)" ${!canGoPrev ? 'disabled' : ''} title="Ano Anterior"><span>◀</span><span>Ano</span></button>
+             <button onclick="changeHistoryMonth(-1)" ${!canGoPrev ? 'disabled' : ''} title="Mês Anterior"><span>◀</span><span>Mês</span></button>
+          </div>
+          <div class="center-date">
+             <span style="font-weight:700; color:var(--text); text-transform:uppercase; font-size:12px;">${monthNames[targetMonth]}</span>
+             <span>${targetYear}</span>
+          </div>
+          <div style="display:flex; gap:4px;">
+             <button onclick="changeHistoryMonth(1)" ${!canGoNext ? 'disabled' : ''} title="Mês Seguinte"><span>▶</span><span>Mês</span></button>
+             <button onclick="changeHistoryYear(1)" ${!canGoNext ? 'disabled' : ''} title="Ano Seguinte"><span>▶</span><span>Ano</span></button>
+             <button onclick="resetHistoryToToday()" style="background:#30363d; color:#ffffff; border-color:#8b949e;" title="Hoje"><span>▼</span><span>Hoje</span></button>
+          </div>
+       </div>`;
+
+      html += `<div id="hist-swipe" class="swipe-container"><div id="history-track" class="swipe-track" style="transform: translateX(-33.3333%);">`;
+      html += getHistoryMonthGrid(prevYear, prevMonth, selectedDateISO, onClickAction);
+      html += getHistoryMonthGrid(targetYear, targetMonth, selectedDateISO, onClickAction);
+      html += getHistoryMonthGrid(nextYear, nextMonth, selectedDateISO, onClickAction);
+      html += `</div></div>`;
+      return html;
+    }
+
+    function renderHistoryCalendar() {
+       document.getElementById("history-calendar").innerHTML = generateHistoryCalendarHTML(historySelectedDate, 'selectHistoryDate');
+       setupSwipeListener('hist-swipe', 'history-track', () => changeHistoryMonth(1), () => changeHistoryMonth(-1), true);
        renderHistoryDetails();
     }
 
@@ -1760,7 +1828,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     function renderHistoryDetails() {
        const container = document.getElementById("history-details-container");
-       if(!container) return;
        let dayTrips = trips.filter(t => t.date === historySelectedDate);
        
        if (currentHistoryFilter !== "ALL") {
@@ -1770,8 +1837,16 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        if(dayTrips.length === 0) {
           const isFuture = historySelectedDate > todayISO;
           let btnHtml = isFuture ? '' : `<button class="gh-btn primary" style="margin:0 auto; padding:10px 16px; width:auto; font-size:13px;" onclick="openModalWithDate('${historySelectedDate}')">Registar Viagem</button>`;
-          let msgText = currentHistoryFilter !== "ALL" ? `Nenhum registo para ${currentHistoryFilter} neste dia.` : `Sem viagens registadas neste dia.`;
-          container.innerHTML = `<div class="hist-details" style="text-align:center; padding: 24px 14px;"><div style="color:var(--muted); font-size:13px; margin-bottom:16px;">${msgText}</div>${btnHtml}</div>`;
+          let msgText = currentHistoryFilter !== "ALL" 
+             ? `Nenhum registo para ${currentHistoryFilter} neste dia.` 
+             : `Sem viagens registadas neste dia.`;
+          
+          container.innerHTML = `
+            <div class="hist-details" style="text-align:center; padding: 24px 14px;">
+              <div style="color:var(--muted); font-size:13px; margin-bottom:16px;">${msgText}</div>
+              ${btnHtml}
+            </div>
+          `;
           return;
        }
 
@@ -1782,12 +1857,18 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           const allPassFemale = trip.passengers.length > 0 && trip.passengers.every(isFemale);
 
           let driverLabel = "Condutores";
-          if (trip.drivers.length === 1) driverLabel = isFemale(trip.drivers[0]) ? "Condutora" : "Condutor";
-          else if (allDriversFemale) driverLabel = "Condutoras";
+          if (trip.drivers.length === 1) {
+             driverLabel = isFemale(trip.drivers[0]) ? "Condutora" : "Condutor";
+          } else if (allDriversFemale) {
+             driverLabel = "Condutoras";
+          }
 
           let passLabel = "Passageiros";
-          if (trip.passengers.length === 1) passLabel = isFemale(trip.passengers[0]) ? "Passageira" : "Passageiro";
-          else if (allPassFemale) passLabel = "Passageiras";
+          if (trip.passengers.length === 1) {
+             passLabel = isFemale(trip.passengers[0]) ? "Passageira" : "Passageiro";
+          } else if (allPassFemale) {
+             passLabel = "Passageiras";
+          }
 
           const passAlfab = [...trip.passengers].sort((a,b) => a.localeCompare(b, 'pt')).join(", ");
           const typeLabel = (trip.cars === 2 ? 'Viagem 2 Carros' : 'Viagem Normal') + (trip.splitCostMode ? ' (Separados)' : '');
@@ -1796,22 +1877,26 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           if (trip.passengerCosts && trip.passengers.length > 0) {
               let pCosts = trip.passengers.map(p => trip.passengerCosts[p]).filter(c => c !== undefined);
               let uniqueCosts = [...new Set(pCosts)];
-              if (uniqueCosts.length > 0) costPassStr = uniqueCosts.map(c => fmt(c) + " 🪙").join(" / ");
+              if (uniqueCosts.length > 0) {
+                  costPassStr = uniqueCosts.map(c => fmt(c) + " 🪙").join(" / ");
+              }
           } else if (trip.costPerPassenger) {
               costPassStr = fmt(trip.costPerPassenger) + " 🪙";
           }
             
-          let passRowHtml = trip.passengers.length >= 4 
-             ? `<span style="display:block; margin-top:4px;"><strong style="color:var(--muted)">${passLabel}:</strong><br><span style="color:var(--text);">${passAlfab || "Nenhum"}</span></span>` 
-             : `<span><strong style="color:var(--muted)">${passLabel}:</strong> <span style="color:var(--text);">${passAlfab || "Nenhum"}</span></span>`;
-
           html += `<div class="hist-details" style="margin-top: ${index > 0 ? '10px' : '0'};">
              <div class="hist-info">
-               <span class="hist-type">${typeLabel}</span>
+               <span class="hist-type">
+                  ${typeLabel}
+               </span>
                <span class="hist-driver-row"><strong style="color:var(--accent)">${driverLabel}:</strong> ${trip.drivers.join(" e ")}</span>
-               ${passRowHtml}
-               <div style="margin-top:8px; display:flex; justify-content:space-between; font-size:12px; color:var(--text); margin-bottom: 2px;"><span>Custo Total: <strong>${fmt(trip.totalCost)} 🪙</strong></span></div>
-               <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted)"><span>Custo/passag.: <strong>${costPassStr}</strong></span></div>
+               <span><strong style="color:var(--muted)">${passLabel}:</strong> ${passAlfab || "Nenhum"}</span>
+               <div style="margin-top:8px; display:flex; justify-content:space-between; font-size:12px; color:var(--text); margin-bottom: 2px;">
+                  <span>Custo Total: <strong>${fmt(trip.totalCost)} 🪙</strong></span>
+               </div>
+               <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted)">
+                  <span>Custo/passag.: <strong>${costPassStr}</strong></span>
+               </div>
              </div>
              <div class="hist-actions">
                 <button class="gh-btn outline" style="flex:1; padding: 6px;" onclick="editTrip('${trip.id}')">Editar</button>
@@ -1824,7 +1909,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     window.requestDelete = function(id) {
        showConfirm("Apagar Viagem?", "Esta ação vai recalcular todos os balanços.", async () => {
-          if (USE_FIREBASE && db) {
+          if (USE_FIREBASE) {
             await deleteDoc(doc(db, "trips", id));
           } else {
             trips = trips.filter(t => t.id !== id);
@@ -1842,8 +1927,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       splitCostMode = false;
       carsData = [ { driver: null, passengers: [], isOneWay: false }, { driver: null, passengers: [], isOneWay: false } ];
       refreshFormUI();
-      const modal = document.getElementById("modal-trip");
-      if(modal) { modal.classList.add("active"); modal.scrollTop = 0; }
+      document.getElementById("modal-trip").classList.add("active");
+      document.getElementById("modal-trip").scrollTop = 0;
     }
 
     window.openModalWithDate = function(dateIso) {
@@ -1874,36 +1959,26 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             { driver: null, passengers: [], isOneWay: false } 
          ];
       }
+      
       refreshFormUI();
-      const modal = document.getElementById("modal-trip");
-      if(modal) { modal.classList.add("active"); modal.scrollTop = 0; }
+      document.getElementById("modal-trip").classList.add("active");
+      document.getElementById("modal-trip").scrollTop = 0;
     }
 
     function refreshFormUI() {
-      const tripCalendar = document.getElementById("new-trip-calendar");
-      if(tripCalendar) {
-         tripCalendar.innerHTML = generateFormCalendarHTML(formDate, 'selectFormDate');
-         attachSmoothSwipeHandler('form-calendar-wrapper', () => changeFormDay(7), () => changeFormDay(-7));
-      }
+      document.getElementById("new-trip-calendar").innerHTML = generateFormCalendarHTML(formDate, 'selectFormDate');
+      setupSwipeListener('form-swipe', 'form-track', () => changeFormDay(7), () => changeFormDay(-7));
 
-      const oBox0 = document.getElementById("trip-oneway-box-0");
-      const oBox1 = document.getElementById("trip-oneway-box-1");
-      const sBox = document.getElementById("split-cost-box");
-      if(oBox0) oBox0.classList.toggle("on", carsData[0].isOneWay);
-      if(oBox1) oBox1.classList.toggle("on", carsData[1].isOneWay);
-      if(sBox) sBox.classList.toggle("on", splitCostMode);
+      document.getElementById("trip-oneway-box-0").classList.toggle("on", carsData[0].isOneWay);
+      document.getElementById("trip-oneway-box-1").classList.toggle("on", carsData[1].isOneWay);
+      document.getElementById("split-cost-box").classList.toggle("on", splitCostMode);
       
-      const car2Sec = document.getElementById("car2-section");
-      const addCar2 = document.getElementById("add-car2-container");
-      const remCar2 = document.getElementById("remove-car2-container");
-      const splitCont = document.getElementById("split-cost-container");
-      const c1Header = document.getElementById("car1-header");
-
-      if(car2Sec) car2Sec.style.display = selectedCars === 2 ? "block" : "none";
-      if(addCar2) addCar2.style.display = selectedCars === 1 ? "block" : "none";
-      if(remCar2) remCar2.style.display = selectedCars === 2 ? "block" : "none";
-      if(splitCont) splitCont.style.display = selectedCars === 2 ? "block" : "none";
-      if(c1Header) c1Header.innerText = selectedCars === 2 ? "CARRO 1" : "CONFIGURAÇÃO";
+      document.getElementById("car2-section").style.display = selectedCars === 2 ? "block" : "none";
+      document.getElementById("add-car2-container").style.display = selectedCars === 1 ? "block" : "none";
+      document.getElementById("remove-car2-container").style.display = selectedCars === 2 ? "block" : "none";
+      document.getElementById("split-cost-container").style.display = selectedCars === 2 ? "block" : "none";
+      
+      document.getElementById("car1-header").innerText = selectedCars === 2 ? "CARRO 1" : "CONFIGURAÇÃO";
 
       renderCarGrid(0, "grid-c1-drivers", "grid-c1-pass");
       if(selectedCars === 2) renderCarGrid(1, "grid-c2-drivers", "grid-c2-pass");
@@ -1918,10 +1993,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        refreshFormUI();
     }
     
-    window.closeModal = function() { 
-      const modal = document.getElementById("modal-trip");
-      if(modal) modal.classList.remove("active"); 
-    }
+    window.closeModal = function() { document.getElementById("modal-trip").classList.remove("active"); }
     
     window.toggleOneWay = function(carIndex) {
       carsData[carIndex].isOneWay = !carsData[carIndex].isOneWay;
@@ -1981,7 +2053,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     function renderCarGrid(carIndex, dGridId, pGridId) {
       const dGrid = document.getElementById(dGridId);
       const pGrid = document.getElementById(pGridId);
-      if(!dGrid || !pGrid) return;
       dGrid.innerHTML = ""; pGrid.innerHTML = "";
 
       const globalDrivers = getAllSelectedDrivers();
@@ -2012,7 +2083,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     function drawCar(carIndex, containerId) {
       const container = document.getElementById(containerId);
-      if(!container) return;
       container.innerHTML = "";
       const car = carsData[carIndex];
       
@@ -2023,10 +2093,23 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       const driverClass = driverName ? 'seat driver-seat' : 'seat empty';
       
       let pList = car.passengers;
-      const getPSeat = (index) => index < pList.length ? `<div class="seat pass-seat">${INITIALS[pList[index]]}</div>` : `<div class="seat empty"></div>`;
-      let backRowHTML = (pList.length === 4) ? `<div class="car-row back-row-3">${getPSeat(1)}${getPSeat(2)}${getPSeat(3)}</div>` : `<div class="car-row back-row-2">${getPSeat(1)}${getPSeat(2)}</div>`;
+      const getPSeat = (index) => {
+         return index < pList.length 
+            ? `<div class="seat pass-seat">${INITIALS[pList[index]]}</div>` 
+            : `<div class="seat empty"></div>`;
+      };
+      
+      let backRowHTML = (pList.length === 4) 
+        ? `<div class="car-row back-row-3">${getPSeat(1)}${getPSeat(2)}${getPSeat(3)}</div>`
+        : `<div class="car-row back-row-2">${getPSeat(1)}${getPSeat(2)}</div>`;
 
-      carDiv.innerHTML = `<div class="car-row front-row"><div class="${driverClass}">${driverName}</div>${getPSeat(0)}</div>${backRowHTML}`;
+      carDiv.innerHTML = `
+         <div class="car-row front-row">
+            <div class="${driverClass}">${driverName}</div>
+            ${getPSeat(0)}
+         </div>
+         ${backRowHTML}
+      `;
       container.appendChild(carDiv);
     }
 
@@ -2046,9 +2129,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     window.updateSummary = function() {
       const btnSave = document.getElementById("btn-save-trip");
-      const summaryBox = document.getElementById("summary-box");
-      if(!btnSave || !summaryBox) return;
-
       let html = "";
       let valid = true;
       let finalCalc = { driverProfits: {}, passengerCosts: {}, totalCost: 0, drivers: [], passengers: [] };
@@ -2110,6 +2190,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                   <strong style="color:var(--text); font-size:13px; font-weight:600;">VIAGEM 2 CARROS (SEPARADOS)</strong><br>
                   <div style="display:flex; justify-content:space-between; margin-top:6px; font-size:12px;"><span>Carro 1 (${d0}):</span> <strong>${fmt(c0Calc.totalCost)} 🪙</strong></div>
                   <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:12px; color:var(--muted)"><span>Custo Passageiro:</span> <strong>${fmt(c0Calc.costPerPassenger)} 🪙</strong></div>
+                  
                   <div style="display:flex; justify-content:space-between; font-size:12px;"><span>Carro 2 (${d1}):</span> <strong>${fmt(c1Calc.totalCost)} 🪙</strong></div>
                   <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted)"><span>Custo Passageiro:</span> <strong>${fmt(c1Calc.costPerPassenger)} 🪙</strong></div>
                `;
@@ -2134,7 +2215,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          }
       }
 
-      summaryBox.innerHTML = html;
+      document.getElementById("summary-box").innerHTML = html;
       btnSave.disabled = !valid;
       window.currentTripFinalCalc = finalCalc;
     }
@@ -2154,7 +2235,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          car2: selectedCars === 2 ? { driver: carsData[1].driver, passengers: [...carsData[1].passengers], isOneWay: carsData[1].isOneWay } : null
       };
 
-      if(USE_FIREBASE && db) {
+      if(USE_FIREBASE) {
           if(editingTripId) await updateDoc(doc(db, "trips", editingTripId), newTrip);
           else await addDoc(collection(db, "trips"), newTrip);
       } else {
@@ -2164,15 +2245,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
              newTrip.id = Date.now().toString(); 
              trips.push(newTrip);
           }
-          safeSet("pec_trips_v20", JSON.stringify(trips));
+          localStorage.setItem("pec_trips_v20", JSON.stringify(trips));
           recalculateAndRender();
       }
       
       closeModal();
       showToast("Viagem guardada com sucesso!");
       historySelectedDate = formDate;
-      const hFilter = document.getElementById('history-filter');
-      if(hFilter) hFilter.value = "ALL";
+      document.getElementById('history-filter').value = "ALL";
       currentHistoryFilter = "ALL";
       applyHistoryFilter();
     }
