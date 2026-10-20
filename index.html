@@ -221,7 +221,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       <h1 class="brand" style="font-size: 20px; margin-bottom: 6px; justify-content: center;">GESTÃO DE <span>BOLEIAS</span> PEC</h1>
       <p style="color: var(--muted); font-size: 12px;">Ponte de Lima</p>
     </div>
-    <input type="password" id="password-input" class="input-text" placeholder="Palavra-passe" style="text-align: center; margin-bottom: 12px; max-width: 280px;">
+    <input type="password" id="password-input" class="input-text" placeholder="Palavra-passe" style="text-align: center; margin-bottom: 12px; max-width: 280px;" onkeypress="if(event.key === 'Enter') checkLogin()">
     <button class="gh-btn primary" onclick="checkLogin()" style="width: 100%; max-width: 280px; justify-content: center;">Entrar na App</button>
   </div>
 
@@ -307,7 +307,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     <!-- TAB 4: POUPANÇA E IMPACTO -->
     <div id="tab-savings" class="page tab-content" style="display: none;">
-      <div class="eyebrow">Poupança e Impacto Ambiental</div>
+      <div class="eyebrow">POUPANÇA IMPACTO AMBIENTAL</div>
       
       <div class="card">
          <div style="background: var(--card2); padding: 12px; border-radius: 6px; margin-bottom: 16px;">
@@ -535,14 +535,66 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
   <div id="toast" class="toast"></div>
 
+  <!-- Script Não-Módulo para Login Seguro -->
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js')
         .then(() => console.log("Service Worker registado com sucesso!"))
         .catch((err) => console.log("Erro ao registar Service Worker:", err));
     }
+
+    async function hashString(string) {
+      const msgUint8 = new TextEncoder().encode(string);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    window.checkLogin = async function() {
+      // Retira os espaços em branco e passa tudo para minúsculas
+      const pwd = document.getElementById("password-input").value.trim().toLowerCase();
+      const targetHash = "2496e57975c7cb484c2049d5bf599e0339cb1d43a14434241cd64d4b1a1ea0f9"; 
+      
+      let enteredHash = null;
+      try {
+         enteredHash = await hashString(pwd);
+      } catch(e) {
+         console.warn("Crypto bloqueado pelo browser. A validar como texto...");
+      }
+
+      if (enteredHash === targetHash || pwd === "pec2026") {
+        localStorage.setItem("pec_auth", "true");
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("app-screen").style.display = "block";
+        
+        if (typeof window.initApp === 'function') {
+            window.initApp();
+        } else {
+            alert("Erro a carregar a app. Se usas um bloqueador de anúncios, tenta desativá-lo para este site.");
+        }
+      } else {
+        alert("Password incorreta.");
+      }
+    }
+
+    window.onload = function() {
+      if (localStorage.getItem("pec_auth") === "true") {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("app-screen").style.display = "block";
+        
+        // Verifica se a app principal já carregou (para não bloquear se a cache falhar)
+        const tryInit = setInterval(() => {
+            if (typeof window.initApp === 'function') {
+                clearInterval(tryInit);
+                window.initApp();
+            }
+        }, 50);
+        setTimeout(() => clearInterval(tryInit), 3000);
+      }
+    }
   </script>
 
+  <!-- Script App Principal (Módulo) -->
   <script type="module">
     const USE_FIREBASE = true;
 
@@ -555,8 +607,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       appId: "1:920930610974:web:600d31aeaaebc9aef0230f"
     };
 
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, getDocs, disableNetwork, enableNetwork } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+    // Versão da Firebase atualizada para uma versão garantidamente existente
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, getDocs, disableNetwork, enableNetwork } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     let db;
     if (USE_FIREBASE) {
@@ -886,42 +939,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        window.scrollTo(0,0);
     }
 
-    async function hashString(string) {
-      const msgUint8 = new TextEncoder().encode(string);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    window.checkLogin = async function() {
-      const pwd = document.getElementById("password-input").value;
-      const targetHash = "2496e57975c7cb484c2049d5bf599e0339cb1d43a14434241cd64d4b1a1ea0f9"; 
-      
-      let enteredHash = null;
-      try {
-         enteredHash = await hashString(pwd);
-      } catch(e) {
-         console.warn("Crypto bloqueado pelo browser. A validar como texto...");
-      }
-
-      if (enteredHash === targetHash || pwd === "pec2026") {
-        localStorage.setItem("pec_auth", "true");
-        document.getElementById("login-screen").style.display = "none";
-        document.getElementById("app-screen").style.display = "block";
-        initApp();
-      } else {
-        alert("Password incorreta.");
-      }
-    }
-
-    window.onload = function() {
-      if (localStorage.getItem("pec_auth") === "true") {
-        document.getElementById("login-screen").style.display = "none";
-        document.getElementById("app-screen").style.display = "block";
-        initApp();
-      }
-    }
-
     function setupSwipeListener(containerId, trackId, onSwipeLeft, onSwipeRight, isMonthlyNav = false) {
        const container = document.getElementById(containerId);
        if(!container) return;
@@ -1014,7 +1031,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        }, {passive: true});
     }
 
-    function initApp() {
+    window.initApp = function() {
       document.getElementById('calc-cons').value = localStorage.getItem('pec_cons') || '5.0';
       document.getElementById('calc-price').value = localStorage.getItem('pec_price') || '2.00';
       
@@ -1314,7 +1331,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        }
     }
 
-    /* === SECÇÃO POUPANÇA E IMPACTO AMBIENTAL === */
+    /* === SECÇÃO POUPANÇA E IMPACTO === */
 
     window.jumpSavingsMonth = function() {
        const m = document.getElementById("savings-month-sel").value;
@@ -1499,7 +1516,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         const displayEuros = displayLiters * price;
         const displayCO2Kg = displayLiters * 2.48; 
         
-        const fmtEuros = displayEuros >= 1000 ? parseFloat((displayEuros / 1000).toFixed(2)) + ' k'fmtMoney(displayEuros);
+        const fmtEuros = displayEuros >= 1000 ? parseFloat((displayEuros / 1000).toFixed(2)) + ' k' : fmtMoney(displayEuros);
         
         let fmtLiters;
         if (displayLiters >= 1000) {
@@ -1535,9 +1552,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             const numArvores = Math.floor(displayCO2Kg / 22); 
             if (displayCO2Kg >= 1000) {
                 const co2Tons = (displayCO2Kg / 1000).toFixed(1);
-                treeCounterDiv.innerHTML = `🌲 <b>Impressionante!</b> ${co2Tons} t de CO₂ correspondem a uma plantação de <b>${numArvores} árvores adultas</b>!`;
+                treeCounterDiv.innerHTML = `🌲 <b>Impressionante!</b> ${co2Tons} t de CO₂ evitadas correspondem a uma plantação de <b>${numArvores} árvores adultas</b>!`;
             } else if (displayCO2Kg >= 22) {
-                treeCounterDiv.innerHTML = `🌳 <b>Fantástico!</b> ${Math.floor(displayCO2Kg)} kg de CO₂ equivalem ao trabalho de <b>${numArvores} árvores adultas</b> durante 1 ano!`;
+                treeCounterDiv.innerHTML = `🌳 <b>Fantástico!</b> ${Math.floor(displayCO2Kg)} kg de CO₂ evitados equivalem ao trabalho de <b>${numArvores} árvores adultas</b> durante 1 ano!`;
             } else {
                 treeCounterDiv.innerHTML = `🌱 Cada viagem conta! Estão no bom caminho para "plantar" a vossa primeira árvore (aos 22 kg de CO₂)!`;
             }
