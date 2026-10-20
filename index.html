@@ -41,7 +41,7 @@ html, body { min-height: 100vh; margin: 0; background: var(--bg); touch-action: 
 button, a, img, select { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif; color: var(--text); -webkit-tap-highlight-color: transparent; padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px)); }
 
-body.locked-scroll { overflow: hidden; height: 100vh; }
+body.locked-scroll { overflow: hidden; height: 100vh; height: 100dvh; }
 
 h1, h2, h3, h4 { font-weight: 600; margin: 0; }
 p { margin: 0; line-height: 1.5; color: var(--muted); font-size: 13.5px; text-align: justify; }
@@ -494,7 +494,12 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     function safeSet(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).catch(err => console.log('Erro SW:', err));
+      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
+        reg.update();
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') reg.update();
+        });
+      }).catch(err => console.log('Erro SW:', err));
     }
 
     async function hashString(string) {
@@ -515,14 +520,30 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       if(aScreen) aScreen.style.display = 'block';
     }
 
+    // Espera (até 10s) que o módulo principal (Firebase) carregue e defina window.initApp
+    function waitForInitApp(timeoutMs = 10000) {
+      return new Promise((resolve, reject) => {
+        if (typeof window.initApp === 'function') return resolve();
+        const start = Date.now();
+        const timer = setInterval(() => {
+          if (typeof window.initApp === 'function') { clearInterval(timer); resolve(); }
+          else if (Date.now() - start > timeoutMs) { clearInterval(timer); reject(new Error('timeout')); }
+        }, 50);
+      });
+    }
+
     async function startApp() {
       enterApp();
-      if (typeof window.initApp === 'function') {
+      try {
+        await waitForInitApp();
         window.initApp();
-      } else {
-        window.addEventListener('DOMContentLoaded', () => {
-          if (typeof window.initApp === 'function') window.initApp();
-        });
+      } catch (e) {
+        console.error('Erro ao iniciar a app:', e);
+        const aScreen = document.getElementById('app-screen');
+        const lScreen = document.getElementById('login-screen');
+        if (aScreen) aScreen.style.display = 'none';
+        if (lScreen) lScreen.style.display = 'flex';
+        showLoginError('Não foi possível carregar a app. Verifica a ligação e toca em "Entrar na App" para tentar de novo.');
       }
     }
 
@@ -578,16 +599,30 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     };
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, getDocs, disableNetwork, enableNetwork } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { getFirestore, initializeFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, getDocs, disableNetwork, enableNetwork } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     let db;
     if (USE_FIREBASE) {
       try {
         const app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
+        try {
+          // Auto-deteta quando o canal normal (WebChannel) é bloqueado/instável e passa a long polling.
+          // Este é o problema típico em Android (dados móveis, DNS privado, poupança de dados, etc.).
+          db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
+        } catch (e) {
+          db = getFirestore(app);
+        }
       } catch (err) {
         console.error("Erro ao iniciar Firebase:", err);
       }
+    }
+
+    // Garante que um documento incompleto nunca rebenta o cálculo dos balanços
+    function normalizeTrip(id, data) {
+      const t = { ...data, id };
+      t.drivers = Array.isArray(t.drivers) ? t.drivers : [];
+      t.passengers = Array.isArray(t.passengers) ? t.passengers : [];
+      return t;
     }
 
     const PEOPLE = ["Ana", "André", "Henrique", "Joana", "João", "Luciano", "Luís", "Mariana"];
@@ -805,19 +840,21 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     }
 
     window.forceRefresh = async function() {
-       if(!USE_FIREBASE || !db) return;
+       if(!USE_FIREBASE || !db) { showToast("Firebase indisponível."); return; }
        const btn = document.getElementById("btn-refresh");
        if(btn) { btn.innerText = "A atualizar..."; btn.disabled = true; }
        try {
           const q = query(collection(db, "trips"), orderBy("date", "desc"));
           const snapshot = await getDocs(q);
-          trips = [];
-          snapshot.forEach((doc) => { trips.push({ id: doc.id, ...doc.data() }); });
-          localStorage.setItem("pec_trips_v20", JSON.stringify(trips));
+          // Cache vazia sem ligação não conta como "dados": não apaga o que já está no ecrã
+          if (snapshot.metadata.fromCache && snapshot.empty) throw new Error("sem ligação ao servidor");
+          trips = snapshot.docs.map(d => normalizeTrip(d.id, d.data()));
+          safeSet("pec_trips_v20", JSON.stringify(trips));
           recalculateAndRender();
           showToast("Dados atualizados!");
        } catch (err) {
-          showToast("Erro ao sincronizar dados!");
+          console.error("forceRefresh:", err);
+          showToast("Sem ligação ao servidor. A mostrar os últimos dados guardados.");
        } finally {
           if(btn) { btn.innerHTML = "Atualizar Dados ☁️"; btn.disabled = false; }
        }
@@ -903,10 +940,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     }
 
     window.initApp = function() {
+      if (window.__appStarted) return; // evita dois listeners em simultâneo
+      window.__appStarted = true;
+
       const consInput = document.getElementById('calc-cons');
       const priceInput = document.getElementById('calc-price');
-      if(consInput) consInput.value = localStorage.getItem('pec_cons') || '5.0';
-      if(priceInput) priceInput.value = localStorage.getItem('pec_price') || '2.00';
+      if(consInput) consInput.value = safeGet('pec_cons') || '5.0';
+      if(priceInput) priceInput.value = safeGet('pec_price') || '2.00';
       
       populateSavingsYearDropdown();
       updateSavingsMonthOptions();
@@ -918,11 +958,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       
       switchTab('home');
 
-      // CARREGAMENTO IMEDIATO LOCAL PARA EVITAR ECRÃS A PRETO NO ANDROID
-      const localTrips = localStorage.getItem("pec_trips_v20");
+      // Mostra logo a última cópia local (evita ecrã vazio enquanto a rede responde)
+      const localTrips = safeGet("pec_trips_v20");
       if(localTrips) {
          try {
-            trips = JSON.parse(localTrips);
+            trips = JSON.parse(localTrips).map(t => normalizeTrip(t.id, t));
             recalculateAndRender();
          } catch(e) {}
       }
@@ -930,14 +970,31 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       if (USE_FIREBASE && db) {
         const q = query(collection(db, "trips"), orderBy("date", "desc"));
         onSnapshot(q, (snapshot) => {
-          trips = [];
-          snapshot.forEach((doc) => { trips.push({ id: doc.id, ...doc.data() }); });
-          localStorage.setItem("pec_trips_v20", JSON.stringify(trips));
-          recalculateAndRender();
+          try {
+            // Snapshot vazio vindo só da cache (sem rede) NÃO pode apagar os dados que já temos
+            if (snapshot.metadata.fromCache && snapshot.empty) return;
+            trips = snapshot.docs.map(d => normalizeTrip(d.id, d.data()));
+            safeSet("pec_trips_v20", JSON.stringify(trips));
+            recalculateAndRender();
+          } catch (e) {
+            console.error("Erro a processar dados:", e);
+            showToast("Erro a processar os dados.");
+          }
         }, (error) => {
           console.error("Erro no listener do Firestore:", error);
-          showToast("Modo Offline Ativo.");
+          showToast("Sem ligação em tempo real.");
         });
+
+        // Android suspende a rede em segundo plano: ao voltar, reinicia a ligação ao Firestore
+        const reconnect = async () => {
+          try { await disableNetwork(db); await enableNetwork(db); } catch (e) {}
+        };
+        let hiddenAt = 0;
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'hidden') hiddenAt = Date.now();
+          else if (hiddenAt && Date.now() - hiddenAt > 30000) { hiddenAt = 0; reconnect(); }
+        });
+        window.addEventListener('online', reconnect);
       }
     }
 
@@ -1282,8 +1339,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         const cons = consElem ? (parseFloat(consElem.value) || 0) : 5.0;
         const price = priceElem ? (parseFloat(priceElem.value) || 0) : 2.0;
         
-        localStorage.setItem('pec_cons', cons);
-        localStorage.setItem('pec_price', price);
+        safeSet('pec_cons', cons);
+        safeSet('pec_price', price);
 
         let filteredTrips = trips;
         if (currentSavingsView !== 'monthly' && periodVal !== "ALL") {
