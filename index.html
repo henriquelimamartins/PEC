@@ -110,9 +110,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .center-date { text-align: center; line-height: 1.2; font-size: 11px; }
 .center-date span { display: block; }
 
-.swipe-container { overflow: hidden; width: 100%; position: relative; transition: height 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
-.swipe-track { display: flex; align-items: flex-start; width: 300%; will-change: transform; transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
-.streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 46px; gap: 6px; padding-bottom: 16px; width: 33.3333%; flex-shrink: 0; }
+.swipe-container { overflow: hidden; width: 100%; position: relative; }
+.streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 46px; gap: 6px; padding-bottom: 16px; width: 100%; }
 
 .s-day { background: var(--card2); border-radius: 6px; height: 46px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--border); cursor: pointer; position: relative; }
 .s-month-badge { position: absolute; top: 1px; left: 0; right: 0; text-align: center; font-size: 6.5px; font-weight: 600; color: var(--muted); opacity: 0.8; }
@@ -574,11 +573,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       document.getElementById('app-screen').style.display = 'block';
     }
 
-    function backToLogin() {
-      document.getElementById('app-screen').style.display = 'none';
-      document.getElementById('login-screen').style.display = 'flex';
-    }
-
     function waitForInitApp(timeoutMs = 8000) {
       return new Promise((resolve, reject) => {
         if (typeof window.initApp === 'function') return resolve();
@@ -668,7 +662,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     let db;
     if (USE_FIREBASE) {
       const app = initializeApp(firebaseConfig);
-      // Inicialização limpa e universal compatível com todos os browsers móveis (Android/iOS)
       db = getFirestore(app);
     }
 
@@ -709,6 +702,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     function initHistoryFilterDropdown() {
        const select = document.getElementById("history-filter");
+       if(!select) return;
        select.innerHTML = '<option value="ALL">Visualização Global</option>';
        PEOPLE.forEach(person => {
           let opt = document.createElement('option');
@@ -940,6 +934,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     window.showToast = function(msg) {
       const t = document.getElementById("toast");
+      if(!t) return;
       t.textContent = msg;
       t.classList.add("show");
       setTimeout(() => t.classList.remove("show"), 2500);
@@ -958,17 +953,22 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        document.getElementById("custom-confirm").classList.remove("active");
        confirmCallback = null;
     }
-    document.getElementById("confirm-btn").onclick = function() {
-       if(confirmCallback) confirmCallback();
-       closeConfirm();
+    const confirmBtn = document.getElementById("confirm-btn");
+    if(confirmBtn) {
+        confirmBtn.onclick = function() {
+           if(confirmCallback) confirmCallback();
+           closeConfirm();
+        }
     }
 
     window.switchTab = function(tabName) {
        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
        document.querySelectorAll('.botnav button').forEach(el => el.classList.remove('active'));
        
-       document.getElementById('tab-' + tabName).style.display = 'block';
-       document.getElementById('nav-' + tabName).classList.add('active');
+       const targetTab = document.getElementById('tab-' + tabName);
+       const targetNav = document.getElementById('nav-' + tabName);
+       if(targetTab) targetTab.style.display = 'block';
+       if(targetNav) targetNav.classList.add('active');
        
        if(tabName === 'home') {
           document.body.classList.add('locked-scroll');
@@ -978,7 +978,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        
        if(tabName === 'history') {
           historySelectedDate = getLocalDateISO();
-          document.getElementById('history-filter').value = "ALL"; 
+          const histFilter = document.getElementById('history-filter');
+          if(histFilter) histFilter.value = "ALL"; 
           currentHistoryFilter = "ALL";
           renderHistoryCalendar();
        }
@@ -991,101 +992,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        window.scrollTo(0,0);
     }
 
-    function setupSwipeListener(containerId, trackId, onSwipeLeft, onSwipeRight, isMonthlyNav = false) {
-       const container = document.getElementById(containerId);
-       if(!container) return;
-       let startX = 0, startY = 0, isDragging = false, currentX = 0;
-
-       container.addEventListener('touchstart', e => {
-          startX = e.changedTouches[0].screenX;
-          startY = e.changedTouches[0].screenY;
-          isDragging = true;
-          const track = document.getElementById(trackId);
-          if(track) track.style.transition = 'none';
-       }, {passive: true});
-
-       container.addEventListener('touchmove', e => {
-          if(!isDragging) return;
-          const x = e.changedTouches[0].screenX;
-          const y = e.changedTouches[0].screenY;
-          const deltaX = x - startX;
-          const deltaY = y - startY;
-
-          if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
-             if(isMonthlyNav) {
-                 let targetSelectedMonth = "";
-                 if(containerId.includes('stats')) targetSelectedMonth = statsSelectedMonth;
-                 else if(containerId.includes('savings')) targetSelectedMonth = savingsSelectedMonth;
-                 else if(containerId.includes('hist')) targetSelectedMonth = historySelectedDate.substring(0, 7);
-
-                 let [y, m] = targetSelectedMonth.split('-');
-                 let cur = new Date();
-                 
-                 if(deltaX < 0 && parseInt(y) === cur.getFullYear() && parseInt(m) === (cur.getMonth()+1)) {
-                     return; 
-                 }
-                 if(deltaX > 0 && parseInt(y) === MIN_ALLOWED_YEAR && parseInt(m) === MIN_ALLOWED_MONTH) {
-                     return;
-                 }
-             }
-             currentX = Math.max(-120, Math.min(120, deltaX));
-             const track = document.getElementById(trackId);
-             if(track) track.style.transform = `translateX(calc(-33.3333% + ${currentX}px))`;
-             if(e.cancelable) e.preventDefault();
-          }
-       }, {passive: false});
-
-       container.addEventListener('touchend', e => {
-          if(!isDragging) return;
-          isDragging = false;
-          const track = document.getElementById(trackId);
-          if(!track) return;
-          
-          track.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
-          
-          if (currentX < -60) {
-             if(isMonthlyNav) {
-                 let targetSelectedMonth = "";
-                 if(containerId.includes('stats')) targetSelectedMonth = statsSelectedMonth;
-                 else if(containerId.includes('savings')) targetSelectedMonth = savingsSelectedMonth;
-                 else if(containerId.includes('hist')) targetSelectedMonth = historySelectedDate.substring(0, 7);
-
-                 let [y, m] = targetSelectedMonth.split('-');
-                 let cur = new Date();
-                 if(parseInt(y) === cur.getFullYear() && parseInt(m) === (cur.getMonth()+1)) {
-                     track.style.transform = `translateX(-33.3333%)`;
-                     currentX = 0;
-                     return;
-                 }
-             }
-             track.style.transform = `translateX(-66.6666%)`; 
-             setTimeout(() => { onSwipeLeft(); }, 250);
-          } else if (currentX > 60) {
-             if(isMonthlyNav) {
-                 let targetSelectedMonth = "";
-                 if(containerId.includes('stats')) targetSelectedMonth = statsSelectedMonth;
-                 else if(containerId.includes('savings')) targetSelectedMonth = savingsSelectedMonth;
-                 else if(containerId.includes('hist')) targetSelectedMonth = historySelectedDate.substring(0, 7);
-
-                 let [y, m] = targetSelectedMonth.split('-');
-                 if(parseInt(y) === MIN_ALLOWED_YEAR && parseInt(m) === MIN_ALLOWED_MONTH) {
-                     track.style.transform = `translateX(-33.3333%)`;
-                     currentX = 0;
-                     return;
-                 }
-             }
-             track.style.transform = `translateX(0%)`; 
-             setTimeout(() => { onSwipeRight(); }, 250);
-          } else {
-             track.style.transform = `translateX(-33.3333%)`; 
-          }
-          currentX = 0;
-       }, {passive: true});
-    }
-
     window.initApp = function() {
-      document.getElementById('calc-cons').value = localStorage.getItem('pec_cons') || '5.0';
-      document.getElementById('calc-price').value = localStorage.getItem('pec_price') || '2.00';
+      const consInput = document.getElementById('calc-cons');
+      const priceInput = document.getElementById('calc-price');
+      if(consInput) consInput.value = localStorage.getItem('pec_cons') || '5.0';
+      if(priceInput) priceInput.value = localStorage.getItem('pec_price') || '2.00';
       
       populateSavingsYearDropdown();
       updateSavingsMonthOptions();
@@ -1116,7 +1027,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     function renderHeaderDate() {
        const now = new Date();
-       document.getElementById("header-date").innerText = `${String(now.getDate()).padStart(2, '0')} ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+       const hDate = document.getElementById("header-date");
+       if(hDate) hDate.innerText = `${String(now.getDate()).padStart(2, '0')} ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
     }
 
     function renderWeekBar() {
@@ -1124,6 +1036,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        const shortDays = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
        const segsContainer = document.getElementById("wb-segments");
        const labelsContainer = document.getElementById("wb-labels");
+       if(!segsContainer || !labelsContainer) return;
        
        let segsHtml = "";
        let labelsHtml = "";
@@ -1193,6 +1106,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       });
       
       const list = document.getElementById("balance-list");
+      if(!list) return;
       list.innerHTML = "";
       
       sortedPeople.forEach((p, index) => {
@@ -1223,8 +1137,10 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
       renderHistoryCalendar();
       renderWeekBar();
-      if(document.getElementById('tab-stats').style.display === 'block') renderStats();
-      if(document.getElementById('tab-savings').style.display === 'block') updateSavings();
+      const statsTab = document.getElementById('tab-stats');
+      const savingsTab = document.getElementById('tab-savings');
+      if(statsTab && statsTab.style.display === 'block') renderStats();
+      if(savingsTab && savingsTab.style.display === 'block') updateSavings();
     }
 
     function generateStatsCardContent(filteredTrips) {
@@ -1344,9 +1260,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     window.renderStats = function() {
        const container = document.getElementById('stats-content-area');
+       if(!container) return;
        
        if (currentStatsView === 'global') {
-          const filterDays = document.getElementById('stats-month-filter').value;
+          const statsMonthFilter = document.getElementById('stats-month-filter');
+          const filterDays = statsMonthFilter ? statsMonthFilter.value : "ALL";
           let filteredTrips = trips;
           if(filterDays !== "ALL") {
              const daysNum = parseInt(filterDays);
@@ -1361,35 +1279,22 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           container.innerHTML = generateStatsCardContent(filteredTrips);
        } else {
           let [y, m] = statsSelectedMonth.split('-');
-          document.getElementById("stats-year-sel").value = y;
+          const statsYearSel = document.getElementById("stats-year-sel");
+          const statsMonthSel = document.getElementById("stats-month-sel");
+          if(statsYearSel) statsYearSel.value = y;
           updateStatsMonthOptions();
-          document.getElementById("stats-month-sel").value = m;
+          if(statsMonthSel) statsMonthSel.value = m;
 
-          const buildMonthStatsHTML = (mKey) => {
-             let monthlyTrips = trips.filter(t => t.date.startsWith(mKey));
-             return generateStatsCardContent(monthlyTrips);
-          };
-
-          let prev = getOffsetMonth(statsSelectedMonth, -1);
-          let next = getOffsetMonth(statsSelectedMonth, 1);
-
-          container.innerHTML = `
-             <div id="stats-list-swipe" class="swipe-container" style="min-height: 380px;">
-                 <div id="stats-list-track" class="swipe-track" style="transform: translateX(-33.3333%); align-items: flex-start;">
-                    <div style="width: 33.3333%; flex-shrink:0;">${buildMonthStatsHTML(prev)}</div>
-                    <div style="width: 33.3333%; flex-shrink:0;">${buildMonthStatsHTML(statsSelectedMonth)}</div>
-                    <div style="width: 33.3333%; flex-shrink:0;">${buildMonthStatsHTML(next)}</div>
-                 </div>
-             </div>
-          `;
-          setupSwipeListener('stats-list-swipe', 'stats-list-track', () => changeStatsMonth(1), () => changeStatsMonth(-1), true);
+          let monthlyTrips = trips.filter(t => t.date.startsWith(statsSelectedMonth));
+          container.innerHTML = generateStatsCardContent(monthlyTrips);
        }
     }
 
     window.jumpSavingsMonth = function() {
-       const m = document.getElementById("savings-month-sel").value;
-       const y = document.getElementById("savings-year-sel").value;
-       savingsSelectedMonth = `${y}-${m}`;
+       const mElem = document.getElementById("savings-month-sel");
+       const yElem = document.getElementById("savings-year-sel");
+       if(!mElem || !yElem) return;
+       savingsSelectedMonth = `${yElem.value}-${mElem.value}`;
        updateSavings();
     }
 
@@ -1413,29 +1318,34 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        if (targetYear > currentYear || (targetYear === currentYear && targetMonth > currentMonth)) return;
 
        savingsSelectedMonth = nextKey;
-       document.getElementById("savings-year-sel").value = ny;
+       const savingsYearSel = document.getElementById("savings-year-sel");
+       const savingsMonthSel = document.getElementById("savings-month-sel");
+       if(savingsYearSel) savingsYearSel.value = ny;
        updateSavingsMonthOptions();
-       document.getElementById("savings-month-sel").value = nm;
+       if(savingsMonthSel) savingsMonthSel.value = nm;
        updateSavings();
     }
 
     window.setSavingsView = function(viewMode) {
        currentSavingsView = viewMode;
-       document.getElementById('btn-view-global').className = viewMode === 'global' ? "gh-btn primary" : "gh-btn outline";
-       document.getElementById('btn-view-monthly').className = viewMode === 'monthly' ? "gh-btn primary" : "gh-btn outline";
+       const btnG = document.getElementById('btn-view-global');
+       const btnM = document.getElementById('btn-view-monthly');
+       if(btnG) btnG.className = viewMode === 'global' ? "gh-btn primary" : "gh-btn outline";
+       if(btnM) btnM.className = viewMode === 'monthly' ? "gh-btn primary" : "gh-btn outline";
        
-       document.getElementById('calc-period-container').style.display = viewMode === 'monthly' ? "none" : "block";
-       document.getElementById('savings-monthly-nav').style.display = viewMode === 'monthly' ? "flex" : "none";
+       const cpContainer = document.getElementById('calc-period-container');
+       const sNav = document.getElementById('savings-monthly-nav');
+       if(cpContainer) cpContainer.style.display = viewMode === 'monthly' ? "none" : "block";
+       if(sNav) sNav.style.display = viewMode === 'monthly' ? "flex" : "none";
        
        if(viewMode === 'monthly') {
           let [y, m] = savingsSelectedMonth.split('-');
-          document.getElementById("savings-year-sel").value = y;
+          const savingsYearSel = document.getElementById("savings-year-sel");
+          const savingsMonthSel = document.getElementById("savings-month-sel");
+          if(savingsYearSel) savingsYearSel.value = y;
           updateSavingsMonthOptions();
-          document.getElementById("savings-month-sel").value = m;
+          if(savingsMonthSel) savingsMonthSel.value = m;
        }
-
-       const track = document.getElementById('savings-list-track');
-       if(track) track.style.transform = 'translateX(-33.3333%)';
        
        updateSavings();
     }
@@ -1469,7 +1379,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                 <li class="list-item">
                     <div class="balance-name">${d.name}</div>
                     <div style="text-align: right; color: var(--muted); font-size: 11.5px; font-style: italic;">
-                        Sem dados para este mês
+                        Sem dados para este período
                     </div>
                 </li>`;
             } else {
@@ -1496,9 +1406,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     }
 
     window.updateSavings = function() {
-        const periodVal = document.getElementById('calc-period') ? document.getElementById('calc-period').value : "ALL";
-        const cons = parseFloat(document.getElementById('calc-cons').value) || 0;
-        const price = parseFloat(document.getElementById('calc-price').value) || 0;
+        const periodElem = document.getElementById('calc-period');
+        const periodVal = periodElem ? periodElem.value : "ALL";
+        const consElem = document.getElementById('calc-cons');
+        const priceElem = document.getElementById('calc-price');
+        
+        const cons = consElem ? (parseFloat(consElem.value) || 0) : 5.0;
+        const price = priceElem ? (parseFloat(priceElem.value) || 0) : 2.0;
         
         localStorage.setItem('pec_cons', cons);
         localStorage.setItem('pec_price', price);
@@ -1554,9 +1468,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             displayKm = totalKmSaved;
         } else {
             let [y, m] = savingsSelectedMonth.split('-');
-            document.getElementById("savings-year-sel").value = y;
+            const savingsYearSel = document.getElementById("savings-year-sel");
+            const savingsMonthSel = document.getElementById("savings-month-sel");
+            if(savingsYearSel) savingsYearSel.value = y;
             updateSavingsMonthOptions();
-            document.getElementById("savings-month-sel").value = m;
+            if(savingsMonthSel) savingsMonthSel.value = m;
 
             if (monthlySavingsData[savingsSelectedMonth]) {
                 Object.values(monthlySavingsData[savingsSelectedMonth]).forEach(d => {
@@ -1585,20 +1501,23 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             fmtCO2 = fmtMoney(displayCO2Kg) + ' kg';
         }
 
-        document.getElementById('savings-global-results').innerHTML = `
-            <div style="text-align: center; flex: 1; border-right: 1px solid var(--border); padding: 0 2px;">
-               <span style="font-size: 18px; font-weight: 700; color: var(--accent);">${fmtLiters}</span><br>
-               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Comb. Poupado</span>
-            </div>
-            <div style="text-align: center; flex: 1; border-right: 1px solid var(--border); padding: 0 2px;">
-               <span style="font-size: 18px; font-weight: 700; color: var(--text);">${fmtCO2}</span><br>
-               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">CO2 Evitado</span>
-            </div>
-            <div style="text-align: center; flex: 1; padding: 0 2px;">
-               <span style="font-size: 18px; font-weight: 700; color: var(--green);">${fmtEuros} €</span><br>
-               <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Poupança Total</span>
-            </div>
-        `;
+        const savingsGlobalResults = document.getElementById('savings-global-results');
+        if(savingsGlobalResults) {
+            savingsGlobalResults.innerHTML = `
+                <div style="text-align: center; flex: 1; border-right: 1px solid var(--border); padding: 0 2px;">
+                   <span style="font-size: 18px; font-weight: 700; color: var(--accent);">${fmtLiters}</span><br>
+                   <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Comb. Poupado</span>
+                </div>
+                <div style="text-align: center; flex: 1; border-right: 1px solid var(--border); padding: 0 2px;">
+                   <span style="font-size: 18px; font-weight: 700; color: var(--text);">${fmtCO2}</span><br>
+                   <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">CO2 Evitado</span>
+                </div>
+                <div style="text-align: center; flex: 1; padding: 0 2px;">
+                   <span style="font-size: 18px; font-weight: 700; color: var(--green);">${fmtEuros} €</span><br>
+                   <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Poupança Total</span>
+                </div>
+            `;
+        }
 
         const treeCounterDiv = document.getElementById('savings-tree-counter');
         if (treeCounterDiv) {
@@ -1614,6 +1533,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         }
 
         const container = document.getElementById('savings-content-area');
+        if(!container) return;
 
         if (currentSavingsView === 'global') {
             let sortedPeopleAlpha = [...PEOPLE].sort((a, b) => a.localeCompare(b, 'pt'));
@@ -1633,43 +1553,28 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             container.innerHTML = buildSavingsChartHTML(pData, maxEuros, true, uniqueMonths);
 
         } else {
-            const buildMonthHTML = (mKey) => {
-                 let mData = [];
-                 let maxEuros = 0;
-                 let sorted = [...PEOPLE].sort((a,b) => a.localeCompare(b, 'pt'));
+            let mData = [];
+            let maxEuros = 0;
+            let sorted = [...PEOPLE].sort((a,b) => a.localeCompare(b, 'pt'));
 
-                 sorted.forEach(p => {
-                     const km = (monthlySavingsData[mKey] && monthlySavingsData[mKey][p]) ? monthlySavingsData[mKey][p].km : 0;
-                     if (km > 0) {
-                         let euros = (km / 100) * cons * price;
-                         if (euros > maxEuros) maxEuros = euros;
-                         mData.push({ name: p, km, euros, hasData: true });
-                     } else {
-                         mData.push({ name: p, km: 0, euros: 0, hasData: false });
-                     }
-                 });
+            sorted.forEach(p => {
+                const km = (monthlySavingsData[savingsSelectedMonth] && monthlySavingsData[savingsSelectedMonth][p]) ? monthlySavingsData[savingsSelectedMonth][p].km : 0;
+                if (km > 0) {
+                    let euros = (km / 100) * cons * price;
+                    if (euros > maxEuros) maxEuros = euros;
+                    mData.push({ name: p, km, euros, hasData: true });
+                } else {
+                    mData.push({ name: p, km: 0, euros: 0, hasData: false });
+                }
+            });
 
-                 return buildSavingsChartHTML(mData, maxEuros, false, 1);
-            };
-
-            let prev = getOffsetMonth(savingsSelectedMonth, -1);
-            let next = getOffsetMonth(savingsSelectedMonth, 1);
-             
-            container.innerHTML = `
-                <div id="savings-list-swipe" class="swipe-container" style="min-height: 380px;">
-                    <div id="savings-list-track" class="swipe-track" style="transform: translateX(-33.3333%); align-items: flex-start;">
-                       <div style="width: 33.3333%; flex-shrink:0;">${buildMonthHTML(prev)}</div>
-                       <div style="width: 33.3333%; flex-shrink:0;">${buildMonthHTML(savingsSelectedMonth)}</div>
-                       <div style="width: 33.3333%; flex-shrink:0;">${buildMonthHTML(next)}</div>
-                    </div>
-                </div>
-            `;
-            setupSwipeListener('savings-list-swipe', 'savings-list-track', () => changeSavingsMonth(1), () => changeSavingsMonth(-1), true);
+            container.innerHTML = buildSavingsChartHTML(mData, maxEuros, false, 1);
         }
     };
 
     window.applyHistoryFilter = function() {
-       currentHistoryFilter = document.getElementById("history-filter").value;
+       const hFilter = document.getElementById("history-filter");
+       currentHistoryFilter = hFilter ? hFilter.value : "ALL";
        renderHistoryCalendar();
     }
 
@@ -1732,9 +1637,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     function generateFormCalendarHTML(selectedDateISO, onClickAction) {
        const parts = selectedDateISO.split('-');
        const targetDate = new Date(parts[0], parts[1]-1, parts[2]);
-       
-       let prevDate = new Date(targetDate); prevDate.setDate(prevDate.getDate() - 7);
-       let nextDate = new Date(targetDate); nextDate.setDate(nextDate.getDate() + 7);
 
        let html = `<div class="calendar-header-nav">
           <div style="display:flex; gap:4px;">
@@ -1750,11 +1652,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           </div>
        </div>`;
 
-       html += `<div id="form-swipe" class="swipe-container"><div id="form-track" class="swipe-track" style="transform: translateX(-33.3333%);">`;
-       html += getFormWeekGrid(prevDate, selectedDateISO, onClickAction);
        html += getFormWeekGrid(targetDate, selectedDateISO, onClickAction);
-       html += getFormWeekGrid(nextDate, selectedDateISO, onClickAction);
-       html += `</div></div>`;
        return html;
     }
 
@@ -1785,20 +1683,45 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        renderHistoryCalendar();
     }
 
-    function getHistoryMonthGrid(targetYear, targetMonth, selectedDateISO, onClickAction) {
-       let html = `<div class="streak-grid">`;
-       const firstDayOfMonth = new Date(targetYear, targetMonth, 1);
-       const jsDayFirst = firstDayOfMonth.getDay();
-       const monBasedFirst = (jsDayFirst + 6) % 7; 
-       const startDate = new Date(targetYear, targetMonth, 1 - monBasedFirst);
+    function generateHistoryCalendarHTML(selectedDateISO, onClickAction) {
+      const parts = selectedDateISO.split('-');
+      const targetDate = new Date(parts[0], parts[1]-1, parts[2]);
+      const targetYear = targetDate.getFullYear();
+      const targetMonth = targetDate.getMonth();
+      const canGoPrev = !(targetYear === MIN_ALLOWED_YEAR && targetMonth === (MIN_ALLOWED_MONTH - 1));
+      const curY = new Date().getFullYear();
+      const curM = new Date().getMonth();
+      const canGoNext = !(targetYear === curY && targetMonth === curM);
 
-       const lastDayOfMonth = new Date(targetYear, targetMonth + 1, 0);
-       const jsDayLast = lastDayOfMonth.getDay();
-       const monBasedLast = (jsDayLast + 6) % 7;
-       const endDate = new Date(targetYear, targetMonth + 1, 0 + (6 - monBasedLast));
-       const shortDays = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
+      let html = `<div class="calendar-header-nav">
+          <div style="display:flex; gap:4px;">
+             <button onclick="changeHistoryYear(-1)" ${!canGoPrev ? 'disabled' : ''} title="Ano Anterior"><span>◀</span><span>Ano</span></button>
+             <button onclick="changeHistoryMonth(-1)" ${!canGoPrev ? 'disabled' : ''} title="Mês Anterior"><span>◀</span><span>Mês</span></button>
+          </div>
+          <div class="center-date">
+             <span style="font-weight:700; color:var(--text); text-transform:uppercase; font-size:12px;">${monthNames[targetMonth]}</span>
+             <span>${targetYear}</span>
+          </div>
+          <div style="display:flex; gap:4px;">
+             <button onclick="changeHistoryMonth(1)" ${!canGoNext ? 'disabled' : ''} title="Mês Seguinte"><span>▶</span><span>Mês</span></button>
+             <button onclick="changeHistoryYear(1)" ${!canGoNext ? 'disabled' : ''} title="Ano Seguinte"><span>▶</span><span>Ano</span></button>
+             <button onclick="resetHistoryToToday()" style="background:#30363d; color:#ffffff; border-color:#8b949e;" title="Hoje"><span>▼</span><span>Hoje</span></button>
+          </div>
+       </div>`;
 
-       for(let d = new Date(startDate.getTime()); d <= endDate; d.setDate(d.getDate() + 1)){
+      let gridHtml = `<div class="streak-grid">`;
+      const firstDayOfMonth = new Date(targetYear, targetMonth, 1);
+      const jsDayFirst = firstDayOfMonth.getDay();
+      const monBasedFirst = (jsDayFirst + 6) % 7; 
+      const startDate = new Date(targetYear, targetMonth, 1 - monBasedFirst);
+
+      const lastDayOfMonth = new Date(targetYear, targetMonth + 1, 0);
+      const jsDayLast = lastDayOfMonth.getDay();
+      const monBasedLast = (jsDayLast + 6) % 7;
+      const endDate = new Date(targetYear, targetMonth + 1, 0 + (6 - monBasedLast));
+      const shortDays = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
+
+      for(let d = new Date(startDate.getTime()); d <= endDate; d.setDate(d.getDate() + 1)){
           const iso = getLocalDateISO(d);
           const isPast = iso < todayISO;
           const isFuture = iso > todayISO;
@@ -1838,53 +1761,16 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           }
 
           let clickAttr = isFuture ? '' : `onclick="${onClickAction}('${iso}')"`;
-          html += `<div class="${c}" ${clickAttr}>${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
-       }
-       return html + `</div>`;
-    }
+          gridHtml += `<div class="${c}" ${clickAttr}>${badgeHtml}<div class="s-date">${dateNum}</div><div class="s-wkd">${dayName}</div></div>`;
+      }
+      gridHtml += `</div>`;
 
-    function generateHistoryCalendarHTML(selectedDateISO, onClickAction) {
-      const parts = selectedDateISO.split('-');
-      const targetDate = new Date(parts[0], parts[1]-1, parts[2]);
-      const targetYear = targetDate.getFullYear();
-      const targetMonth = targetDate.getMonth();
-      const canGoPrev = !(targetYear === MIN_ALLOWED_YEAR && targetMonth === (MIN_ALLOWED_MONTH - 1));
-      const curY = new Date().getFullYear();
-      const curM = new Date().getMonth();
-      const canGoNext = !(targetYear === curY && targetMonth === curM);
-
-      let prevYear = targetYear, prevMonth = targetMonth - 1;
-      if(prevMonth < 0) { prevMonth = 11; prevYear--; }
-      let nextYear = targetYear, nextMonth = targetMonth + 1;
-      if(nextMonth > 11) { nextMonth = 0; nextYear++; }
-
-      let html = `<div class="calendar-header-nav">
-          <div style="display:flex; gap:4px;">
-             <button onclick="changeHistoryYear(-1)" ${!canGoPrev ? 'disabled' : ''} title="Ano Anterior"><span>◀</span><span>Ano</span></button>
-             <button onclick="changeHistoryMonth(-1)" ${!canGoPrev ? 'disabled' : ''} title="Mês Anterior"><span>◀</span><span>Mês</span></button>
-          </div>
-          <div class="center-date">
-             <span style="font-weight:700; color:var(--text); text-transform:uppercase; font-size:12px;">${monthNames[targetMonth]}</span>
-             <span>${targetYear}</span>
-          </div>
-          <div style="display:flex; gap:4px;">
-             <button onclick="changeHistoryMonth(1)" ${!canGoNext ? 'disabled' : ''} title="Mês Seguinte"><span>▶</span><span>Mês</span></button>
-             <button onclick="changeHistoryYear(1)" ${!canGoNext ? 'disabled' : ''} title="Ano Seguinte"><span>▶</span><span>Ano</span></button>
-             <button onclick="resetHistoryToToday()" style="background:#30363d; color:#ffffff; border-color:#8b949e;" title="Hoje"><span>▼</span><span>Hoje</span></button>
-          </div>
-       </div>`;
-
-      html += `<div id="hist-swipe" class="swipe-container"><div id="history-track" class="swipe-track" style="transform: translateX(-33.3333%);">`;
-      html += getHistoryMonthGrid(prevYear, prevMonth, selectedDateISO, onClickAction);
-      html += getHistoryMonthGrid(targetYear, targetMonth, selectedDateISO, onClickAction);
-      html += getHistoryMonthGrid(nextYear, nextMonth, selectedDateISO, onClickAction);
-      html += `</div></div>`;
-      return html;
+      return html + gridHtml;
     }
 
     function renderHistoryCalendar() {
-       document.getElementById("history-calendar").innerHTML = generateHistoryCalendarHTML(historySelectedDate, 'selectHistoryDate');
-       setupSwipeListener('hist-swipe', 'history-track', () => changeHistoryMonth(1), () => changeHistoryMonth(-1), true);
+       const hCalendar = document.getElementById("history-calendar");
+       if(hCalendar) hCalendar.innerHTML = generateHistoryCalendarHTML(historySelectedDate, 'selectHistoryDate');
        renderHistoryDetails();
     }
 
@@ -1896,6 +1782,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     function renderHistoryDetails() {
        const container = document.getElementById("history-details-container");
+       if(!container) return;
        let dayTrips = trips.filter(t => t.date === historySelectedDate);
        
        if (currentHistoryFilter !== "ALL") {
@@ -2002,8 +1889,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       splitCostMode = false;
       carsData = [ { driver: null, passengers: [], isOneWay: false }, { driver: null, passengers: [], isOneWay: false } ];
       refreshFormUI();
-      document.getElementById("modal-trip").classList.add("active");
-      document.getElementById("modal-trip").scrollTop = 0;
+      const modal = document.getElementById("modal-trip");
+      if(modal) {
+          modal.classList.add("active");
+          modal.scrollTop = 0;
+      }
     }
 
     window.openModalWithDate = function(dateIso) {
@@ -2036,24 +1926,35 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       }
       
       refreshFormUI();
-      document.getElementById("modal-trip").classList.add("active");
-      document.getElementById("modal-trip").scrollTop = 0;
+      const modal = document.getElementById("modal-trip");
+      if(modal) {
+          modal.classList.add("active");
+          modal.scrollTop = 0;
+      }
     }
 
     function refreshFormUI() {
-      document.getElementById("new-trip-calendar").innerHTML = generateFormCalendarHTML(formDate, 'selectFormDate');
-      setupSwipeListener('form-swipe', 'form-track', () => changeFormDay(7), () => changeFormDay(-7));
+      const tripCalendar = document.getElementById("new-trip-calendar");
+      if(tripCalendar) tripCalendar.innerHTML = generateFormCalendarHTML(formDate, 'selectFormDate');
 
-      document.getElementById("trip-oneway-box-0").classList.toggle("on", carsData[0].isOneWay);
-      document.getElementById("trip-oneway-box-1").classList.toggle("on", carsData[1].isOneWay);
-      document.getElementById("split-cost-box").classList.toggle("on", splitCostMode);
+      const oBox0 = document.getElementById("trip-oneway-box-0");
+      const oBox1 = document.getElementById("trip-oneway-box-1");
+      const sBox = document.getElementById("split-cost-box");
+      if(oBox0) oBox0.classList.toggle("on", carsData[0].isOneWay);
+      if(oBox1) oBox1.classList.toggle("on", carsData[1].isOneWay);
+      if(sBox) sBox.classList.toggle("on", splitCostMode);
       
-      document.getElementById("car2-section").style.display = selectedCars === 2 ? "block" : "none";
-      document.getElementById("add-car2-container").style.display = selectedCars === 1 ? "block" : "none";
-      document.getElementById("remove-car2-container").style.display = selectedCars === 2 ? "block" : "none";
-      document.getElementById("split-cost-container").style.display = selectedCars === 2 ? "block" : "none";
-      
-      document.getElementById("car1-header").innerText = selectedCars === 2 ? "CARRO 1" : "CONFIGURAÇÃO";
+      const car2Sec = document.getElementById("car2-section");
+      const addCar2 = document.getElementById("add-car2-container");
+      const remCar2 = document.getElementById("remove-car2-container");
+      const splitCont = document.getElementById("split-cost-container");
+      const c1Header = document.getElementById("car1-header");
+
+      if(car2Sec) car2Sec.style.display = selectedCars === 2 ? "block" : "none";
+      if(addCar2) addCar2.style.display = selectedCars === 1 ? "block" : "none";
+      if(remCar2) remCar2.style.display = selectedCars === 2 ? "block" : "none";
+      if(splitCont) splitCont.style.display = selectedCars === 2 ? "block" : "none";
+      if(c1Header) c1Header.innerText = selectedCars === 2 ? "CARRO 1" : "CONFIGURAÇÃO";
 
       renderCarGrid(0, "grid-c1-drivers", "grid-c1-pass");
       if(selectedCars === 2) renderCarGrid(1, "grid-c2-drivers", "grid-c2-pass");
@@ -2068,7 +1969,10 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        refreshFormUI();
     }
     
-    window.closeModal = function() { document.getElementById("modal-trip").classList.remove("active"); }
+    window.closeModal = function() { 
+      const modal = document.getElementById("modal-trip");
+      if(modal) modal.classList.remove("active"); 
+    }
     
     window.toggleOneWay = function(carIndex) {
       carsData[carIndex].isOneWay = !carsData[carIndex].isOneWay;
@@ -2128,6 +2032,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     function renderCarGrid(carIndex, dGridId, pGridId) {
       const dGrid = document.getElementById(dGridId);
       const pGrid = document.getElementById(pGridId);
+      if(!dGrid || !pGrid) return;
       dGrid.innerHTML = ""; pGrid.innerHTML = "";
 
       const globalDrivers = getAllSelectedDrivers();
@@ -2158,6 +2063,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     function drawCar(carIndex, containerId) {
       const container = document.getElementById(containerId);
+      if(!container) return;
       container.innerHTML = "";
       const car = carsData[carIndex];
       
@@ -2204,6 +2110,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     window.updateSummary = function() {
       const btnSave = document.getElementById("btn-save-trip");
+      const summaryBox = document.getElementById("summary-box");
+      if(!btnSave || !summaryBox) return;
+
       let html = "";
       let valid = true;
       let finalCalc = { driverProfits: {}, passengerCosts: {}, totalCost: 0, drivers: [], passengers: [] };
@@ -2290,7 +2199,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          }
       }
 
-      document.getElementById("summary-box").innerHTML = html;
+      summaryBox.innerHTML = html;
       btnSave.disabled = !valid;
       window.currentTripFinalCalc = finalCalc;
     }
@@ -2327,7 +2236,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       closeModal();
       showToast("Viagem guardada com sucesso!");
       historySelectedDate = formDate;
-      document.getElementById('history-filter').value = "ALL";
+      const hFilter = document.getElementById('history-filter');
+      if(hFilter) hFilter.value = "ALL";
       currentHistoryFilter = "ALL";
       applyHistoryFilter();
     }
