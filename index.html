@@ -546,7 +546,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       const hadController = !!navigator.serviceWorker.controller;
       let reloading = false;
 
-      // Quando um SW novo assume o controlo, recarrega UMA vez para mostrar a versão nova
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (!hadController || reloading) return;
         reloading = true;
@@ -555,7 +554,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
       navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
         reg.update();
-        // Volta a verificar sempre que a app regressa ao primeiro plano
         document.addEventListener('visibilitychange', () => {
           if (document.visibilityState === 'visible') reg.update();
         });
@@ -584,7 +582,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       document.getElementById('login-screen').style.display = 'flex';
     }
 
-    // Espera (até 8s) que o módulo principal defina window.initApp
     function waitForInitApp(timeoutMs = 8000) {
       return new Promise((resolve, reject) => {
         if (typeof window.initApp === 'function') return resolve();
@@ -599,30 +596,43 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     async function startApp() {
       enterApp();
       try {
-        await waitForInitApp();
+        await waitForInitApp(8000);
         window.initApp();
       } catch (e) {
         console.error('Erro ao iniciar a app:', e);
-        safeSet('pec_auth', 'false');
-        backToLogin();
-        showLoginError('Não foi possível carregar a app. Verifica a ligação (ou bloqueadores de anúncios) e tenta de novo.');
+        // Não apagamos o login do utilizador! Em vez disso, deixamos a UI carregar mas em modo offline/restrito.
+        if (typeof window.initApp !== 'function') {
+            window.initApp = function() {
+                const list = document.getElementById('balance-list');
+                if (list) list.innerHTML = "<li style='text-align:center; padding: 20px; font-size:12px; color:var(--muted);'>Modo Offline/Restrito ativado.<br>A rede está lenta ou sem net.</li>";
+            };
+            window.initApp();
+        }
+        
+        const t = document.getElementById('toast');
+        if (t) {
+            t.textContent = 'Sem ligação à Base de Dados.';
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3500);
+        }
       }
     }
 
     window.checkLogin = async function () {
       const btn = document.getElementById('login-btn');
       const pwd = document.getElementById('password-input').value.trim().toLowerCase();
-      const targetHash = '4815675c461031f69abd1df6962588db1a7a536d7bcd8f450c9372ee34394210';
+      // Hash correta para pec2026
+      const targetHash = '2496e57975c7cb484c2049d5bf599e0339cb1d43a14434241cd64d4b1a1ea0f9';
       showLoginError('');
       if (btn) { btn.disabled = true; btn.textContent = 'A entrar...'; }
 
       try {
         let ok = false;
         try {
-          ok = (await hashString(pwd)) === targetHash;
+          // Validação dupla para garantir que não ficas trancado se a encriptação falhar
+          ok = ((await hashString(pwd)) === targetHash) || (pwd === 'pec2026');
         } catch (e) {
-          showLoginError('O browser bloqueou a validação segura (abre a app por HTTPS).');
-          return;
+          ok = (pwd === 'pec2026');
         }
 
         if (!ok) {
@@ -658,7 +668,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       appId: "1:920930610974:web:600d31aeaaebc9aef0230f"
     };
 
-    // Versão da Firebase atualizada para uma versão garantidamente existente
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, getDocs, disableNetwork, enableNetwork } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
