@@ -3,10 +3,15 @@
 // (ignorando a cache HTTP do browser/GitHub Pages) e só usa a cache se estiveres offline.
 const CACHE_NAME = 'pec-boleias-runtime-v3';
 
+// Ficheiros guardados para funcionar offline (os que não existirem são simplesmente ignorados)
 const CORE_FILES = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './favicon.png',
+  './apple-touch-icon.png',
+  './icon-192x192.png',
+  './icon-512x512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -51,7 +56,8 @@ self.addEventListener('fetch', event => {
         return res;
       })
       .catch(() =>
-        caches.match(req).then(cached => {
+        // ignoreSearch: abrir a app com ?qualquer-coisa (atalho, partilha) também funciona offline
+        caches.match(req, { ignoreSearch: true }).then(cached => {
           if (cached) return cached;
           if (req.mode === 'navigate') return caches.match('./index.html');
           return Response.error();
