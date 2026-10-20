@@ -79,7 +79,6 @@ input, select { font-family: inherit; }
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
 .card.no-pad-top { padding-top: 4px; padding-bottom: 4px; }
 .card h3 { font-size: 14px; margin-bottom: 12px; color: var(--text); display: flex; justify-content: space-between; align-items: center; }
-.tag { color: var(--muted); font-size: 11px; font-weight: 500; background: var(--card2); border: 1px solid var(--border); padding: 2px 8px; border-radius: 12px; }
 
 .gh-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--card2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; width: 100%; text-align: center; color: var(--text); font-weight: 500; font-size: 14px; }
 .gh-btn:hover { background: #30363d; }
@@ -110,7 +109,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .center-date { text-align: center; line-height: 1.2; font-size: 11px; }
 .center-date span { display: block; }
 
-.swipe-container { overflow: hidden; width: 100%; position: relative; touch-action: pan-y; }
+.swipe-container { overflow: hidden; width: 100%; position: relative; touch-action: pan-y; will-change: transform; }
 .streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 46px; gap: 6px; padding-bottom: 16px; width: 100%; }
 
 .s-day { background: var(--card2); border-radius: 6px; height: 46px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--border); cursor: pointer; position: relative; }
@@ -298,7 +297,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          <button onclick="changeStatsMonth(1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;" id="btn-next-stats-month">▶</button>
       </div>
 
-      <div id="stats-content-area"></div>
+      <div id="stats-content-area" class="swipe-container"></div>
     </div>
 
     <!-- TAB 4: POUPANÇA E IMPACTO -->
@@ -352,7 +351,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             <button onclick="changeSavingsMonth(1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;" id="btn-next-month">▶</button>
          </div>
 
-         <div id="savings-content-area"></div>
+         <div id="savings-content-area" class="swipe-container"></div>
       </div>
     </div>
     
@@ -1212,7 +1211,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        });
 
        return `
-          <div class="card">
+          <div class="card" style="margin-bottom:0;">
             <h3 style="margin-bottom: 8px;">Estatísticas Gerais</h3>
             <div style="font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 20px; display: flex; align-items: baseline; gap: 8px;">
               <span>${totalTripsCount}</span>
@@ -1255,6 +1254,10 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
           let monthlyTrips = trips.filter(t => t.date.startsWith(statsSelectedMonth));
           container.innerHTML = generateStatsCardContent(monthlyTrips);
+          
+          if(currentStatsView === 'monthly') {
+             attachSmoothSwipeHandler('stats-content-area', () => changeStatsMonth(1), () => changeStatsMonth(-1));
+          }
        }
     }
 
@@ -1504,6 +1507,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             });
 
             container.innerHTML = buildSavingsChartHTML(mData, maxEuros, false, 1);
+            attachSmoothSwipeHandler('savings-content-area', () => changeSavingsMonth(1), () => changeSavingsMonth(-1));
         }
     };
 
@@ -1689,30 +1693,52 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       return html + gridHtml;
     }
 
-    // GESTÃO DE GESTOS SWIPE NOS CALENDÁRIOS
-    function attachSwipeHandler(containerId, onSwipeLeft, onSwipeRight) {
+    // GESTÃO DE SWIPE SUAVE COM O MOVIMENTO DO DEDO
+    function attachSmoothSwipeHandler(containerId, onSwipeLeft, onSwipeRight) {
        const el = document.getElementById(containerId);
        if(!el) return;
        let startX = 0;
        let startY = 0;
-       
+       let currentX = 0;
+       let isTracking = false;
+
        el.addEventListener('touchstart', e => {
           if (!e.touches || e.touches.length === 0) return;
           startX = e.touches[0].clientX;
           startY = e.touches[0].clientY;
+          currentX = startX;
+          isTracking = true;
+          el.style.transition = 'none';
+       }, { passive: true });
+
+       el.addEventListener('touchmove', e => {
+          if (!isTracking || !e.touches || e.touches.length === 0) return;
+          currentX = e.touches[0].clientX;
+          let currentY = e.touches[0].clientY;
+          let diffX = currentX - startX;
+          let diffY = currentY - startY;
+
+          if (Math.abs(diffX) > Math.abs(diffY)) {
+             el.style.transform = `translateX(${diffX}px)`;
+          }
        }, { passive: true });
 
        el.addEventListener('touchend', e => {
-          if (!e.changedTouches || e.changedTouches.length === 0) return;
-          let diffX = e.changedTouches[0].clientX - startX;
-          let diffY = e.changedTouches[0].clientY - startY;
-
-          if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+          if (!isTracking) return;
+          isTracking = false;
+          let diffX = currentX - startX;
+          
+          el.style.transition = 'transform 0.25s ease';
+          if (Math.abs(diffX) > 60) {
              if (diffX > 0) {
-                if(onSwipeRight) onSwipeRight();
+                el.style.transform = `translateX(100%)`;
+                setTimeout(() => { el.style.transform = 'none'; if(onSwipeRight) onSwipeRight(); }, 200);
              } else {
-                if(onSwipeLeft) onSwipeLeft();
+                el.style.transform = `translateX(-100%)`;
+                setTimeout(() => { el.style.transform = 'none'; if(onSwipeLeft) onSwipeLeft(); }, 200);
              }
+          } else {
+             el.style.transform = 'translateX(0px)';
           }
        }, { passive: true });
     }
@@ -1721,7 +1747,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        const hCalendar = document.getElementById("history-calendar");
        if(hCalendar) {
           hCalendar.innerHTML = generateHistoryCalendarHTML(historySelectedDate, 'selectHistoryDate');
-          attachSwipeHandler('history-calendar', () => changeHistoryMonth(1), () => changeHistoryMonth(-1));
+          attachSmoothSwipeHandler('history-calendar', () => changeHistoryMonth(1), () => changeHistoryMonth(-1));
        }
        renderHistoryDetails();
     }
@@ -1857,7 +1883,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       const tripCalendar = document.getElementById("new-trip-calendar");
       if(tripCalendar) {
          tripCalendar.innerHTML = generateFormCalendarHTML(formDate, 'selectFormDate');
-         attachSwipeHandler('form-calendar-wrapper', () => changeFormDay(7), () => changeFormDay(-7));
+         attachSmoothSwipeHandler('form-calendar-wrapper', () => changeFormDay(7), () => changeFormDay(-7));
       }
 
       const oBox0 = document.getElementById("trip-oneway-box-0");
