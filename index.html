@@ -535,12 +535,27 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
   <div id="toast" class="toast"></div>
 
-  <!-- Script Não-Módulo para Login Seguro -->
+  <!-- Script Não-Módulo para Login Seguro e Cache Aggressive -->
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js')
-        .then(() => console.log("Service Worker registado com sucesso!"))
-        .catch((err) => console.log("Erro ao registar Service Worker:", err));
+      navigator.serviceWorker.register('./sw.js').then(reg => {
+        // 1. Força o browser a verificar se há novidades no servidor sempre que a app abre
+        reg.update();
+        
+        // 2. Fica à escuta. Se houver um sw.js novo, atua!
+        reg.onupdatefound = () => {
+          const newWorker = reg.installing;
+          newWorker.onstatechange = () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log("Nova versão detetada! A limpar cache agressivamente...");
+              // 3. Limpa todas as caches antigas e força o refresh da página
+              caches.keys()
+                .then(names => Promise.all(names.map(name => caches.delete(name))))
+                .then(() => window.location.reload(true));
+            }
+          };
+        };
+      }).catch(err => console.log("Erro SW:", err));
     }
 
     async function hashString(string) {
