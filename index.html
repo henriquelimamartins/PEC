@@ -131,7 +131,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .hist-details { background: var(--card2); border-radius: 6px; padding: 14px; margin-top: 10px; border: 1px solid var(--border); }
 .hist-info { font-size: 13px; color: var(--muted); line-height: 1.5; text-align: left; }
 .hist-type { font-weight: 600; color: var(--text); display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.hist-driver-row { display: block; margin-bottom: 4px; }
+.hist-driver-row { display: block; margin-bottom: 4px; color: var(--text); }
 .hist-actions { display: flex; gap: 8px; margin-top: 12px; }
 
 .stats-section-title { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
@@ -813,6 +813,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           const snapshot = await getDocs(q);
           trips = [];
           snapshot.forEach((doc) => { trips.push({ id: doc.id, ...doc.data() }); });
+          localStorage.setItem("pec_trips_v20", JSON.stringify(trips));
           recalculateAndRender();
           showToast("Dados atualizados!");
        } catch (err) {
@@ -917,20 +918,26 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       
       switchTab('home');
 
+      // CARREGAMENTO IMEDIATO LOCAL PARA EVITAR ECRÃS A PRETO NO ANDROID
+      const localTrips = localStorage.getItem("pec_trips_v20");
+      if(localTrips) {
+         try {
+            trips = JSON.parse(localTrips);
+            recalculateAndRender();
+         } catch(e) {}
+      }
+
       if (USE_FIREBASE && db) {
         const q = query(collection(db, "trips"), orderBy("date", "desc"));
         onSnapshot(q, (snapshot) => {
           trips = [];
           snapshot.forEach((doc) => { trips.push({ id: doc.id, ...doc.data() }); });
+          localStorage.setItem("pec_trips_v20", JSON.stringify(trips));
           recalculateAndRender();
         }, (error) => {
           console.error("Erro no listener do Firestore:", error);
-          showToast("Aviso: ligação à BD instável.");
+          showToast("Modo Offline Ativo.");
         });
-      } else {
-        const localTrips = localStorage.getItem("pec_trips_v20");
-        if(localTrips) trips = JSON.parse(localTrips);
-        recalculateAndRender();
       }
     }
 
@@ -1493,7 +1500,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
              <button onclick="changeFormDay(7)" title="Semana Seguinte"><span>▶</span><span>Sem</span></button>
              <button onclick="resetFormWeekToToday()" style="background:#30363d; color:#ffffff; border-color:#8b949e;" title="Hoje"><span>▼</span><span>Hoje</span></button>
           </div>
-       `;
+       </div>`;
 
        return html + getFormWeekGrid(targetDate, selectedDateISO, onClickAction);
     }
@@ -1656,7 +1663,10 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
               costPassStr = fmt(trip.costPerPassenger) + " 🪙";
           }
             
-          let passRowHtml = trip.passengers.length >= 4 ? `<span style="display:block; margin-top:4px;"><strong style="color:var(--muted)">${passLabel}:</strong><br><span style="color:var(--text);">${passAlfab || "Nenhum"}</span></span>` : `<span><strong style="color:var(--muted)">${passLabel}:</strong> ${passAlfab || "Nenhum"}</span>`;
+          // CORREÇÃO DA COR A BRANCO QUANDO MUDAVA DE LINHA (>3 PASSAGEIROS)
+          let passRowHtml = trip.passengers.length >= 4 
+             ? `<span style="display:block; margin-top:4px;"><strong style="color:var(--muted)">${passLabel}:</strong><br><span style="color:var(--text);">${passAlfab || "Nenhum"}</span></span>` 
+             : `<span><strong style="color:var(--muted)">${passLabel}:</strong> <span style="color:var(--text);">${passAlfab || "Nenhum"}</span></span>`;
 
           html += `<div class="hist-details" style="margin-top: ${index > 0 ? '10px' : '0'};">
              <div class="hist-info">
