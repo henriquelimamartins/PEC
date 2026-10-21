@@ -41,8 +41,6 @@ html, body { min-height: 100vh; margin: 0; background: var(--bg); touch-action: 
 button, a, img, select { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif; color: var(--text); -webkit-tap-highlight-color: transparent; padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px)); }
 
-body.locked-scroll { overflow: hidden; height: 100vh; }
-
 h1, h2, h3, h4 { font-weight: 600; margin: 0; }
 p { margin: 0; line-height: 1.5; color: var(--muted); font-size: 13.5px; text-align: justify; }
 button { font-family: inherit; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease; }
@@ -360,13 +358,10 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 24px;">
          <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; justify-content: space-between;">
             <span>Versão 1.0</span>
-            <span style="color:var(--muted); font-weight:400; font-size:11px;">Lançamento Oficial</span>
+            <span style="color:var(--muted); font-weight:400; font-size:11px;">21 Outubro 2026</span>
          </h4>
          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5; text-align: justify;">
-            <li style="margin-bottom:4px;">Implementação do algoritmo automático de créditos para 1 carro ou multi-carro.</li>
-            <li style="margin-bottom:4px;">Nova funcionalidade visual interativa (calendários com *swipe* suave).</li>
-            <li style="margin-bottom:4px;">Calculadora avançada de impacto ambiental (CO2 poupado equivalente em árvores).</li>
-            <li>Inclusão de cálculos monetários em função dos consumos e custos de portagens.</li>
+            <li>Versão base inicial com sistema de gestão de boleias, cálculo de poupanças e análise gráfica de estatísticas.</li>
          </ul>
       </div>
 
@@ -410,7 +405,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          </p>
          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5; text-align: justify;">
             <li style="margin-bottom: 6px;"><strong>Distância Base:</strong> Considera automaticamente 29 km (Braga) ou 26 km (Vila Verde). O valor duplica para ida e volta.</li>
-            <li style="margin-bottom: 6px;"><strong>Fórmula:</strong> Valor do Combustível + Portagem para cada trajeto evitado.</li>
+            <li style="margin-bottom: 6px;"><strong>Fórmula de Poupança:</strong> (Distância × Consumo × Preço Combustível) + Custo de Portagens da respetiva viagem.</li>
             <li><strong>CO2 Evitado:</strong> Calculado com base em 2.48 kg de CO2 por litro queimado.</li>
          </ul>
       </div>
@@ -601,6 +596,37 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     const MIN_ALLOWED_YEAR = 2025;
     const MIN_ALLOWED_MONTH = 11;
     const MIN_ALLOWED_ISO = "2025-11-01";
+
+    // FUNÇÃO EM FALTA RESTAURADA - É ELA QUE INICIA A APP, DADOS, PREENCHE DROPDOWNS E DATA NO TOPO
+    function initApp() {
+      document.getElementById('calc-cons').value = localStorage.getItem('pec_cons') || '5.0';
+      document.getElementById('calc-price').value = localStorage.getItem('pec_price') || '2.00';
+      document.getElementById('calc-tolls').value = localStorage.getItem('pec_tolls') || '1.10';
+      
+      const lastUpdateMsg = localStorage.getItem('pec_last_update');
+      if (lastUpdateMsg) document.getElementById('last-update-time').innerText = lastUpdateMsg;
+
+      populateSavingsYearDropdown(); updateSavingsMonthOptions();
+      populateStatsYearDropdown(); updateStatsMonthOptions();
+      renderHeaderDate(); renderWeekBar(); initHistoryFilterDropdown();
+      
+      switchTab('home');
+
+      if (USE_FIREBASE) {
+        const q = query(collection(db, "trips"), orderBy("date", "desc"));
+        onSnapshot(q, (snapshot) => {
+          trips = [];
+          snapshot.forEach((doc) => { trips.push({ id: doc.id, ...doc.data() }); });
+          recalculateAndRender();
+          updateTimestamp();
+        });
+      } else {
+        const localTrips = localStorage.getItem("pec_trips_v20");
+        if(localTrips) trips = JSON.parse(localTrips);
+        recalculateAndRender();
+        updateTimestamp();
+      }
+    }
 
     function updateTimestamp() {
        const now = new Date();
@@ -898,11 +924,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        document.getElementById('tab-' + tabName).style.display = 'block';
        document.getElementById('nav-' + tabName).classList.add('active');
        
-       if(tabName === 'home') {
-          document.body.classList.add('locked-scroll');
-       } else {
-          document.body.classList.remove('locked-scroll');
-       }
+       // REMOÇÃO DA CLASSE QUE ESTAVA A BLOQUEAR O SCROLL DA PÁGINA INICIAL
+       document.body.classList.remove('locked-scroll');
        
        if(tabName === 'history') {
           historySelectedDate = getLocalDateISO();
