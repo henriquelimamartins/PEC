@@ -568,8 +568,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
     const shortMonths = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
     
-    const fmtMoney = (v) => parseFloat(v.toFixed(2));
-    const fmt = (num) => parseFloat(num.toFixed(2)).toString();
+    // Funções utilitárias seguras contra null/undefined
+    const fmtMoney = (v) => (v != null && !isNaN(v)) ? parseFloat(Number(v).toFixed(2)) : 0;
+    const fmt = (num) => (num != null && !isNaN(num)) ? parseFloat(Number(num).toFixed(2)).toString() : "0";
 
     function getLocalDateISO(d = new Date()) {
        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -682,13 +683,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        }
     }
 
-    window.onSavingsYearChange = function() {
+    function onSavingsYearChange() {
        const yearSel = document.getElementById("savings-year-sel");
        const monthSel = document.getElementById("savings-month-sel");
        updateSavingsMonthOptions();
        savingsSelectedMonth = `${yearSel.value}-${monthSel.value}`;
        updateSavings();
     }
+    window.onSavingsYearChange = onSavingsYearChange;
 
     function populateStatsYearDropdown() {
        const yearSel = document.getElementById("stats-year-sel");
@@ -750,20 +752,22 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        }
     }
 
-    window.onStatsYearChange = function() {
+    function onStatsYearChange() {
        const yearSel = document.getElementById("stats-year-sel");
        const monthSel = document.getElementById("stats-month-sel");
        updateStatsMonthOptions();
        statsSelectedMonth = `${yearSel.value}-${monthSel.value}`;
        renderStats();
     }
+    window.onStatsYearChange = onStatsYearChange;
 
-    window.jumpStatsMonth = function() {
+    function jumpStatsMonth() {
        const m = document.getElementById("stats-month-sel").value;
        const y = document.getElementById("stats-year-sel").value;
        statsSelectedMonth = `${y}-${m}`;
        renderStats();
     }
+    window.jumpStatsMonth = jumpStatsMonth;
 
     function getOffsetMonth(mKey, delta) {
         let [y, m] = mKey.split('-');
@@ -772,7 +776,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
     }
 
-    window.changeStatsMonth = function(delta) {
+    function changeStatsMonth(delta) {
        let nextKey = getOffsetMonth(statsSelectedMonth, delta);
        let [ny, nm] = nextKey.split('-');
        let targetYear = parseInt(ny);
@@ -790,8 +794,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        document.getElementById("stats-month-sel").value = nm;
        renderStats();
     }
+    window.changeStatsMonth = changeStatsMonth;
 
-    window.setStatsView = function(viewMode) {
+    function setStatsView(viewMode) {
        currentStatsView = viewMode;
        document.getElementById('btn-stats-view-global').className = viewMode === 'global' ? "gh-btn primary" : "gh-btn outline";
        document.getElementById('btn-stats-view-monthly').className = viewMode === 'monthly' ? "gh-btn primary" : "gh-btn outline";
@@ -808,8 +813,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
        renderStats();
     }
+    window.setStatsView = setStatsView;
 
-    window.forceRefresh = async function() {
+    async function forceRefresh() {
        if(!USE_FIREBASE) return;
        const btn = document.getElementById("btn-refresh");
        btn.innerText = "A atualizar...";
@@ -829,8 +835,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           btn.disabled = false;
        }
     }
+    window.forceRefresh = forceRefresh;
 
-    window.forceBackup = async function() {
+    async function forceBackup() {
        if(!USE_FIREBASE) return;
        const btn = document.getElementById("btn-force-backup");
        const origText = btn.innerText;
@@ -844,16 +851,18 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        }
        btn.innerText = origText;
     }
+    window.forceBackup = forceBackup;
 
-    window.showToast = function(msg) {
+    function showToast(msg) {
       const t = document.getElementById("toast");
       t.textContent = msg;
       t.classList.add("show");
       setTimeout(() => t.classList.remove("show"), 2500);
     }
+    window.showToast = showToast;
     
     let confirmCallback = null;
-    window.showConfirm = function(title, msg, callback) {
+    function showConfirm(title, msg, callback) {
        document.getElementById("confirm-title").innerText = title;
        document.getElementById("confirm-msg").innerText = msg;
        
@@ -869,16 +878,20 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        confirmCallback = callback;
        document.getElementById("custom-confirm").classList.add("active");
     }
-    window.closeConfirm = function() {
+    window.showConfirm = showConfirm;
+
+    function closeConfirm() {
        document.getElementById("custom-confirm").classList.remove("active");
        confirmCallback = null;
     }
+    window.closeConfirm = closeConfirm;
+
     document.getElementById("confirm-btn").onclick = function() {
        if(confirmCallback) confirmCallback();
        closeConfirm();
     }
 
-    window.switchTab = function(tabName) {
+    function switchTab(tabName) {
        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
        document.querySelectorAll('.botnav button').forEach(el => el.classList.remove('active'));
        
@@ -905,6 +918,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        }
        window.scrollTo(0,0);
     }
+    window.switchTab = switchTab;
 
     async function hashString(string) {
       const msgUint8 = new TextEncoder().encode(string);
@@ -913,7 +927,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    window.checkLogin = async function() {
+    async function checkLogin() {
       const pwd = document.getElementById("password-input").value;
       const targetHash = "2496e57975c7cb484c2049d5bf599e0339cb1d43a14434241cd64d4b1a1ea0f9"; 
       
@@ -927,6 +941,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          initApp();
       } else { alert("Password incorreta."); }
     }
+    window.checkLogin = checkLogin;
 
     window.onload = function() {
       if (localStorage.getItem("pec_auth") === "true") {
@@ -1058,10 +1073,12 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     function getLastDrivenTime(personName) {
        let latest = 0;
        for(let t of trips) {
-          if(t.drivers && t.drivers.includes(personName)) {
+          if(t.drivers && t.drivers.includes(personName) && t.date) {
              let parts = t.date.split('-');
-             let dTime = new Date(parts[0], parts[1]-1, parts[2]).getTime();
-             if(dTime > latest) latest = dTime;
+             if(parts.length === 3) {
+                 let dTime = new Date(parts[0], parts[1]-1, parts[2]).getTime();
+                 if(dTime > latest) latest = dTime;
+             }
           }
        }
        return latest;
@@ -1070,8 +1087,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     function getPersonRatio(personName) {
        let drv = 0, pas = 0;
        trips.forEach(t => {
-          if(t.drivers.includes(personName)) drv++;
-          if(t.passengers.includes(personName)) pas++;
+          if(t.drivers && t.drivers.includes(personName)) drv++;
+          if(t.passengers && t.passengers.includes(personName)) pas++;
        });
        let total = drv + pas;
        return total === 0 ? 0 : (drv / total);
@@ -1079,26 +1096,29 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
     function getTripCardHTML(trip) {
         const isFemale = name => FEMALES.includes(name);
-        const allDriversFemale = trip.drivers.length > 0 && trip.drivers.every(isFemale);
-        const allPassFemale = trip.passengers.length > 0 && trip.passengers.every(isFemale);
+        const driversList = trip.drivers || [];
+        const passList = trip.passengers || [];
+
+        const allDriversFemale = driversList.length > 0 && driversList.every(isFemale);
+        const allPassFemale = passList.length > 0 && passList.every(isFemale);
 
         let driverLabel = "Condutores";
-        if (trip.drivers.length === 1) driverLabel = isFemale(trip.drivers[0]) ? "Condutora" : "Condutor";
+        if (driversList.length === 1) driverLabel = isFemale(driversList[0]) ? "Condutora" : "Condutor";
         else if (allDriversFemale) driverLabel = "Condutoras";
 
         let passLabel = "Passageiros";
-        if (trip.passengers.length === 1) passLabel = isFemale(trip.passengers[0]) ? "Passageira" : "Passageiro";
+        if (passList.length === 1) passLabel = isFemale(passList[0]) ? "Passageira" : "Passageiro";
         else if (allPassFemale) passLabel = "Passageiras";
 
-        const passAlfab = [...trip.passengers].sort((a,b) => a.localeCompare(b, 'pt')).join(", ");
+        const passAlfab = [...passList].sort((a,b) => a.localeCompare(b, 'pt')).join(", ");
         const typeLabel = (trip.cars === 2 ? 'Viagem 2 Carros' : 'Viagem Normal') + (trip.splitCostMode ? ' (Separados)' : '');
         
         let costPassStr = "0 🪙";
-        if (trip.passengerCosts && trip.passengers.length > 0) {
-            let pCosts = trip.passengers.map(p => trip.passengerCosts[p]).filter(c => c !== undefined);
+        if (trip.passengerCosts && passList.length > 0) {
+            let pCosts = passList.map(p => trip.passengerCosts[p]).filter(c => c !== undefined);
             let uniqueCosts = [...new Set(pCosts)];
             if (uniqueCosts.length > 0) costPassStr = uniqueCosts.map(c => fmt(c) + " 🪙").join(" / ");
-        } else if (trip.costPerPassenger) {
+        } else if (trip.costPerPassenger != null) {
             costPassStr = fmt(trip.costPerPassenger) + " 🪙";
         }
           
@@ -1106,10 +1126,10 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           <div class="hist-details" style="margin-top: 10px;">
              <div class="hist-info">
                <span class="hist-type">${typeLabel}</span>
-               <span class="hist-driver-row"><strong style="color:var(--accent)">${driverLabel}:</strong> ${trip.drivers.join(" e ")}</span>
+               <span class="hist-driver-row"><strong style="color:var(--accent)">${driverLabel}:</strong> ${driversList.join(" e ")}</span>
                <span><strong style="color:var(--muted)">${passLabel}:</strong> ${passAlfab || "Nenhum"}</span>
                <div style="margin-top:8px; display:flex; justify-content:space-between; font-size:12px; color:var(--text); margin-bottom: 2px;">
-                  <span>Custo Total: <strong>${fmt(trip.totalCost)} 🪙</strong></span>
+                  <span>Custo Total: <strong>${fmt(trip.totalCost || 0)} 🪙</strong></span>
                </div>
                <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted)">
                   <span>Custo/passag.: <strong>${costPassStr}</strong></span>
@@ -1139,61 +1159,65 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     }
 
     function recalculateAndRender() {
-      PEOPLE.forEach(p => balances[p] = 0);
-      
-      trips.forEach(trip => {
-         if (trip.driverProfits && trip.passengerCosts) {
-             Object.keys(trip.driverProfits).forEach(d => balances[d] += trip.driverProfits[d]);
-             Object.keys(trip.passengerCosts).forEach(p => balances[p] -= trip.passengerCosts[p]);
-         } else {
-             if(trip.passengers) trip.passengers.forEach(p => balances[p] -= trip.costPerPassenger);
-             if(trip.drivers) trip.drivers.forEach(d => balances[d] += trip.profitPerDriver);
-         }
-      });
+      try {
+          PEOPLE.forEach(p => balances[p] = 0);
+          
+          trips.forEach(trip => {
+             if (trip.driverProfits && trip.passengerCosts) {
+                 Object.keys(trip.driverProfits).forEach(d => balances[d] += (trip.driverProfits[d] || 0));
+                 Object.keys(trip.passengerCosts).forEach(p => balances[p] -= (trip.passengerCosts[p] || 0));
+             } else {
+                 if(trip.passengers) trip.passengers.forEach(p => balances[p] -= (trip.costPerPassenger || 0));
+                 if(trip.drivers) trip.drivers.forEach(d => balances[d] += (trip.profitPerDriver || 0));
+             }
+          });
 
-      const sortedPeople = PEOPLE.map(name => ({
-        name, val: balances[name], ratio: getPersonRatio(name), lastTime: getLastDrivenTime(name)
-      })).sort((a, b) => {
-        if (a.val !== b.val) return a.val - b.val;
-        if (a.ratio !== b.ratio) return a.ratio - b.ratio;
-        if (a.lastTime !== b.lastTime) return a.lastTime - b.lastTime;
-        return a.name.localeCompare(b.name, 'pt'); 
-      });
-      
-      const list = document.getElementById("balance-list");
-      list.innerHTML = "";
-      
-      sortedPeople.forEach((p, index) => {
-        const li = document.createElement("li");
-        li.className = "list-item";
-        
-        let badge = '';
-        if (index === 0) {
-           const isFemale = FEMALES.includes(p.name);
-           const tagText = isFemale ? "CONDUTORA SUGERIDA" : "CONDUTOR SUGERIDO";
-           badge = `<span class="next-driver-tag">${tagText}</span>`;
-        }
+          const sortedPeople = PEOPLE.map(name => ({
+            name, val: balances[name], ratio: getPersonRatio(name), lastTime: getLastDrivenTime(name)
+          })).sort((a, b) => {
+            if (a.val !== b.val) return a.val - b.val;
+            if (a.ratio !== b.ratio) return a.ratio - b.ratio;
+            if (a.lastTime !== b.lastTime) return a.lastTime - b.lastTime;
+            return a.name.localeCompare(b.name, 'pt'); 
+          });
+          
+          const list = document.getElementById("balance-list");
+          list.innerHTML = "";
+          
+          sortedPeople.forEach((p, index) => {
+            const li = document.createElement("li");
+            li.className = "list-item";
+            
+            let badge = '';
+            if (index === 0) {
+               const isFemale = FEMALES.includes(p.name);
+               const tagText = isFemale ? "CONDUTORA SUGERIDA" : "CONDUTOR SUGERIDO";
+               badge = `<span class="next-driver-tag">${tagText}</span>`;
+            }
 
-        let valClass = p.val < 0 ? 'negative' : (p.val > 0 ? 'positive' : '');
-        let prefix = p.val > 0 ? '+' : '';
-        let valStr = Math.abs(p.val).toFixed(2);
-        let sign = p.val < 0 ? '-' : prefix;
-        
-        li.innerHTML = `
-          <div class="balance-name">${p.name}</div>
-          <div class="balance-right">
-             ${badge}
-             <div class="balance-val ${valClass}">${sign}${valStr} 🪙</div>
-          </div>
-        `;
-        list.appendChild(li);
-      });
+            let valClass = p.val < 0 ? 'negative' : (p.val > 0 ? 'positive' : '');
+            let prefix = p.val > 0 ? '+' : '';
+            let valStr = Math.abs(p.val || 0).toFixed(2);
+            let sign = p.val < 0 ? '-' : prefix;
+            
+            li.innerHTML = `
+              <div class="balance-name">${p.name}</div>
+              <div class="balance-right">
+                 ${badge}
+                 <div class="balance-val ${valClass}">${sign}${valStr} 🪙</div>
+              </div>
+            `;
+            list.appendChild(li);
+          });
 
-      renderTodayTrips();
-      renderHistoryCalendar();
-      renderWeekBar();
-      if(document.getElementById('tab-stats').style.display === 'block') renderStats();
-      if(document.getElementById('tab-savings').style.display === 'block') updateSavings();
+          renderTodayTrips();
+          renderHistoryCalendar();
+          renderWeekBar();
+          if(document.getElementById('tab-stats').style.display === 'block') renderStats();
+          if(document.getElementById('tab-savings').style.display === 'block') updateSavings();
+      } catch (err) {
+          console.error("Erro durante recalculateAndRender", err);
+      }
     }
 
     function generateStatsCardContent(filteredTrips) {
@@ -1206,13 +1230,16 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           let passCount = 0;
 
           filteredTrips.forEach(t => {
-             if(t.drivers.includes(person)) {
+             const dList = t.drivers || [];
+             const pList = t.passengers || [];
+
+             if(dList.includes(person)) {
                 asDriver++;
-                if(t.car1 && t.car1.driver === person) passCount += t.car1.passengers.length;
-                else if(t.car2 && t.car2.driver === person) passCount += t.car2.passengers.length;
-                else if(!t.car1) passCount += t.passengers.length; 
+                if(t.car1 && t.car1.driver === person) passCount += (t.car1.passengers || []).length;
+                else if(t.car2 && t.car2.driver === person) passCount += (t.car2.passengers || []).length;
+                else if(!t.car1) passCount += pList.length; 
              }
-             if(t.passengers.includes(person)) {
+             if(pList.includes(person)) {
                 asPassenger++;
              }
           });
@@ -1311,7 +1338,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        `;
     }
 
-    window.renderStats = function() {
+    function renderStats() {
        const container = document.getElementById('stats-content-area');
        
        if (currentStatsView === 'global') {
@@ -1322,7 +1349,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
              const now = new Date();
              const cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysNum);
              filteredTrips = trips.filter(t => {
+                if(!t.date) return false;
                 const parts = t.date.split('-');
+                if(parts.length !== 3) return false;
                 const tDate = new Date(parts[0], parts[1]-1, parts[2]);
                 return tDate >= cutoff;
              });
@@ -1335,7 +1364,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           document.getElementById("stats-month-sel").value = m;
 
           const buildMonthStatsHTML = (mKey) => {
-             let monthlyTrips = trips.filter(t => t.date.startsWith(mKey));
+             let monthlyTrips = trips.filter(t => t.date && t.date.startsWith(mKey));
              return generateStatsCardContent(monthlyTrips);
           };
 
@@ -1354,15 +1383,17 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           setupSwipeListener('stats-list-swipe', 'stats-list-track', () => changeStatsMonth(1), () => changeStatsMonth(-1), true);
        }
     }
+    window.renderStats = renderStats;
 
-    window.jumpSavingsMonth = function() {
+    function jumpSavingsMonth() {
        const m = document.getElementById("savings-month-sel").value;
        const y = document.getElementById("savings-year-sel").value;
        savingsSelectedMonth = `${y}-${m}`;
        updateSavings();
     }
+    window.jumpSavingsMonth = jumpSavingsMonth;
 
-    window.changeSavingsMonth = function(delta) {
+    function changeSavingsMonth(delta) {
        let nextKey = getOffsetMonth(savingsSelectedMonth, delta);
        let [ny, nm] = nextKey.split('-');
        let targetYear = parseInt(ny);
@@ -1380,8 +1411,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        document.getElementById("savings-month-sel").value = nm;
        updateSavings();
     }
+    window.changeSavingsMonth = changeSavingsMonth;
 
-    window.setSavingsView = function(viewMode) {
+    function setSavingsView(viewMode) {
        currentSavingsView = viewMode;
        document.getElementById('btn-view-global').className = viewMode === 'global' ? "gh-btn primary" : "gh-btn outline";
        document.getElementById('btn-view-monthly').className = viewMode === 'monthly' ? "gh-btn primary" : "gh-btn outline";
@@ -1401,6 +1433,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        
        updateSavings();
     }
+    window.setSavingsView = setSavingsView;
 
     function buildSavingsChartHTML(dataArr, maxEuros, showMonthlyAvg = true, monthsCount = 1) {
         if (dataArr.length === 0) return `<div style="text-align:center; padding: 30px 10px; color: var(--muted); font-size: 12px; width: 100%;">Nenhuma viagem registada.</div>`;
@@ -1457,7 +1490,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         return chartStr + `<ul class="list">${listStr}</ul>`;
     }
 
-    window.updateSavings = function() {
+    function updateSavings() {
         const periodVal = document.getElementById('calc-period') ? document.getElementById('calc-period').value : "ALL";
         const cons = parseFloat(document.getElementById('calc-cons').value) || 0;
         const price = parseFloat(document.getElementById('calc-price').value) || 0;
@@ -1473,7 +1506,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
            const now = new Date();
            const cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysNum);
            filteredTrips = trips.filter(t => {
+              if(!t.date) return false;
               const parts = t.date.split('-');
+              if(parts.length !== 3) return false;
               const tDate = new Date(parts[0], parts[1]-1, parts[2]);
               return tDate >= cutoff;
            });
@@ -1486,7 +1521,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         let totalEurosSaved = 0;
 
         filteredTrips.forEach(trip => {
-            const mKey = trip.date.substring(0, 7);
+            const mKey = trip.date ? trip.date.substring(0, 7) : "2025-01";
             if (!monthlySavingsData[mKey]) {
                 monthlySavingsData[mKey] = {};
                 PEOPLE.forEach(p => monthlySavingsData[mKey][p] = { km: 0, euros: 0 });
@@ -1637,13 +1672,15 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             setupSwipeListener('savings-list-swipe', 'savings-list-track', () => changeSavingsMonth(1), () => changeSavingsMonth(-1), true);
         }
     };
+    window.updateSavings = updateSavings;
 
-    window.applyHistoryFilter = function() {
+    function applyHistoryFilter() {
        currentHistoryFilter = document.getElementById("history-filter").value;
        renderHistoryCalendar();
     }
+    window.applyHistoryFilter = applyHistoryFilter;
 
-    window.changeFormDay = function(deltaDays) {
+    function changeFormDay(deltaDays) {
        let parts = formDate.split('-');
        let currDate = new Date(parts[0], parts[1]-1, parts[2]);
        currDate.setDate(currDate.getDate() + deltaDays);
@@ -1652,11 +1689,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        formDate = newIso;
        refreshFormUI();
     }
+    window.changeFormDay = changeFormDay;
 
-    window.resetFormWeekToToday = function() {
+    function resetFormWeekToToday() {
        formDate = todayISO;
        refreshFormUI();
     }
+    window.resetFormWeekToToday = resetFormWeekToToday;
 
     function getFormWeekGrid(targetDate, selectedDateISO, onClickAction) {
        const startDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
@@ -1728,7 +1767,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        return html;
     }
 
-    window.changeHistoryMonth = function(delta) {
+    function changeHistoryMonth(delta) {
        let parts = historySelectedDate.split('-');
        let currDate = new Date(parts[0], parts[1]-1, parts[2]);
        currDate.setMonth(currDate.getMonth() + delta);
@@ -1738,8 +1777,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        historySelectedDate = newIso;
        renderHistoryCalendar();
     }
+    window.changeHistoryMonth = changeHistoryMonth;
     
-    window.changeHistoryYear = function(delta) {
+    function changeHistoryYear(delta) {
        let parts = historySelectedDate.split('-');
        let currDate = new Date(parts[0], parts[1]-1, parts[2]);
        currDate.setFullYear(currDate.getFullYear() + delta);
@@ -1749,11 +1789,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        historySelectedDate = newIso;
        renderHistoryCalendar();
     }
+    window.changeHistoryYear = changeHistoryYear;
     
-    window.resetHistoryToToday = function() {
+    function resetHistoryToToday() {
        historySelectedDate = todayISO;
        renderHistoryCalendar();
     }
+    window.resetHistoryToToday = resetHistoryToToday;
 
     function getHistoryMonthGrid(targetYear, targetMonth, selectedDateISO, onClickAction) {
        let html = `<div class="streak-grid">`;
@@ -1782,9 +1824,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
              const hasTrip = trips.some(t => t.date === iso);
              if (hasTrip) tripClass = "has-trip";
           } else {
-             const personTrips = trips.filter(t => t.date === iso && (t.drivers.includes(currentHistoryFilter) || t.passengers.includes(currentHistoryFilter)));
+             const personTrips = trips.filter(t => t.date === iso && ((t.drivers || []).includes(currentHistoryFilter) || (t.passengers || []).includes(currentHistoryFilter)));
              if (personTrips.length > 0) {
-                const isDriver = personTrips.some(t => t.drivers.includes(currentHistoryFilter));
+                const isDriver = personTrips.some(t => (t.drivers || []).includes(currentHistoryFilter));
                 tripClass = isDriver ? "has-trip-driver" : "has-trip-passenger";
              }
           }
@@ -1858,13 +1900,44 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        renderHistoryDetails();
     }
 
-    window.selectHistoryDate = function(iso) {
+    function selectHistoryDate(iso) {
        if(iso > todayISO) return;
        historySelectedDate = iso;
        renderHistoryCalendar(); 
     }
+    window.selectHistoryDate = selectHistoryDate;
 
-    window.requestDelete = function(id) {
+    function renderHistoryDetails() {
+       const container = document.getElementById("history-details-container");
+       let dayTrips = trips.filter(t => t.date === historySelectedDate);
+       
+       if (currentHistoryFilter !== "ALL") {
+          dayTrips = dayTrips.filter(t => (t.drivers || []).includes(currentHistoryFilter) || (t.passengers || []).includes(currentHistoryFilter));
+       }
+       
+       if(dayTrips.length === 0) {
+          const isFuture = historySelectedDate > todayISO;
+          let btnHtml = isFuture ? '' : `<button class="gh-btn primary" style="margin:0 auto; padding:10px 16px; width:auto; font-size:13px;" onclick="openModalWithDate('${historySelectedDate}')">Registar Viagem</button>`;
+          let msgText = currentHistoryFilter !== "ALL" ? `Nenhum registo para ${currentHistoryFilter} neste dia.` : `Sem viagens registadas neste dia.`;
+          
+          container.innerHTML = `
+            <div class="hist-details" style="text-align:center; padding: 24px 14px;">
+              <div style="color:var(--muted); font-size:13px; margin-bottom:16px;">${msgText}</div>
+              ${btnHtml}
+            </div>`;
+          return;
+       }
+
+       let html = "";
+       dayTrips.forEach((trip, index) => {
+           let cardHtml = getTripCardHTML(trip);
+           if (index === 0) cardHtml = cardHtml.replace('margin-top: 10px;', 'margin-top: 0;');
+           html += cardHtml;
+       });
+       container.innerHTML = html;
+    }
+
+    function requestDelete(id) {
        showConfirm("Apagar Viagem?", "Esta ação vai recalcular todos os balanços.", async () => {
           if (USE_FIREBASE) {
             await deleteDoc(doc(db, "trips", id));
@@ -1876,8 +1949,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           showToast("Viagem apagada!");
        });
     }
+    window.requestDelete = requestDelete;
 
-    window.openModal = function() {
+    function openModal() {
       editingTripId = null;
       formDate = todayISO;
       selectedCars = 1; 
@@ -1887,15 +1961,17 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       document.getElementById("modal-trip").classList.add("active");
       document.getElementById("modal-trip").scrollTop = 0;
     }
+    window.openModal = openModal;
 
-    window.openModalWithDate = function(dateIso) {
+    function openModalWithDate(dateIso) {
       if(dateIso > todayISO) return;
       openModal();
       formDate = dateIso;
       refreshFormUI();
     }
+    window.openModalWithDate = openModalWithDate;
 
-    window.editTrip = function(id) {
+    function editTrip(id) {
       const trip = trips.find(t => t.id === id);
       if(!trip) return;
       editingTripId = id;
@@ -1905,14 +1981,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          selectedCars = 2;
          splitCostMode = !!trip.splitCostMode;
          carsData = [
-            { driver: trip.car1.driver, passengers: [...trip.car1.passengers], isOneWay: trip.car1.isOneWay },
-            { driver: trip.car2.driver, passengers: [...trip.car2.passengers], isOneWay: trip.car2.isOneWay }
+            { driver: trip.car1.driver, passengers: [...(trip.car1.passengers || [])], isOneWay: trip.car1.isOneWay },
+            { driver: trip.car2.driver, passengers: [...(trip.car2.passengers || [])], isOneWay: trip.car2.isOneWay }
          ];
       } else {
          selectedCars = 1;
          splitCostMode = false;
          carsData = [
-            { driver: trip.drivers[0], passengers: [...trip.passengers], isOneWay: trip.car1 ? trip.car1.isOneWay : trip.isOneWay }, 
+            { driver: (trip.drivers || [])[0], passengers: [...(trip.passengers || [])], isOneWay: trip.car1 ? trip.car1.isOneWay : trip.isOneWay }, 
             { driver: null, passengers: [], isOneWay: false } 
          ];
       }
@@ -1921,6 +1997,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       document.getElementById("modal-trip").classList.add("active");
       document.getElementById("modal-trip").scrollTop = 0;
     }
+    window.editTrip = editTrip;
 
     function refreshFormUI() {
       document.getElementById("new-trip-calendar").innerHTML = generateFormCalendarHTML(formDate, 'selectFormDate');
@@ -1944,25 +2021,29 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       updateSummary();
     }
 
-    window.selectFormDate = function(iso) {
+    function selectFormDate(iso) {
        if(iso > todayISO) return;
        formDate = iso;
        refreshFormUI();
     }
+    window.selectFormDate = selectFormDate;
     
-    window.closeModal = function() { document.getElementById("modal-trip").classList.remove("active"); }
+    function closeModal() { document.getElementById("modal-trip").classList.remove("active"); }
+    window.closeModal = closeModal;
     
-    window.toggleOneWay = function(carIndex) {
+    function toggleOneWay(carIndex) {
       carsData[carIndex].isOneWay = !carsData[carIndex].isOneWay;
       refreshFormUI();
     }
+    window.toggleOneWay = toggleOneWay;
 
-    window.toggleSplitCost = function() {
+    function toggleSplitCost() {
       splitCostMode = !splitCostMode;
       refreshFormUI();
     }
+    window.toggleSplitCost = toggleSplitCost;
 
-    window.setCars = function(num) {
+    function setCars(num) {
       if(num < selectedCars) {
          carsData[1].passengers.forEach(p => carsData[0].passengers.push(p));
          carsData[1] = { driver: null, passengers: [], isOneWay: false };
@@ -1970,6 +2051,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       selectedCars = num;
       refreshFormUI();
     }
+    window.setCars = setCars;
 
     function getAllSelectedDrivers() { return [carsData[0].driver, carsData[1].driver].filter(Boolean); }
     function getAllSelectedPassengers(carIndexToIgnore = -1) {
@@ -2084,7 +2166,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        return { totalCost: total, costPerPassenger: total / numPass, profitPerDriver: total };
     }
 
-    window.updateSummary = function() {
+    function updateSummary() {
       const btnSave = document.getElementById("btn-save-trip");
       let html = "";
       let valid = true;
@@ -2167,7 +2249,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             html = `
                <strong style="color:var(--text); font-size:13px; font-weight:600;">VIAGEM NORMAL (1 CARRO)</strong><br>
                <div style="display:flex; justify-content:space-between; margin-top:6px; margin-bottom:2px;"><span>Custo Total:</span> <strong style="color:var(--text)">${fmt(c0Calc.totalCost)} 🪙</strong></div>
-               <div style="display:flex; justify-content:space-between;"><span>Custo/passag.:</span> <strong style="color:var(--text)">${fmt(c0Calc.costPerPassenger)} 🪙</strong></div>
+               <div style="display:flex; justify-content:space-between; margin-bottom:2px;"><span>Custo/passag.:</span> <strong style="color:var(--text)">${fmt(c0Calc.costPerPassenger)} 🪙</strong></div>
+               <div style="display:flex; justify-content:space-between; color:var(--green)"><span>Crédito/condut.:</span> <strong>+${fmt(c0Calc.profitPerDriver)} 🪙</strong></div>
             `;
          }
       }
@@ -2177,16 +2260,16 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       window.currentTripFinalCalc = finalCalc;
     }
 
-    window.saveTrip = async function(forceSave = false) {
+    async function saveTrip(forceSave = false) {
       const calc = window.currentTripFinalCalc;
       
       if (!forceSave && !editingTripId) {
           const sameDayTrips = trips.filter(t => t.date === formDate);
           const isExactDuplicate = sameDayTrips.some(t => {
-             const existingDrivers = [...t.drivers].sort().join(',');
-             const existingPass = [...t.passengers].sort().join(',');
-             const newDrivers = [...calc.drivers].sort().join(',');
-             const newPass = [...calc.passengers].sort().join(',');
+             const existingDrivers = [...(t.drivers || [])].sort().join(',');
+             const existingPass = [...(t.passengers || [])].sort().join(',');
+             const newDrivers = [...(calc.drivers || [])].sort().join(',');
+             const newPass = [...(calc.passengers || [])].sort().join(',');
              return existingDrivers === newDrivers && existingPass === newPass;
           });
 
@@ -2220,6 +2303,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       historySelectedDate = formDate; document.getElementById('history-filter').value = "ALL";
       currentHistoryFilter = "ALL"; applyHistoryFilter();
     }
+    window.saveTrip = saveTrip;
 
   </script>
 </body>
