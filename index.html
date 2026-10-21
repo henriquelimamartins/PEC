@@ -79,7 +79,6 @@ input, select { font-family: inherit; }
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
 .card.no-pad-top { padding-top: 4px; padding-bottom: 4px; }
 .card h3 { font-size: 14px; margin-bottom: 12px; color: var(--text); display: flex; justify-content: space-between; align-items: center; }
-.tag { color: var(--muted); font-size: 11px; font-weight: 500; background: var(--card2); border: 1px solid var(--border); padding: 2px 8px; border-radius: 12px; }
 
 .gh-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--card2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; width: 100%; text-align: center; color: var(--text); font-weight: 500; font-size: 14px; }
 .gh-btn:hover { background: #30363d; }
@@ -122,7 +121,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .s-day.other-month { opacity: 0.35 !important; }
 .s-day.future-day { opacity: 0.25 !important; cursor: not-allowed; }
 .s-day.weekend { background: var(--weekend-bg); border-color: var(--weekend-border); }
-.s-day.weekend .s-wkd { color: #80583b; }
 .s-day.selected { border-color: var(--accent) !important; background: rgba(214, 107, 43, 0.15) !important; }
 .s-day.selected .s-date { color: var(--accent); }
 
@@ -131,7 +129,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .s-day.has-trip-passenger { border-bottom: 3px solid var(--yellow); }
 
 .hist-details { background: var(--card2); border-radius: 6px; padding: 14px; margin-top: 10px; border: 1px solid var(--border); }
-.hist-info { font-size: 13px; color: var(--muted); line-height: 1.5; text-align: left; }
+.hist-info { font-size: 13px; color: var(--muted); line-height: 1.5; text-align: justify; }
 .hist-type { font-weight: 600; color: var(--text); display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .hist-driver-row { display: block; margin-bottom: 4px; }
 .hist-actions { display: flex; gap: 8px; margin-top: 12px; }
@@ -139,12 +137,10 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .stats-section-title { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
 .stats-chart { display: flex; flex-direction: column; margin-bottom: 25px; padding-bottom: 16px; border-bottom: 1px solid var(--border); position: relative; overflow: visible; }
 .chart-bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; position: relative; z-index: 2; margin-bottom: 8px; }
-.chart-bar-row:last-child { margin-bottom: 0; }
 .chart-label { width: 65px; color: var(--muted); font-weight: 500; text-align: right; flex-shrink: 0; }
 .chart-track { flex: 1; background: var(--card2); height: 10px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); position: relative; }
 .chart-fill { height: 100%; background: var(--accent); border-radius: 4px; }
 .chart-val { width: 125px; font-weight: 600; color: var(--text); flex-shrink: 0; display: flex; justify-content: flex-start; align-items: center; gap: 4px; font-size: 11px; white-space: nowrap; }
-
 .avg-line { position: absolute; top: 8px; bottom: 8px; border-left: 1px solid rgba(255,255,255,0.4); z-index: 1; pointer-events: none; }
 .avg-label { position: absolute; top: 0; font-size: 8.5px; color: var(--muted); white-space: nowrap; font-weight: 500; transform: translateX(-50%); pointer-events: none; z-index: 3; }
 
@@ -179,29 +175,17 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 .confirm-box h3 { font-size: 16px; margin-bottom: 8px; }
 
 .cars-container { display: flex; justify-content: center; gap: 16px; padding: 10px 0; }
-.car-visual { 
-  width: 112px; background: #010409; border: 1px solid var(--border); 
-  border-radius: 20px 20px 10px 10px; position: relative; padding: 28px 8px 16px; 
-  display: flex; flex-direction: column; gap: 20px;
-}
-.car-visual::before { 
-  content: ''; position: absolute; top: 8px; left: 16px; right: 16px; height: 12px; 
-  background: rgba(255,255,255,0.06); border-radius: 4px 4px 2px 2px; 
-}
+.car-visual { width: 112px; background: #010409; border: 1px solid var(--border); border-radius: 20px 20px 10px 10px; position: relative; padding: 28px 8px 16px; display: flex; flex-direction: column; gap: 20px; }
+.car-visual::before { content: ''; position: absolute; top: 8px; left: 16px; right: 16px; height: 12px; background: rgba(255,255,255,0.06); border-radius: 4px 4px 2px 2px; }
 .car-row { display: flex; width: 100%; justify-content: center; }
 .front-row, .back-row-2 { gap: 14px; }
 .back-row-3 { gap: 6px; }
-.seat { 
-  background: var(--card2); border-radius: 50%; width: 26px; height: 26px; 
-  display: flex; align-items: center; justify-content: center; 
-  font-size: 9px; font-weight: 600; color: var(--text); border: 1px solid var(--border); 
-}
+.seat { background: var(--card2); border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: var(--text); border: 1px solid var(--border); }
 .seat.empty { background: transparent; border-color: transparent; color: transparent; }
 .seat.driver-seat { background: #30363d; border-color: var(--accent); color: var(--accent); }
 .seat.pass-seat { background: #9c4b1d; border-color: #d66b2b; color: #fff; }
 
 .summary-panel { background: var(--card2); padding: 14px; border-radius: 6px; border: 1px solid var(--border); border-left: 3px solid var(--accent); font-size: 13px; color: var(--text); margin-bottom: 16px; line-height: 1.5; text-align: justify; }
-
 #savings-content-area, #stats-content-area { min-height: 380px; }
 
 .botnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 150; justify-content: space-between; }
@@ -227,7 +211,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
   <!-- App Principal -->
   <div id="app-screen" style="display: none;">
-    <!-- Topbar Fixa Global -->
     <div class="topbar">
       <div class="topbar-header">
         <div class="brand">GESTÃO DE <span>BOLEIAS</span> PEC</div>
@@ -250,9 +233,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         <b>Registar Nova Viagem</b>
       </button>
 
-      <button id="btn-refresh" class="gh-btn outline" onclick="forceRefresh()" style="border-style: dashed; color: #fff; margin-bottom: 0; font-size: 13px; padding: 10px;">
+      <button id="btn-refresh" class="gh-btn outline" onclick="forceRefresh()" style="border-style: dashed; color: #fff; margin-bottom: 6px; font-size: 13px; padding: 10px;">
         Atualizar Dados ☁️
       </button>
+      <div id="last-update-time" style="text-align: center; color: var(--muted); font-size: 11px; margin-bottom: 24px;"></div>
+
+      <div class="eyebrow" style="margin-bottom: 6px;">Viagens de Hoje</div>
+      <div id="today-trips-container" style="margin-bottom: 16px;"></div>
     </div>
 
     <!-- TAB 2: HISTÓRICO -->
@@ -275,13 +262,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     <div id="tab-stats" class="page tab-content" style="display: none;">
       <div class="eyebrow">MÉTRICAS E RESUMO</div>
       
-      <!-- Modos de Visualização: Resumo Global vs Mensal nas Estatísticas -->
       <div style="display: flex; gap: 8px; margin-bottom: 12px;">
          <button id="btn-stats-view-global" class="gh-btn primary" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setStatsView('global')">Resumo Global</button>
          <button id="btn-stats-view-monthly" class="gh-btn outline" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setStatsView('monthly')">Análise Mensal</button>
       </div>
 
-      <!-- Drop-down temporal global para estatísticas -->
       <div id="stats-period-container" style="margin-bottom: 12px;">
          <select id="stats-month-filter" class="input-text" style="height: 44px; padding: 0 12px; line-height: 42px;" onchange="renderStats()">
             <option value="ALL">Desde Sempre</option>
@@ -292,7 +277,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
          </select>
       </div>
 
-      <!-- Navegador Mensal de Estatísticas -->
       <div id="stats-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: transparent; padding: 0; border: none; height: 44px;">
          <button onclick="changeStatsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;" id="btn-prev-stats-month">◀</button>
          <div style="display:flex; gap:6px; align-items: center; flex: 1; margin: 0 6px; height: 44px;">
@@ -305,7 +289,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       <div id="stats-content-area"></div>
     </div>
 
-    <!-- TAB 4: POUPANÇA E IMPACTO -->
+    <!-- TAB 4: POUPANÇA -->
     <div id="tab-savings" class="page tab-content" style="display: none;">
       <div class="eyebrow">Poupança e Impacto Ambiental</div>
       
@@ -320,27 +304,27 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                   <label style="font-size: 10px; color: var(--muted); display: block; margin-bottom: 4px;">Preço (€/L)</label>
                   <input type="number" id="calc-price" class="input-text" step="0.01" style="padding: 8px; font-size: 12px;" oninput="updateSavings()">
                </div>
+               <div style="flex: 1;">
+                  <label style="font-size: 10px; color: var(--muted); display: block; margin-bottom: 4px;">Portagens (€)</label>
+                  <input type="number" id="calc-tolls" class="input-text" step="0.01" style="padding: 8px; font-size: 12px;" oninput="updateSavings()">
+               </div>
             </div>
             <p style="font-size: 10px; text-align: center; color: var(--muted); margin-top: 6px; line-height: 1.4;">
-               Cálculo automático: 29 km (Braga) ou 26 km (Vila Verde).
+               Cálculo automático: 29 km (Braga) ou 26 km (Vila Verde). O custo de portagens é calculado para cada sentido da viagem.
             </p>
          </div>
 
-         <!-- Resultados Globais da Calculadora -->
          <div id="savings-global-results" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: #010409; padding: 16px 8px; border-radius: 6px; border: 1px solid var(--border);">
          </div>
 
-         <!-- NOVO: Contador Dinâmico de Árvores -->
          <div id="savings-tree-counter" style="text-align: center; margin-bottom: 16px; background: rgba(35, 134, 54, 0.1); border: 1px dashed var(--green); padding: 12px; border-radius: 6px; font-size: 12px; color: var(--text); line-height: 1.4;">
          </div>
 
-         <!-- Modos de Visualização: Resumo Global vs Mensal -->
          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
             <button id="btn-view-global" class="gh-btn primary" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setSavingsView('global')">Resumo Global</button>
             <button id="btn-view-monthly" class="gh-btn outline" style="flex: 1; padding: 8px; font-size: 11px; margin-bottom: 0;" onclick="setSavingsView('monthly')">Análise Mensal</button>
          </div>
 
-         <!-- Drop-down temporal global -->
          <div id="calc-period-container" style="margin-bottom: 12px;">
             <select id="calc-period" class="input-text" style="height: 44px; padding: 0 12px; line-height: 42px;" onchange="updateSavings()">
                <option value="ALL">Desde Sempre</option>
@@ -351,7 +335,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             </select>
          </div>
 
-         <!-- Navegador Mensal de Poupança -->
          <div id="savings-monthly-nav" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; background: transparent; padding: 0; border: none; height: 44px;">
             <button onclick="changeSavingsMonth(-1)" class="gh-btn outline" style="margin:0; padding: 0 10px; font-size: 12px; width:auto; height: 44px; border-color:var(--border); background: #010409;" id="btn-prev-month">◀</button>
             <div style="display:flex; gap:6px; align-items: center; flex: 1; margin: 0 6px; height: 44px;">
@@ -371,6 +354,20 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       <div style="text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
         <p style="font-size: 13px; margin-bottom: 6px; color: var(--muted); text-align: center;">Para quê ler isto tudo?</p>
         <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" style="color: var(--accent); text-decoration: underline; font-weight: 600; font-size: 14px;">> VÊ O VÍDEO <</a>
+      </div>
+
+      <div class="eyebrow" style="margin-bottom: 12px;">Patch Notes</div>
+      <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 24px;">
+         <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; justify-content: space-between;">
+            <span>Versão 1.0</span>
+            <span style="color:var(--muted); font-weight:400; font-size:11px;">Lançamento Oficial</span>
+         </h4>
+         <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5; text-align: justify;">
+            <li style="margin-bottom:4px;">Implementação do algoritmo automático de créditos para 1 carro ou multi-carro.</li>
+            <li style="margin-bottom:4px;">Nova funcionalidade visual interativa (calendários com *swipe* suave).</li>
+            <li style="margin-bottom:4px;">Calculadora avançada de impacto ambiental (CO2 poupado equivalente em árvores).</li>
+            <li>Inclusão de cálculos monetários em função dos consumos e custos de portagens.</li>
+         </ul>
       </div>
 
       <div class="eyebrow" style="margin-bottom: 12px;">Manual Operacional Técnico</div>
@@ -409,12 +406,12 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       <div style="background: var(--card2); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px;">
          <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--accent); display: flex; align-items: center; gap: 8px;"><span>🌱</span> Cálculo da Poupança</h4>
          <p style="color: var(--muted); font-size: 12px; margin-bottom: 10px; line-height: 1.5;">
-            A poupança reflete o dinheiro e combustível que cada passageiro poupa ao viajar à boleia em vez de conduzir sozinho:
+            A poupança reflete o dinheiro que cada passageiro poupa ao viajar à boleia em vez de conduzir sozinho:
          </p>
          <ul style="padding-left: 20px; color: var(--muted); font-size: 12px; margin: 0; line-height: 1.5; text-align: justify;">
-            <li style="margin-bottom: 6px;"><strong>Distância Base:</strong> Considera automaticamente 29 km (se todos forem do grupo de Braga) ou 26 km (Vila Verde). O valor é duplicado para viagens de ida e volta.</li>
-            <li style="margin-bottom: 6px;"><strong>Conversão Monetária:</strong> Baseia-se nos litros por 100 km e no preço por litro definidos pelo utilizador.</li>
-            <li><strong>CO2 Evitado:</strong> Calculado com base num fator de emissão padrão de 2.48 kg de CO2 por litro de combustível queimado.</li>
+            <li style="margin-bottom: 6px;"><strong>Distância Base:</strong> Considera automaticamente 29 km (Braga) ou 26 km (Vila Verde). O valor duplica para ida e volta.</li>
+            <li style="margin-bottom: 6px;"><strong>Fórmula:</strong> Valor do Combustível + Portagem para cada trajeto evitado.</li>
+            <li><strong>CO2 Evitado:</strong> Calculado com base em 2.48 kg de CO2 por litro queimado.</li>
          </ul>
       </div>
 
@@ -423,7 +420,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       </button>
     </div>
 
-    <!-- Barra de Navegação Inferior Fixa -->
+    <!-- Barra de Navegação Inferior -->
     <div class="botnav">
        <button onclick="switchTab('home')" class="active" id="nav-home">
           <span class="ic">🏠</span>Início
@@ -521,14 +518,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     </div>
   </div>
 
-  <!-- Modal In-App Confirmar Apagar -->
+  <!-- Modal In-App Confirmar -->
   <div id="custom-confirm" class="modal-overlay" style="z-index: 300;">
      <div class="confirm-box" style="margin: 0 auto; margin-top: 20vh;">
-        <h3 id="confirm-title">Apagar Viagem?</h3>
-        <p id="confirm-msg" style="color: var(--muted); font-size: 13px; margin-bottom: 16px;">Esta ação vai recalcular todos os balanços.</p>
+        <h3 id="confirm-title"></h3>
+        <p id="confirm-msg" style="color: var(--muted); font-size: 13px; margin-bottom: 16px;"></p>
         <div style="display:flex; gap:8px;">
            <button class="gh-btn outline" style="flex:1; margin:0;" onclick="closeConfirm()">Cancelar</button>
-           <button class="gh-btn danger" style="flex:1; margin:0;" id="confirm-btn">Sim, Apagar</button>
+           <button class="gh-btn primary" style="flex:1; margin:0; background: var(--accent); color: white;" id="confirm-btn">Confirmar</button>
         </div>
      </div>
   </div>
@@ -537,9 +534,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js')
-        .then(() => console.log("Service Worker registado com sucesso!"))
-        .catch((err) => console.log("Erro ao registar Service Worker:", err));
+      navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
     }
   </script>
 
@@ -574,6 +569,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     const shortMonths = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
     
     const fmtMoney = (v) => parseFloat(v.toFixed(2));
+    const fmt = (num) => parseFloat(num.toFixed(2)).toString();
 
     function getLocalDateISO(d = new Date()) {
        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -588,7 +584,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     
     let currentSavingsView = "global";
     let savingsSelectedMonth = todayISO.substring(0, 7); 
-
+    
     let currentStatsView = "global";
     let statsSelectedMonth = todayISO.substring(0, 7);
     
@@ -601,6 +597,19 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
     ];
     let editingTripId = null;
 
+    const MIN_ALLOWED_YEAR = 2025;
+    const MIN_ALLOWED_MONTH = 11;
+    const MIN_ALLOWED_ISO = "2025-11-01";
+
+    function updateTimestamp() {
+       const now = new Date();
+       const timeStr = now.toLocaleTimeString('pt-PT', {hour: '2-digit', minute:'2-digit'});
+       const dateStr = now.toLocaleDateString('pt-PT', {day: 'numeric', month: 'long'});
+       const msg = `Última atualização: ${dateStr} às ${timeStr}`;
+       document.getElementById('last-update-time').innerText = msg;
+       localStorage.setItem('pec_last_update', msg);
+    }
+
     function initHistoryFilterDropdown() {
        const select = document.getElementById("history-filter");
        select.innerHTML = '<option value="ALL">Visualização Global</option>';
@@ -612,11 +621,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           select.appendChild(opt);
        });
     }
-
-    /* === DATA LIMITE ABSOLUTA: NOVEMBRO DE 2025 === */
-    const MIN_ALLOWED_YEAR = 2025;
-    const MIN_ALLOWED_MONTH = 11;
-    const MIN_ALLOWED_ISO = "2025-11-01";
 
     function populateSavingsYearDropdown() {
        const yearSel = document.getElementById("savings-year-sel");
@@ -761,6 +765,13 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        renderStats();
     }
 
+    function getOffsetMonth(mKey, delta) {
+        let [y, m] = mKey.split('-');
+        let d = new Date(parseInt(y), parseInt(m)-1, 1);
+        d.setMonth(d.getMonth() + delta);
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    }
+
     window.changeStatsMonth = function(delta) {
        let nextKey = getOffsetMonth(statsSelectedMonth, delta);
        let [ny, nm] = nextKey.split('-');
@@ -809,6 +820,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           trips = [];
           snapshot.forEach((doc) => { trips.push({ id: doc.id, ...doc.data() }); });
           recalculateAndRender();
+          updateTimestamp();
           showToast("Dados atualizados!");
        } catch (err) {
           showToast("Erro ao sincronizar dados!");
@@ -840,12 +852,20 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       setTimeout(() => t.classList.remove("show"), 2500);
     }
     
-    const fmt = (num) => parseFloat(num.toFixed(2)).toString();
-
     let confirmCallback = null;
     window.showConfirm = function(title, msg, callback) {
        document.getElementById("confirm-title").innerText = title;
        document.getElementById("confirm-msg").innerText = msg;
+       
+       const btn = document.getElementById("confirm-btn");
+       if(title.includes("Apagar")) {
+           btn.style.background = "var(--danger)";
+           btn.innerText = "Sim, Apagar";
+       } else {
+           btn.style.background = "var(--accent)";
+           btn.innerText = "Confirmar";
+       }
+
        confirmCallback = callback;
        document.getElementById("custom-confirm").classList.add("active");
     }
@@ -898,20 +918,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       const targetHash = "2496e57975c7cb484c2049d5bf599e0339cb1d43a14434241cd64d4b1a1ea0f9"; 
       
       let enteredHash = null;
-      try {
-         enteredHash = await hashString(pwd);
-      } catch(e) {
-         console.warn("Crypto bloqueado pelo browser. A validar como texto...");
-      }
+      try { enteredHash = await hashString(pwd); } catch(e) { console.warn("Crypto bloqueado pelo browser. A validar como texto..."); }
 
       if (enteredHash === targetHash || pwd === "pec2026") {
          localStorage.setItem("pec_auth", "true");
          document.getElementById("login-screen").style.display = "none";
          document.getElementById("app-screen").style.display = "block";
          initApp();
-      } else {
-         alert("Password incorreta.");
-      }
+      } else { alert("Password incorreta."); }
     }
 
     window.onload = function() {
@@ -952,12 +966,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                 let [y, m] = targetSelectedMonth.split('-');
                 let cur = new Date();
                 
-                if(deltaX < 0 && parseInt(y) === cur.getFullYear() && parseInt(m) === (cur.getMonth()+1)) {
-                    return; 
-                }
-                if(deltaX > 0 && parseInt(y) === MIN_ALLOWED_YEAR && parseInt(m) === MIN_ALLOWED_MONTH) {
-                    return;
-                }
+                if(deltaX < 0 && parseInt(y) === cur.getFullYear() && parseInt(m) === (cur.getMonth()+1)) return; 
+                if(deltaX > 0 && parseInt(y) === MIN_ALLOWED_YEAR && parseInt(m) === MIN_ALLOWED_MONTH) return;
              }
              currentX = Math.max(-window.innerWidth, Math.min(window.innerWidth, deltaX));
              const track = document.getElementById(trackId);
@@ -1014,34 +1024,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        }, {passive: true});
     }
 
-    function initApp() {
-      document.getElementById('calc-cons').value = localStorage.getItem('pec_cons') || '5.0';
-      document.getElementById('calc-price').value = localStorage.getItem('pec_price') || '2.00';
-      
-      populateSavingsYearDropdown();
-      updateSavingsMonthOptions();
-      populateStatsYearDropdown();
-      updateStatsMonthOptions();
-      renderHeaderDate();
-      renderWeekBar();
-      initHistoryFilterDropdown();
-      
-      switchTab('home');
-
-      if (USE_FIREBASE) {
-        const q = query(collection(db, "trips"), orderBy("date", "desc"));
-        onSnapshot(q, (snapshot) => {
-          trips = [];
-          snapshot.forEach((doc) => { trips.push({ id: doc.id, ...doc.data() }); });
-          recalculateAndRender();
-        });
-      } else {
-        const localTrips = localStorage.getItem("pec_trips_v20");
-        if(localTrips) trips = JSON.parse(localTrips);
-        recalculateAndRender();
-      }
-    }
-
     function renderHeaderDate() {
        const now = new Date();
        document.getElementById("header-date").innerText = `${String(now.getDate()).padStart(2, '0')} ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
@@ -1095,6 +1077,67 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        return total === 0 ? 0 : (drv / total);
     }
 
+    function getTripCardHTML(trip) {
+        const isFemale = name => FEMALES.includes(name);
+        const allDriversFemale = trip.drivers.length > 0 && trip.drivers.every(isFemale);
+        const allPassFemale = trip.passengers.length > 0 && trip.passengers.every(isFemale);
+
+        let driverLabel = "Condutores";
+        if (trip.drivers.length === 1) driverLabel = isFemale(trip.drivers[0]) ? "Condutora" : "Condutor";
+        else if (allDriversFemale) driverLabel = "Condutoras";
+
+        let passLabel = "Passageiros";
+        if (trip.passengers.length === 1) passLabel = isFemale(trip.passengers[0]) ? "Passageira" : "Passageiro";
+        else if (allPassFemale) passLabel = "Passageiras";
+
+        const passAlfab = [...trip.passengers].sort((a,b) => a.localeCompare(b, 'pt')).join(", ");
+        const typeLabel = (trip.cars === 2 ? 'Viagem 2 Carros' : 'Viagem Normal') + (trip.splitCostMode ? ' (Separados)' : '');
+        
+        let costPassStr = "0 🪙";
+        if (trip.passengerCosts && trip.passengers.length > 0) {
+            let pCosts = trip.passengers.map(p => trip.passengerCosts[p]).filter(c => c !== undefined);
+            let uniqueCosts = [...new Set(pCosts)];
+            if (uniqueCosts.length > 0) costPassStr = uniqueCosts.map(c => fmt(c) + " 🪙").join(" / ");
+        } else if (trip.costPerPassenger) {
+            costPassStr = fmt(trip.costPerPassenger) + " 🪙";
+        }
+          
+        return `
+          <div class="hist-details" style="margin-top: 10px;">
+             <div class="hist-info">
+               <span class="hist-type">${typeLabel}</span>
+               <span class="hist-driver-row"><strong style="color:var(--accent)">${driverLabel}:</strong> ${trip.drivers.join(" e ")}</span>
+               <span><strong style="color:var(--muted)">${passLabel}:</strong> ${passAlfab || "Nenhum"}</span>
+               <div style="margin-top:8px; display:flex; justify-content:space-between; font-size:12px; color:var(--text); margin-bottom: 2px;">
+                  <span>Custo Total: <strong>${fmt(trip.totalCost)} 🪙</strong></span>
+               </div>
+               <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted)">
+                  <span>Custo/passag.: <strong>${costPassStr}</strong></span>
+               </div>
+             </div>
+             <div class="hist-actions">
+                <button class="gh-btn outline" style="flex:1; padding: 6px;" onclick="editTrip('${trip.id}')">Editar</button>
+                <button class="gh-btn danger" style="flex:1; padding: 6px; border-color: transparent;" onclick="requestDelete('${trip.id}')">Apagar</button>
+             </div>
+          </div>`;
+    }
+
+    function renderTodayTrips() {
+        const container = document.getElementById("today-trips-container");
+        const todayTrips = trips.filter(t => t.date === todayISO);
+        if (todayTrips.length === 0) {
+            container.innerHTML = `<div class="card no-pad-top" style="text-align:center; color:var(--muted); font-size:12px; padding: 20px 16px;">Nenhuma viagem registada hoje.</div>`;
+            return;
+        }
+        let html = "";
+        todayTrips.forEach((trip, index) => {
+            let cardHtml = getTripCardHTML(trip);
+            if (index === 0) cardHtml = cardHtml.replace('margin-top: 10px;', 'margin-top: 0;');
+            html += cardHtml;
+        });
+        container.innerHTML = `<div class="card">${html}</div>`;
+    }
+
     function recalculateAndRender() {
       PEOPLE.forEach(p => balances[p] = 0);
       
@@ -1109,10 +1152,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       });
 
       const sortedPeople = PEOPLE.map(name => ({
-        name, 
-        val: balances[name],
-        ratio: getPersonRatio(name),
-        lastTime: getLastDrivenTime(name)
+        name, val: balances[name], ratio: getPersonRatio(name), lastTime: getLastDrivenTime(name)
       })).sort((a, b) => {
         if (a.val !== b.val) return a.val - b.val;
         if (a.ratio !== b.ratio) return a.ratio - b.ratio;
@@ -1149,6 +1189,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         list.appendChild(li);
       });
 
+      renderTodayTrips();
       renderHistoryCalendar();
       renderWeekBar();
       if(document.getElementById('tab-stats').style.display === 'block') renderStats();
@@ -1314,20 +1355,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        }
     }
 
-    /* === SECÇÃO POUPANÇA E IMPACTO AMBIENTAL === */
-
     window.jumpSavingsMonth = function() {
        const m = document.getElementById("savings-month-sel").value;
        const y = document.getElementById("savings-year-sel").value;
        savingsSelectedMonth = `${y}-${m}`;
        updateSavings();
-    }
-
-    function getOffsetMonth(mKey, delta) {
-        let [y, m] = mKey.split('-');
-        let d = new Date(parseInt(y), parseInt(m)-1, 1);
-        d.setMonth(d.getMonth() + delta);
-        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
     }
 
     window.changeSavingsMonth = function(delta) {
@@ -1429,9 +1461,11 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         const periodVal = document.getElementById('calc-period') ? document.getElementById('calc-period').value : "ALL";
         const cons = parseFloat(document.getElementById('calc-cons').value) || 0;
         const price = parseFloat(document.getElementById('calc-price').value) || 0;
+        const tolls = parseFloat(document.getElementById('calc-tolls').value) || 0;
         
         localStorage.setItem('pec_cons', cons);
         localStorage.setItem('pec_price', price);
+        localStorage.setItem('pec_tolls', tolls);
 
         let filteredTrips = trips;
         if (currentSavingsView !== 'monthly' && periodVal !== "ALL") {
@@ -1447,14 +1481,15 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
         let globalSavingsData = {};
         let monthlySavingsData = {}; 
-        PEOPLE.forEach(p => globalSavingsData[p] = { km: 0 });
+        PEOPLE.forEach(p => globalSavingsData[p] = { km: 0, euros: 0 });
         let totalKmSaved = 0;
+        let totalEurosSaved = 0;
 
         filteredTrips.forEach(trip => {
             const mKey = trip.date.substring(0, 7);
             if (!monthlySavingsData[mKey]) {
                 monthlySavingsData[mKey] = {};
-                PEOPLE.forEach(p => monthlySavingsData[mKey][p] = { km: 0 });
+                PEOPLE.forEach(p => monthlySavingsData[mKey][p] = { km: 0, euros: 0 });
             }
 
             const processCar = (car) => {
@@ -1463,11 +1498,14 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                 const onlyBraga = [car.driver, ...car.passengers].every(p => BRAGA_GROUP.includes(p));
                 const baseDist = onlyBraga ? 29 : 26;
                 const finalDist = car.isOneWay ? baseDist : (baseDist * 2);
+                const tollCost = car.isOneWay ? tolls : (tolls * 2);
 
                 car.passengers.forEach(p => {
-                    if (globalSavingsData[p]) globalSavingsData[p].km += finalDist;
-                    if (monthlySavingsData[mKey] && monthlySavingsData[mKey][p]) monthlySavingsData[mKey][p].km += finalDist;
+                    const tripEuros = ((finalDist / 100) * cons * price) + tollCost;
+                    if (globalSavingsData[p]) { globalSavingsData[p].km += finalDist; globalSavingsData[p].euros += tripEuros; }
+                    if (monthlySavingsData[mKey] && monthlySavingsData[mKey][p]) { monthlySavingsData[mKey][p].km += finalDist; monthlySavingsData[mKey][p].euros += tripEuros; }
                     totalKmSaved += finalDist;
+                    totalEurosSaved += tripEuros;
                 });
             };
 
@@ -1480,8 +1518,10 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
         });
 
         let displayKm = 0;
+        let displayEuros = 0;
         if (currentSavingsView === 'global') {
             displayKm = totalKmSaved;
+            displayEuros = totalEurosSaved;
         } else {
             let [y, m] = savingsSelectedMonth.split('-');
             document.getElementById("savings-year-sel").value = y;
@@ -1491,15 +1531,15 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             if (monthlySavingsData[savingsSelectedMonth]) {
                 Object.values(monthlySavingsData[savingsSelectedMonth]).forEach(d => {
                     displayKm += d.km;
+                    displayEuros += d.euros;
                 });
             }
         }
 
         const displayLiters = (displayKm / 100) * cons;
-        const displayEuros = displayLiters * price;
         const displayCO2Kg = displayLiters * 2.48; 
         
-        const fmtEuros = displayEuros >= 1000 ? parseFloat((displayEuros / 1000).toFixed(2)) + ' k' : fmtMoney(displayEuros);
+        const fmtEurosStr = displayEuros >= 1000 ? parseFloat((displayEuros / 1000).toFixed(2)) + ' k' : fmtMoney(displayEuros);
         
         let fmtLiters;
         if (displayLiters >= 1000) {
@@ -1525,7 +1565,7 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
                <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">CO2 Evitado</span>
             </div>
             <div style="text-align: center; flex: 1; padding: 0 2px;">
-               <span style="font-size: 18px; font-weight: 700; color: var(--green);">${fmtEuros} €</span><br>
+               <span style="font-size: 18px; font-weight: 700; color: var(--green);">${fmtEurosStr} €</span><br>
                <span style="font-size: 9px; color: var(--muted); text-transform: uppercase;">Poupança Total</span>
             </div>
         `;
@@ -1551,9 +1591,9 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             let maxEuros = 0;
 
             sortedPeopleAlpha.forEach(p => {
+                let euros = globalSavingsData[p].euros;
                 let km = globalSavingsData[p].km;
                 if (km > 0) {
-                    let euros = (km / 100) * cons * price;
                     if (euros > maxEuros) maxEuros = euros;
                     pData.push({ name: p, km, euros, hasData: true });
                 }
@@ -1570,8 +1610,8 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
 
                  sorted.forEach(p => {
                      const km = (monthlySavingsData[mKey] && monthlySavingsData[mKey][p]) ? monthlySavingsData[mKey][p].km : 0;
+                     const euros = (monthlySavingsData[mKey] && monthlySavingsData[mKey][p]) ? monthlySavingsData[mKey][p].euros : 0;
                      if (km > 0) {
-                         let euros = (km / 100) * cons * price;
                          if (euros > maxEuros) maxEuros = euros;
                          mData.push({ name: p, km, euros, hasData: true });
                      } else {
@@ -1597,8 +1637,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
             setupSwipeListener('savings-list-swipe', 'savings-list-track', () => changeSavingsMonth(1), () => changeSavingsMonth(-1), true);
         }
     };
-
-    /* === HISTÓRICO E FORMULÁRIO === */
 
     window.applyHistoryFilter = function() {
        currentHistoryFilter = document.getElementById("history-filter").value;
@@ -1824,87 +1862,6 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
        if(iso > todayISO) return;
        historySelectedDate = iso;
        renderHistoryCalendar(); 
-    }
-
-    function renderHistoryDetails() {
-       const container = document.getElementById("history-details-container");
-       let dayTrips = trips.filter(t => t.date === historySelectedDate);
-       
-       if (currentHistoryFilter !== "ALL") {
-          dayTrips = dayTrips.filter(t => t.drivers.includes(currentHistoryFilter) || t.passengers.includes(currentHistoryFilter));
-       }
-       
-       if(dayTrips.length === 0) {
-          const isFuture = historySelectedDate > todayISO;
-          let btnHtml = isFuture ? '' : `<button class="gh-btn primary" style="margin:0 auto; padding:10px 16px; width:auto; font-size:13px;" onclick="openModalWithDate('${historySelectedDate}')">Registar Viagem</button>`;
-          let msgText = currentHistoryFilter !== "ALL" 
-             ? `Nenhum registo para ${currentHistoryFilter} neste dia.` 
-             : `Sem viagens registadas neste dia.`;
-          
-          container.innerHTML = `
-            <div class="hist-details" style="text-align:center; padding: 24px 14px;">
-              <div style="color:var(--muted); font-size:13px; margin-bottom:16px;">${msgText}</div>
-              ${btnHtml}
-            </div>
-          `;
-          return;
-       }
-
-       const isFemale = name => FEMALES.includes(name);
-       let html = "";
-       dayTrips.forEach((trip, index) => {
-          const allDriversFemale = trip.drivers.length > 0 && trip.drivers.every(isFemale);
-          const allPassFemale = trip.passengers.length > 0 && trip.passengers.every(isFemale);
-
-          let driverLabel = "Condutores";
-          if (trip.drivers.length === 1) {
-             driverLabel = isFemale(trip.drivers[0]) ? "Condutora" : "Condutor";
-          } else if (allDriversFemale) {
-             driverLabel = "Condutoras";
-          }
-
-          let passLabel = "Passageiros";
-          if (trip.passengers.length === 1) {
-             passLabel = isFemale(trip.passengers[0]) ? "Passageira" : "Passageiro";
-          } else if (allPassFemale) {
-             passLabel = "Passageiras";
-          }
-
-          const passAlfab = [...trip.passengers].sort((a,b) => a.localeCompare(b, 'pt')).join(", ");
-          const typeLabel = (trip.cars === 2 ? 'Viagem 2 Carros' : 'Viagem Normal') + (trip.splitCostMode ? ' (Separados)' : '');
-          
-          let costPassStr = "0 🪙";
-          if (trip.passengerCosts && trip.passengers.length > 0) {
-              let pCosts = trip.passengers.map(p => trip.passengerCosts[p]).filter(c => c !== undefined);
-              let uniqueCosts = [...new Set(pCosts)];
-              if (uniqueCosts.length > 0) {
-                  costPassStr = uniqueCosts.map(c => fmt(c) + " 🪙").join(" / ");
-              }
-          } else if (trip.costPerPassenger) {
-              costPassStr = fmt(trip.costPerPassenger) + " 🪙";
-          }
-            
-          html += `<div class="hist-details" style="margin-top: ${index > 0 ? '10px' : '0'};">
-             <div class="hist-info">
-               <span class="hist-type">
-                  ${typeLabel}
-               </span>
-               <span class="hist-driver-row"><strong style="color:var(--accent)">${driverLabel}:</strong> ${trip.drivers.join(" e ")}</span>
-               <span><strong style="color:var(--muted)">${passLabel}:</strong> ${passAlfab || "Nenhum"}</span>
-               <div style="margin-top:8px; display:flex; justify-content:space-between; font-size:12px; color:var(--text); margin-bottom: 2px;">
-                  <span>Custo Total: <strong>${fmt(trip.totalCost)} 🪙</strong></span>
-               </div>
-               <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted)">
-                  <span>Custo/passag.: <strong>${costPassStr}</strong></span>
-               </div>
-             </div>
-             <div class="hist-actions">
-                <button class="gh-btn outline" style="flex:1; padding: 6px;" onclick="editTrip('${trip.id}')">Editar</button>
-                <button class="gh-btn danger" style="flex:1; padding: 6px;" onclick="requestDelete('${trip.id}')">Apagar</button>
-             </div>
-          </div>`;
-       });
-       container.innerHTML = html;
     }
 
     window.requestDelete = function(id) {
@@ -2220,17 +2177,31 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
       window.currentTripFinalCalc = finalCalc;
     }
 
-    window.saveTrip = async function() {
+    window.saveTrip = async function(forceSave = false) {
       const calc = window.currentTripFinalCalc;
+      
+      if (!forceSave && !editingTripId) {
+          const sameDayTrips = trips.filter(t => t.date === formDate);
+          const isExactDuplicate = sameDayTrips.some(t => {
+             const existingDrivers = [...t.drivers].sort().join(',');
+             const existingPass = [...t.passengers].sort().join(',');
+             const newDrivers = [...calc.drivers].sort().join(',');
+             const newPass = [...calc.passengers].sort().join(',');
+             return existingDrivers === newDrivers && existingPass === newPass;
+          });
+
+          if (isExactDuplicate) {
+             showConfirm("Viagem Duplicada", "Já existe uma viagem com os mesmos condutores e passageiros registada neste dia. Queres mesmo adicionar outra?", () => {
+                saveTrip(true);
+             });
+             return;
+          }
+      }
+
       const newTrip = {
-         date: formDate,
-         cars: selectedCars,
-         splitCostMode: splitCostMode,
-         driverProfits: calc.driverProfits,
-         passengerCosts: calc.passengerCosts,
-         drivers: calc.drivers,
-         passengers: calc.passengers,
-         totalCost: calc.totalCost,
+         date: formDate, cars: selectedCars, splitCostMode: splitCostMode,
+         driverProfits: calc.driverProfits, passengerCosts: calc.passengerCosts,
+         drivers: calc.drivers, passengers: calc.passengers, totalCost: calc.totalCost,
          car1: { driver: carsData[0].driver, passengers: [...carsData[0].passengers], isOneWay: carsData[0].isOneWay },
          car2: selectedCars === 2 ? { driver: carsData[1].driver, passengers: [...carsData[1].passengers], isOneWay: carsData[1].isOneWay } : null
       };
@@ -2239,23 +2210,17 @@ select.input-text { appearance: none; -webkit-appearance: none; background-image
           if(editingTripId) await updateDoc(doc(db, "trips", editingTripId), newTrip);
           else await addDoc(collection(db, "trips"), newTrip);
       } else {
-          if(editingTripId) {
-             trips = trips.map(t => t.id === editingTripId ? { id: editingTripId, ...newTrip } : t);
-          } else {
-             newTrip.id = Date.now().toString(); 
-             trips.push(newTrip);
-          }
+          if(editingTripId) trips = trips.map(t => t.id === editingTripId ? { id: editingTripId, ...newTrip } : t);
+          else { newTrip.id = Date.now().toString(); trips.push(newTrip); }
           localStorage.setItem("pec_trips_v20", JSON.stringify(trips));
           recalculateAndRender();
       }
       
-      closeModal();
-      showToast("Viagem guardada com sucesso!");
-      historySelectedDate = formDate;
-      document.getElementById('history-filter').value = "ALL";
-      currentHistoryFilter = "ALL";
-      applyHistoryFilter();
+      closeModal(); showToast("Viagem guardada com sucesso!");
+      historySelectedDate = formDate; document.getElementById('history-filter').value = "ALL";
+      currentHistoryFilter = "ALL"; applyHistoryFilter();
     }
+
   </script>
 </body>
 </html>
